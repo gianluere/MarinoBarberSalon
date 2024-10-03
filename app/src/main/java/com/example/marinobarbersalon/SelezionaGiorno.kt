@@ -4,13 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -79,8 +84,9 @@ fun Data() {
         mutableIntStateOf(0)
     }
 
-    Column(modifier = Modifier.fillMaxSize()
-        .padding(top = 30.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(top = 30.dp, bottom = 30.dp)) {
         LazyRow(
             modifier = Modifier.background(color = Color(0xFFF5F5DC)),
             contentPadding = PaddingValues(25.dp),
@@ -97,6 +103,36 @@ fun Data() {
 
             }
         }
+
+        Spacer(Modifier.height(30.dp))
+
+        Box(modifier = Modifier
+            .padding(horizontal = 8.dp)){
+
+            Box(modifier = Modifier.fillMaxSize()
+                .border(2.dp, my_gold, RoundedCornerShape(17.dp))
+                .background(color = my_yellow, RoundedCornerShape(17.dp))){
+
+                LazyColumn(
+                    contentPadding = PaddingValues(25.dp),
+                    verticalArrangement = Arrangement.spacedBy(23.dp)
+                ) {
+                    items(listaDate.size) { index ->
+                        CardOrario(
+                            index = index,
+                            isSelected = index == indexSelezionato,
+                            onCardSelected = { selectedIndex ->
+                                indexSelezionato = selectedIndex
+                            }
+                        )
+
+                    }
+                }
+
+            }
+        }
+
+
     }
 
 
@@ -109,7 +145,7 @@ fun CardGiorno(index : Int, isSelected: Boolean, onCardSelected: (Int) -> Unit) 
     Card(
         modifier = Modifier
             .size(90.dp)
-            .border(if(isSelected) 4.dp else 2.dp, Color.Black, RoundedCornerShape(17.dp))
+            .border(if (isSelected) 4.dp else 2.dp, Color.Black, RoundedCornerShape(17.dp))
             .clickable {
                 onCardSelected(index)
             },
@@ -136,10 +172,45 @@ fun CardGiorno(index : Int, isSelected: Boolean, onCardSelected: (Int) -> Unit) 
                 color = Color.Black,
                 fontSize = 17.sp)
 
-            Text(text = giorno.format(DateTimeFormatter.ofPattern("EEE", Locale("it"))).replaceFirstChar { it.uppercase() },
+            Text(text = giorno.format(DateTimeFormatter.ofPattern("EEE", Locale("it"))).uppercase(),
                 fontFamily = myFont,
                 color = Color.Black,
                 fontSize = 17.sp)
         }
     }
+}
+
+
+@Composable
+fun CardOrario(index: Int, isSelected: Boolean, onCardSelected: (Int) -> Unit) {
+
+    val giorno = listaDate[index]
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .border(if (isSelected) 4.dp else 2.dp, Color.Black, RoundedCornerShape(17.dp))
+            .clickable {
+                onCardSelected(index)
+            },
+        shape = RoundedCornerShape(17.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if(isSelected) Color(0xFFB4915B) else my_gold
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        )
+    ){
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            Text(text = giorno.format(DateTimeFormatter.ofPattern("MMMM", Locale("it"))).replaceFirstChar { it.uppercase() },
+                fontFamily = myFont,
+                color = Color.Black,
+                fontSize = 17.sp)
+        }
+
+    }
+
 }
