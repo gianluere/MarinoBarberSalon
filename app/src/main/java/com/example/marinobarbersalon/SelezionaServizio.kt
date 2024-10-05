@@ -40,9 +40,9 @@ import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
 @Composable
-fun SelezioneServizioCapelli(onNavigateToSelezionaGiorno: () -> Unit, onBack: () -> Unit) {
+fun SelezioneServizioCapelli(viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer: String) -> Unit, onBack: () -> Unit) {
 
-    val serviziViewModel : ListaServiziViewModel = viewModel()
+    val serviziViewModel = viewModel
 
     val servizi by serviziViewModel.listaServizi.collectAsState()
 
@@ -51,6 +51,7 @@ fun SelezioneServizioCapelli(onNavigateToSelezionaGiorno: () -> Unit, onBack: ()
                  onBack()
         },
         content =  {
+
             Contenuto(servizi = servizi.filter{ it.tipo == "Capelli"}, titolo = "Capelli", onNavigateToSelezionaGiorno)
         }
     )
@@ -58,11 +59,12 @@ fun SelezioneServizioCapelli(onNavigateToSelezionaGiorno: () -> Unit, onBack: ()
 }
 
 @Composable
-fun SelezionaServiziobarba(onNavigateToSelezionaGiorno: () -> Unit, onBack: () -> Unit) {
+fun SelezionaServiziobarba(viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer : String) -> Unit, onBack: () -> Unit) {
 
-    val serviziViewModel : ListaServiziViewModel = viewModel()
+    val serviziViewModel = viewModel
 
     val servizi by serviziViewModel.listaServizi.collectAsState()
+    Log.d("PROVA", "DIM: ${servizi.size} : $servizi ")
 
     ScaffoldPersonalizzato(titolo = "Prenota un appuntamento",
         onBack = {
@@ -77,7 +79,7 @@ fun SelezionaServiziobarba(onNavigateToSelezionaGiorno: () -> Unit, onBack: () -
 
 
 @Composable
-private fun Contenuto(servizi: List<Servizio>, titolo : String, onNavigateToSelezionaGiorno: () -> Unit) {
+private fun Contenuto(servizi: List<Servizio>, titolo : String, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
     Column(Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -103,7 +105,7 @@ private fun Contenuto(servizi: List<Servizio>, titolo : String, onNavigateToSele
 
 
 @Composable
-fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: () -> Unit) {
+fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +119,7 @@ fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: () -> Uni
             defaultElevation = 6.dp
         ),
         onClick = {
-            onNavigateToSelezionaGiorno()
+            onNavigateToSelezionaGiorno(servizio.nome.toString())
         }
     ) {
         Column(
