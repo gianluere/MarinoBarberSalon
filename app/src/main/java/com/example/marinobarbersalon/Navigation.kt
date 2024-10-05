@@ -70,7 +70,10 @@ fun Navigation(userViewModel : UserViewModel) {
                 onBack = {
                     navController.popBackStack()
                 },
-                idSer = id.toString()
+                idSer = id.toString(),
+                onNavigateToRiepilogo = {idSer->
+                    navController.navigate(Screen.Riepilogo.route + "/$idSer")
+                }
             )
         }
         /*{
@@ -80,6 +83,24 @@ fun Navigation(userViewModel : UserViewModel) {
         }
 
          */
+
+        composable(Screen.Riepilogo.route + "/{idSer}",
+            arguments =  listOf(
+                navArgument(name = "idSer"){
+                    type = NavType.StringType
+                }
+            )){backStackEntry ->
+            val id = backStackEntry.arguments?.getString("idSer")
+            Riepilogo(
+                userViewModel = userViewModel,
+                listaServiziViewModel = listaServiziViewModel,
+                idSer = id.toString(),
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+
+        }
 
     }
 }
@@ -91,4 +112,5 @@ sealed class Screen(val route:String ){
     object SelezionaServizioCapelli : Screen("selezionaServizioCapelli")
     object SelezionaServizioBarba : Screen("selezionaServizioBarba")
     object SelezionaGiorno : Screen("selezionaGiorno")
+    object Riepilogo : Screen("riepilogo")
 }

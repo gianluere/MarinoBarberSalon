@@ -33,33 +33,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_yellow
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObjects
-import kotlinx.coroutines.flow.filter
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 
 @Composable
-fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel, onBack : () -> Unit, idSer : String) {
+fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel,
+                    onBack : () -> Unit,
+                    idSer : String,
+                    onNavigateToRiepilogo : (String) -> Unit) {
     
     ScaffoldPersonalizzato(
         titolo = "Scegli un giorno e un orario",
@@ -67,14 +59,14 @@ fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel, onBack : () ->
             onBack()
         },
         content = {
-            Data(idSer, listaServiziViewModel)
+            Data(idSer, listaServiziViewModel, onNavigateToRiepilogo)
         }
         )
 
 }
 
 @Composable
-fun Data(idSer : String, listaServViewModel: ListaServiziViewModel) {
+fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateToRiepilogo : (String) -> Unit) {
 
     Log.d("PROVA", idSer)
     val listaServiziViewModel = listaServViewModel
@@ -176,7 +168,9 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel) {
         }
         
         Spacer(modifier = Modifier.height(25.dp))
-        Button(onClick = { },
+        Button(onClick = {
+            onNavigateToRiepilogo(idSer)
+        },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),

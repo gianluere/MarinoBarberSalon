@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.lang.Thread.State
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -49,10 +50,8 @@ class ListaGiorniViewModelFactory(private val servizio: Servizio) : ViewModelPro
 class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
     private val _listaGiorni = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
-    val listaGiorni: StateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>> = _listaGiorni.asStateFlow()
 
     private val _listaGiorniOccupati = MutableStateFlow<List<Pair<LocalDate, List<LocalTime>>>>(emptyList())
-    val listaGiorniOccupati : StateFlow<List<Pair<LocalDate, List<LocalTime>>>> = _listaGiorniOccupati.asStateFlow()
 
     private val _listaGiorniAggiornata = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
     val listaGiorniAggiornata: StateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>> = _listaGiorniAggiornata.asStateFlow()
