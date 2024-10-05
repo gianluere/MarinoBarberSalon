@@ -1,7 +1,6 @@
 package com.example.marinobarbersalon
 
 import android.util.Log
-import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,9 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,9 +43,6 @@ import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_yellow
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObjects
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -203,6 +199,8 @@ fun Data() {
         mutableIntStateOf(0)
     }
 
+    val listState = rememberLazyListState()
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(top = 30.dp)) {
@@ -219,6 +217,7 @@ fun Data() {
                     onCardSelected = { selectedIndex ->
                         indexGiornoSelezionato = selectedIndex
                         indexOrarioSelezionato = 0
+
                     }
                 )
 
@@ -232,7 +231,7 @@ fun Data() {
             .weight(1f)){
 
             Box(modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(1f)
                 .border(2.dp, my_gold, RoundedCornerShape(17.dp))
                 .background(color = my_yellow, RoundedCornerShape(17.dp)),
                 contentAlignment = Alignment.Center){
@@ -251,13 +250,13 @@ fun Data() {
                 }else{
                     LazyColumn(
                         contentPadding = PaddingValues(25.dp),
-                        verticalArrangement = Arrangement.spacedBy(23.dp)
+                        verticalArrangement = Arrangement.spacedBy(23.dp),
+                        state = listState
                     ) {
                         items(orariDisponibili.size) { index ->
                             CardOrario(
                                 orario = orariDisponibili[index],
                                 index = index,
-                                indexGiornoSelezionato = indexGiornoSelezionato,
                                 isSelected = index == indexOrarioSelezionato,
                                 onCardSelected = { selectedIndex ->
                                     indexOrarioSelezionato = selectedIndex
@@ -275,7 +274,7 @@ fun Data() {
 
         }
         
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(30.dp))
         Button(onClick = {
             Log.d("Prova", listaGiorni[5].second.size.toString())
             Log.d("Prova", listaGiorni[5].first.toString())
@@ -284,7 +283,8 @@ fun Data() {
         },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
+                .padding(bottom = 30.dp, start = 14.dp, end = 14.dp),
+            shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
             Text(text = "PROSEGUI", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
         }
@@ -339,7 +339,12 @@ fun CardGiorno(giorno : LocalDate, index : Int, isSelected: Boolean, onCardSelec
 
 
 @Composable
-fun CardOrario(orario : Pair<LocalTime, LocalTime>, index: Int, indexGiornoSelezionato : Int, isSelected: Boolean, onCardSelected: (Int) -> Unit) {
+fun CardOrario(
+    orario: Pair<LocalTime, LocalTime>,
+    index: Int,
+    isSelected: Boolean,
+    onCardSelected: (Int) -> Unit
+) {
 
 
     Card(

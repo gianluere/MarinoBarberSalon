@@ -169,23 +169,24 @@ class ListaGiorniViewModel : ViewModel() {
             // Se ci sono orari occupati per questa data, rimuovili da orariDisponibili
             val orariAggiornati = if (occupatiPerQuestaData != null) {
                 Log.d("ListaGiorniViewModel", "ciao")
-                /*orariDisponibili.filterNot {
-                    val isOcc = occupatiPerQuestaData.contains(it.first)
+                orariDisponibili.filterNot {
+                    val isOcc = occupatiPerQuestaData.contains(it.first) && occupatiPerQuestaData.contains(it.second)
                     Log.d("ListaGiorniViewModel", "Orario: ${it.first}, Occupato: $isOcc")
                     isOcc
                     //val isOccupato = occupatiPerQuestaData.contains(orarioInizio)
                     //Log.d("ListaGiorniViewModel", "Orario: $orarioInizio, Occupato: $isOccupato")
                     //isOccupato
                 }
-                 */
+
+                /*
+                //ANCHE QUESTO VA BENE
                 val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
                 var orarioCorrente = LocalTime.of(9,0)
                 while (orarioCorrente.isBefore(LocalTime.of(20,0))) {
                     val orarioSuccessivo = orarioCorrente.plusMinutes(30)
                     //Verifica se l'orario corrente è occupato confrontando solo ore e minuti
-                    val isOccupato = occupatiPerQuestaData.any { occupato ->
-                        occupato.hour == orarioCorrente.hour && occupato.minute == orarioCorrente.minute
-                    }
+                    val isOccupato = occupatiPerQuestaData.contains(orarioSuccessivo) &&
+                            occupatiPerQuestaData.contains(orarioCorrente)
 
                     if (!isOccupato) {
                         slotOrari.add(orarioCorrente to orarioSuccessivo)
@@ -194,6 +195,8 @@ class ListaGiorniViewModel : ViewModel() {
                 }
                 //Log.d("Stampa", slotOrari.toString())
                 slotOrari
+                //FINO A QUA
+                 */
             } else {
                 Log.d("ListaGiorniViewModel", "Diverso")
                 orariDisponibili
