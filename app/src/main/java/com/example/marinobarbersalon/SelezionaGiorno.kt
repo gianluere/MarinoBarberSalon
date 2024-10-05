@@ -38,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.ui.theme.myFont
@@ -47,6 +49,7 @@ import com.example.marinobarbersalon.ui.theme.my_yellow
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
+import kotlinx.coroutines.flow.filter
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -56,7 +59,7 @@ import java.util.Locale
 
 
 @Composable
-fun SelezionaGiorno(onBack : () -> Unit) {
+fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel, onBack : () -> Unit, idSer : String) {
     
     ScaffoldPersonalizzato(
         titolo = "Scegli un giorno e un orario",
@@ -64,134 +67,31 @@ fun SelezionaGiorno(onBack : () -> Unit) {
             onBack()
         },
         content = {
-            Data()
+            Data(idSer, listaServiziViewModel)
         }
         )
 
 }
 
-
-fun generaListaDate(dataInizio : LocalDate, dataFine : LocalDate): List<LocalDate> {
-    val listaDate = mutableListOf<LocalDate>()
-    var dataCorrente = dataInizio
-
-    while (dataCorrente.isBefore(dataFine) || dataCorrente.isEqual(dataFine)) {
-        listaDate.add(dataCorrente)
-        // Aggiungi 1 giorno
-        dataCorrente = dataCorrente.plus(1, ChronoUnit.DAYS)
-    }
-
-    return listaDate
-}
-
-val listaDate = generaListaDate(LocalDate.now(), LocalDate.now().plusMonths(2))
-
-
-
-fun generateListaDate(
-    oggi: LocalDate,
-    giorniTotali: Int,
-    giorniFestivi: List<LocalDate>
-): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {
-    val giorniDisponibili = mutableListOf<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>()
-
-    val orarioInizio = LocalTime.of(9, 0)
-    val orarioFine = LocalTime.of(20, 0)
-    val durataSlot = 30L
-
-    for (i in 0..giorniTotali) {
-        val giornoCorrente = oggi.plusDays(i.toLong())
-
-        // Escludi sabato, domenica e giorni festivi
-        if (giornoCorrente.dayOfWeek == DayOfWeek.SATURDAY ||
-            giornoCorrente.dayOfWeek == DayOfWeek.SUNDAY ||
-            giorniFestivi.contains(giornoCorrente)) {
-            // Aggiungi il giorno senza orari disponibili
-            giorniDisponibili.add(giornoCorrente to emptyList())
-        } else {
-            val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
-
-            var orarioCorrente = orarioInizio
-            while (orarioCorrente.isBefore(orarioFine)) {
-                val orarioSuccessivo = orarioCorrente.plusMinutes(durataSlot)
-                slotOrari.add(orarioCorrente to orarioSuccessivo)
-                orarioCorrente = orarioSuccessivo
-            }
-
-            giorniDisponibili.add(giornoCorrente to slotOrari)
-        }
-    }
-
-    return giorniDisponibili
-}
-
-
-val giorniFestivi = listOf(
-    LocalDate.of(2024, 1, 1),  // Capodanno
-    LocalDate.of(2024, 12, 25), // Natale
-    LocalDate.of(2024, 12, 26), // Santo Stefano
-    LocalDate.of(2024, 4, 25),  // Festa della Liberazione
-    LocalDate.of(2024, 8, 15)   // Ferragosto
-)
-
-val giorni = generateListaDate(
-    LocalDate.now(),
-    60, giorniFestivi
-)
-
-
-/*
-fun generaListaOccupati(oggi: LocalDate,
-                        giorniTotali: Int)
-: List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>{
-    val db = Firebase.firestore
-
-    val listaOccupati = mutableListOf<Pair<LocalDate, List<LocalTime>>>()
-    val ultimo = oggi.plusDays(giorniTotali.toLong())
-
-
-    db.collection("appuntamenti")
-        .get()
-        .addOnSuccessListener { giorni ->
-            for (giorno in giorni) {
-                val dati = giorno.data
-                val giornoCorrente =
-                    LocalDate.parse(giorno.id, DateTimeFormatter.ofPattern("dd-mm-yyyy"))
-
-                if (giornoCorrente.isEqual(oggi) ||
-                    (giornoCorrente.isAfter(oggi) && giornoCorrente.isEqual(ultimo)) ||
-                    giornoCorrente.isEqual(ultimo)
-                ) {
-                    val slotOrari = mutableListOf<LocalTime>()
-                    for (key in dati.keys) {
-                        slotOrari.add(
-                            LocalTime.parse(
-                                key.toString(),
-                                DateTimeFormatter.ofPattern("HH:mm")
-                            )
-                        )
-
-                    }
-                    listaOccupati.add(giornoCorrente to slotOrari)
-                }
-
-
-            }
-
-        }
-
-
-    return listaOccupati
-}
-
- */
-
-
-@Preview
 @Composable
-fun Data() {
+fun Data(idSer : String, listaServViewModel: ListaServiziViewModel) {
 
-    val listaGiorniViewModel : ListaGiorniViewModel = viewModel()
+    Log.d("PROVA", idSer)
+    val listaServiziViewModel = listaServViewModel
+    val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
+
+    Log.d("PROVA", "sono qui")
+    Log.d("PROVA", "Contenuto listaServizi: $listaServizi")
+    val servizio = listaServizi.find { serv->
+        serv.nome == idSer
+    }
+    Log.d("PROVA", "sono sotto")
+    if (servizio != null) {
+        Log.d("FINALE", servizio.nome.toString())
+    }
+    val listaGiorniViewModel : ListaGiorniViewModel = viewModel(
+        factory = servizio?.let { ListaGiorniViewModelFactory(it) }
+    )
 
     val listaGiorni by listaGiorniViewModel.listaGiorniAggiornata.collectAsState()
 
@@ -276,15 +176,11 @@ fun Data() {
         }
         
         Spacer(modifier = Modifier.height(25.dp))
-        Button(onClick = {
-            Log.d("Prova", listaGiorni[5].second.size.toString())
-            Log.d("Prova", listaGiorni[5].first.toString())
-            Log.d("Prova", listaGiorni[6].second.size.toString())
-            Log.d("Prova", listaGiorni[7].second.size.toString())
-        },
+        Button(onClick = { },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
+            shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
             Text(text = "PROSEGUI", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
         }

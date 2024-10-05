@@ -1,12 +1,20 @@
 package com.example.marinobarbersalon
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavArgument
+import androidx.navigation.NavType
+
+
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 @Composable
 fun Navigation(userViewModel : UserViewModel) {
+
+    val listaServiziViewModel: ListaServiziViewModel = viewModel()
     val navController = rememberNavController()
     NavHost(navController, startDestination = Screen.Login.route){
         composable(Screen.Login.route){
@@ -30,28 +38,48 @@ fun Navigation(userViewModel : UserViewModel) {
         }
         composable(Screen.SelezionaServizioCapelli.route) {
             SelezioneServizioCapelli(
+                viewModel = listaServiziViewModel,
                 onBack = {
                     navController.popBackStack()
                 },
-                onNavigateToSelezionaGiorno = {
-                    navController.navigate(Screen.SelezionaGiorno.route)
+                onNavigateToSelezionaGiorno = {idSer ->
+                    navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
                 })
         }
         composable(Screen.SelezionaServizioBarba.route) {
             SelezionaServiziobarba(
+                viewModel = listaServiziViewModel,
                 onBack = {
                     navController.popBackStack()
                 },
-                onNavigateToSelezionaGiorno = {
-                    navController.navigate(Screen.SelezionaGiorno.route)
+                onNavigateToSelezionaGiorno = {idSer ->
+                    navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
                 }
             )
         }
-        composable(Screen.SelezionaGiorno.route) {
+        composable(Screen.SelezionaGiorno.route + "/{idSer}",
+            arguments =  listOf(
+                navArgument(name = "idSer"){
+                    type = NavType.StringType
+                }
+            )
+        ){ backStackEntry ->
+            val id = backStackEntry.arguments?.getString("idSer")
+            SelezionaGiorno(
+                listaServiziViewModel = listaServiziViewModel,
+                onBack = {
+                    navController.popBackStack()
+                },
+                idSer = id.toString()
+            )
+        }
+        /*{
             SelezionaGiorno(onBack = {
                 navController.popBackStack()
             })
         }
+
+         */
 
     }
 }

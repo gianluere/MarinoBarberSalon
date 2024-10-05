@@ -1,7 +1,9 @@
 package com.example.marinobarbersalon
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.async
@@ -15,7 +17,36 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-class ListaGiorniViewModel : ViewModel() {
+/*
+class ListaGiorniViewModelFactory(application: Application, servizio : Servizio) :
+    ViewModelProvider.Factory {
+    private val mApplication: Application
+    private val mservizio: Servizio
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return ListaGiorniViewModel(mApplication, mservizio) as T
+    }
+    init {
+        mApplication = application
+        mservizio = servizio
+    }
+}
+
+ */
+
+
+class ListaGiorniViewModelFactory(private val servizio: Servizio) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ListaGiorniViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ListaGiorniViewModel(servizio) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+
+
+class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
     private val _listaGiorni = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
     val listaGiorni: StateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>> = _listaGiorni.asStateFlow()
@@ -185,6 +216,7 @@ class ListaGiorniViewModel : ViewModel() {
                     //Verifica se l'orario corrente è occupato confrontando solo ore e minuti
                     val isOccupato = occupatiPerQuestaData.any { occupato ->
                         occupato.hour == orarioCorrente.hour && occupato.minute == orarioCorrente.minute
+                                && occupatiPerQuestaData.contains(orarioSuccessivo)
                     }
 
                     if (!isOccupato) {
