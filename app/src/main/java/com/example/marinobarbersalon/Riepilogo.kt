@@ -40,13 +40,13 @@ fun Riepilogo(userViewModel: UserViewModel,
     ScaffoldPersonalizzato(titolo = "Riepilogo appuntamento",
         onBack = onBack,
         content = {
-            Contenuto(listaServiziViewModel, idSer)
+            Contenuto(userViewModel, listaServiziViewModel, idSer)
         })
 }
 
 
 @Composable
-fun Contenuto(listaServViewModel: ListaServiziViewModel, idSer: String) {
+fun Contenuto(userViewModel: UserViewModel, listaServViewModel: ListaServiziViewModel, idSer: String) {
 
     val listaServiziViewModel = listaServViewModel
     val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
@@ -54,6 +54,7 @@ fun Contenuto(listaServViewModel: ListaServiziViewModel, idSer: String) {
         serv.nome == idSer
     }
 
+    val user = userViewModel.userState.collectAsState()
 
 
     Column(modifier = Modifier
