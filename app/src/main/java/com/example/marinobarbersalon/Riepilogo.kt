@@ -29,24 +29,35 @@ import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun Riepilogo(userViewModel: UserViewModel,
               listaServiziViewModel: ListaServiziViewModel,
               idSer : String,
+              orarioInizio : String,
+              orarioFine : String,
+              dataSelezionata : String,
               onBack : () -> Unit
 ) {
     Log.d("Input", idSer)
     ScaffoldPersonalizzato(titolo = "Riepilogo appuntamento",
         onBack = onBack,
         content = {
-            Contenuto(userViewModel, listaServiziViewModel, idSer)
+            Contenuto(userViewModel, listaServiziViewModel, idSer, orarioInizio, orarioFine, dataSelezionata)
         })
 }
 
 
 @Composable
-fun Contenuto(userViewModel: UserViewModel, listaServViewModel: ListaServiziViewModel, idSer: String) {
+fun Contenuto(
+    userViewModel: UserViewModel,
+    listaServViewModel: ListaServiziViewModel,
+    idSer: String,
+    orarioInizio : String,
+    orarioFine : String,
+    dataSelezionata: String
+) {
 
     val listaServiziViewModel = listaServViewModel
     val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
@@ -55,6 +66,7 @@ fun Contenuto(userViewModel: UserViewModel, listaServViewModel: ListaServiziView
     }
 
     val user = userViewModel.userState.collectAsState()
+    val dataSelezionata = LocalDate.parse(dataSelezionata).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 
     Column(modifier = Modifier
@@ -83,7 +95,7 @@ fun Contenuto(userViewModel: UserViewModel, listaServViewModel: ListaServiziView
                 .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
 
         Text(modifier = Modifier.fillMaxWidth(),
-            text = "Data:",
+            text = "Data: $dataSelezionata",
             color = my_gold,
             fontFamily = myFont,
             fontSize = 25.sp
@@ -94,7 +106,7 @@ fun Contenuto(userViewModel: UserViewModel, listaServViewModel: ListaServiziView
                 .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
 
         Text(modifier = Modifier.fillMaxWidth(),
-            text = "Ora:",
+            text = "Ora: $orarioInizio - $orarioFine",
             color = my_gold,
             fontFamily = myFont,
             fontSize = 25.sp

@@ -71,8 +71,8 @@ fun Navigation(userViewModel : UserViewModel) {
                     navController.popBackStack()
                 },
                 idSer = id.toString(),
-                onNavigateToRiepilogo = {idSer->
-                    navController.navigate(Screen.Riepilogo.route + "/$idSer")
+                onNavigateToRiepilogo = {idSer, orarioInizio, orarioFine, dataSelezionata->
+                    navController.navigate(Screen.Riepilogo.route + "/$idSer" + "/$orarioInizio" +"/$orarioFine" + "/$dataSelezionata")
                 }
             )
         }
@@ -84,17 +84,32 @@ fun Navigation(userViewModel : UserViewModel) {
 
          */
 
-        composable(Screen.Riepilogo.route + "/{idSer}",
+        composable(Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
             arguments =  listOf(
                 navArgument(name = "idSer"){
+                    type = NavType.StringType
+                },
+                navArgument(name = "orarioInizio"){
+                    type = NavType.StringType
+                },
+                navArgument(name = "orarioFine"){
+                    type = NavType.StringType
+                },
+                navArgument(name = "dataSelezionata"){
                     type = NavType.StringType
                 }
             )){backStackEntry ->
             val id = backStackEntry.arguments?.getString("idSer")
+            val orarioInizio = backStackEntry.arguments?.getString("orarioInizio")
+            val orarioFine = backStackEntry.arguments?.getString("orarioFine")
+            val dataSelezionata = backStackEntry.arguments?.getString("dataSelezionata")
             Riepilogo(
                 userViewModel = userViewModel,
                 listaServiziViewModel = listaServiziViewModel,
                 idSer = id.toString(),
+                orarioInizio = orarioInizio.toString(),
+                orarioFine = orarioFine.toString(),
+                dataSelezionata = dataSelezionata.toString(),
                 onBack = {
                     navController.popBackStack()
                 }

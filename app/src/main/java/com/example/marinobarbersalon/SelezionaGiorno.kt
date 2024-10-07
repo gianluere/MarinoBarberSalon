@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,7 +52,7 @@ import java.util.Locale
 fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel,
                     onBack : () -> Unit,
                     idSer : String,
-                    onNavigateToRiepilogo : (String) -> Unit) {
+                    onNavigateToRiepilogo : (String, String, String, String) -> Unit) {
     
     ScaffoldPersonalizzato(
         titolo = "Scegli un giorno e un orario",
@@ -66,7 +67,7 @@ fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel,
 }
 
 @Composable
-fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateToRiepilogo : (String) -> Unit) {
+fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateToRiepilogo : (String, String, String, String) -> Unit) {
 
     Log.d("PROVA", idSer)
     val listaServiziViewModel = listaServViewModel
@@ -95,6 +96,14 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
         mutableIntStateOf(0)
     }
 
+    var bottone by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    var dataSelezionata : LocalDate = LocalDate.now()
+    var orarioInizio : LocalTime = LocalTime.now()
+    var orarioFine : LocalTime = LocalTime.now()
+
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(top = 30.dp)) {
@@ -111,6 +120,7 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
                     onCardSelected = { selectedIndex ->
                         indexGiornoSelezionato = selectedIndex
                         indexOrarioSelezionato = 0
+                        dataSelezionata = listaGiorni[indexGiornoSelezionato].first
                     }
                 )
 
@@ -140,12 +150,17 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
                         color = Color.Black,
                         lineHeight = 14.sp
                         )
+                    bottone = false
                 }else{
                     LazyColumn(
                         contentPadding = PaddingValues(25.dp),
                         verticalArrangement = Arrangement.spacedBy(23.dp)
                     ) {
                         items(orariDisponibili.size) { index ->
+                            if (index == 0){
+                                orarioInizio = orariDisponibili[indexOrarioSelezionato].first
+                                orarioFine = orariDisponibili[indexOrarioSelezionato].second
+                            }
                             CardOrario(
                                 orario = orariDisponibili[index],
                                 index = index,
@@ -153,11 +168,14 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
                                 isSelected = index == indexOrarioSelezionato,
                                 onCardSelected = { selectedIndex ->
                                     indexOrarioSelezionato = selectedIndex
+                                    orarioInizio = orariDisponibili[indexOrarioSelezionato].first
+                                    orarioFine = orariDisponibili[indexOrarioSelezionato].second
                                 }
                             )
 
                         }
                     }
+                    bottone = true
                 }
 
 
@@ -169,11 +187,12 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
         
         Spacer(modifier = Modifier.height(25.dp))
         Button(onClick = {
-            onNavigateToRiepilogo(idSer)
+            onNavigateToRiepilogo(idSer, orarioInizio.toString(), orarioFine.toString(), dataSelezionata.toString())
         },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
+            enabled = bottone,
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
             Text(text = "PROSEGUI", color = my_gold, fontFamily = myFont, fontSize = 25.sp)

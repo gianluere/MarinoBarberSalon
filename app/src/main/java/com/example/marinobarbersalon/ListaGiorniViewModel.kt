@@ -83,6 +83,10 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
                     Log.d("ViewModelInit", "Lista aggiornata: ${_listaGiorniAggiornata.value}")
 
+                    if (servizio.durata!! > 30){
+                        _listaGiorniAggiornata.value = aggiornaSlotdaSessanta(_listaGiorniAggiornata.value)
+                    }
+
 
                     //_listaGiorniAggiornata.value =_listaGiorni.value
                 }catch (e: Exception){
@@ -236,6 +240,32 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
             // Restituisci la data con la nuova lista di orari aggiornati
             data to orariAggiornati
+        }
+    }
+
+
+    fun aggiornaSlotdaSessanta(
+        lista: List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>
+    ): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {
+
+        return lista.map { (data, orari) ->
+            val nuoviOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
+
+            for (i in 0 until orari.size - 1) {
+                // Ogni intervallo di 1 ora è formato dal primo elemento dell'elemento corrente e il secondo del successivo
+                val orarioCorrente = orari[i]
+                val orarioSuccessivo = orari[i+1]
+
+                if(orarioCorrente.second == orarioSuccessivo.first){
+                    val start = orari[i].first
+                    val end = orari[i + 1].second
+                    nuoviOrari.add(Pair(start, end))
+                }
+
+
+            }
+
+            Pair(data, nuoviOrari)
         }
     }
 
