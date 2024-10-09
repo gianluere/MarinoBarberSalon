@@ -49,6 +49,8 @@ class ListaGiorniViewModelFactory(private val servizio: Servizio) : ViewModelPro
 
 class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
+
+    private val db = FirebaseFirestore.getInstance()
     private val _listaGiorni = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
 
     private val _listaGiorniOccupati = MutableStateFlow<List<Pair<LocalDate, List<LocalTime>>>>(emptyList())
@@ -67,34 +69,29 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
 
     init {
-            viewModelScope.launch {
-                try{
-                    // Genera la lista dei giorni
-                    _listaGiorni.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
-                    _listaGiorniAggiornata.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
+        viewModelScope.launch {
+            try {
+                // Genera la lista dei giorni
+                _listaGiorni.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
+                _listaGiorniAggiornata.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
 
-                    val prova = async{ generaListaOccupatiSospend(LocalDate.now(), 60)}
-                    _listaGiorniOccupati.value = prova.await()
-                    // Genera la lista occupati
-                    //_listaGiorniOccupati.value = generaListaOccupatiSospend(LocalDate.now(), 60)
-                    // Aggiorna la lista dei giorni con quelli occupati
-                    val lista = aggiornaListaOccupati(_listaGiorni.value, _listaGiorniOccupati.value)
-                    _listaGiorniAggiornata.value = lista
+                val prova = async{ generaListaOccupatiSospend(LocalDate.now(), 60)}
+                _listaGiorniOccupati.value = prova.await()
 
-                    Log.d("ViewModelInit", "Lista aggiornata: ${_listaGiorniAggiornata.value}")
+                // Aggiorna la lista dei giorni con quelli occupati
+                val lista = aggiornaListaOccupati(_listaGiorni.value, _listaGiorniOccupati.value)
+                _listaGiorniAggiornata.value = lista
 
-                    if (servizio.durata!! > 30){
-                        _listaGiorniAggiornata.value = aggiornaSlotdaSessanta(_listaGiorniAggiornata.value)
-                    }
-
-
-                    //_listaGiorniAggiornata.value =_listaGiorni.value
-                }catch (e: Exception){
-                    Log.e("ViewModelInit", "Errore durante l'inizializzazione: ${e.message}", e)
+                // Se il servizio dura più di 30 minuti, aggiorna gli slot
+                if (servizio.durata!! > 30) {
+                    _listaGiorniAggiornata.value = aggiornaSlotdaSessanta(_listaGiorniAggiornata.value)
                 }
+
+                Log.d("ViewModelInit", "Lista aggiornata: ${_listaGiorniAggiornata.value}")
+            } catch (e: Exception) {
+                Log.e("ViewModelInit", "Errore durante l'inizializzazione: ${e.message}", e)
             }
-
-
+        }
 
     }
 

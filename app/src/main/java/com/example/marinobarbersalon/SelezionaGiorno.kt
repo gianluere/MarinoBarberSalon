@@ -100,7 +100,9 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
         mutableStateOf(false)
     }
 
-    var dataSelezionata : LocalDate = LocalDate.now()
+    var dataSelezionata by rememberSaveable {
+        mutableStateOf(LocalDate.now())
+    }
     var orarioInizio : LocalTime = LocalTime.now()
     var orarioFine : LocalTime = LocalTime.now()
 
@@ -121,6 +123,7 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
                         indexGiornoSelezionato = selectedIndex
                         indexOrarioSelezionato = 0
                         dataSelezionata = listaGiorni[indexGiornoSelezionato].first
+                        Log.d("Servizio", dataSelezionata.toString())
                     }
                 )
 
@@ -187,6 +190,7 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
         
         Spacer(modifier = Modifier.height(25.dp))
         Button(onClick = {
+            Log.d("Servizio", "data scritta $dataSelezionata")
             onNavigateToRiepilogo(idSer, orarioInizio.toString(), orarioFine.toString(), dataSelezionata.toString())
         },
             modifier = Modifier

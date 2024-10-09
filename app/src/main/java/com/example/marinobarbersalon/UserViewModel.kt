@@ -2,8 +2,10 @@ package com.example.marinobarbersalon
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
@@ -11,6 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class UserViewModel : ViewModel() {
 
@@ -98,6 +104,100 @@ class UserViewModel : ViewModel() {
 
                 }
         }
+    }
+
+    fun aggiungiApp(
+        servizio : String,
+        orarioInizio : String,
+        orarioFine : String,
+        dataSel : String
+    ){
+        viewModelScope.launch {
+            aggiungiAppuntamento(servizio,
+                orarioInizio,
+                orarioFine,
+                dataSel)
+        }
+    }
+
+    suspend fun aggiungiAppuntamento(
+        servizio : String,
+        orarioInizio : String,
+        orarioFine : String,
+        dataSel : String
+    ){
+        val data = dataSel.replace("/", "-")
+        Log.d("Appuntamento", servizio)
+        var idServizio : String = ""
+        val results = db.collection("servizi").whereEqualTo("nome", servizio).limit(1)
+            .get().await()
+
+        idServizio = results.documents[0].id
+
+
+        Log.d("Appuntamento", idServizio)
+        val servizioRiferimento : DocumentReference = db.collection("servizi").document(idServizio)
+        val utenteRiferimento : DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
+
+        val appuntamento = hashMapOf(
+            "cliente" to utenteRiferimento,
+            "orarioInizio" to orarioInizio,
+            "orarioFine" to orarioFine,
+            "data" to data,
+            "servizio" to servizioRiferimento
+        )
+
+        val appuntamentoPath = db.collection("appuntamenti").document(data)
+
+        appuntamentoPath.get()
+            .addOnSuccessListener{ documento ->
+                if (documento.exists()){
+                    Log.d("Appuntamento", "primo esiste")
+                    appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine")
+                        .set(appuntamento)
+                        .addOnSuccessListener {
+                            Log.d("Appuntamento", "Secondo esiste")
+                            db.collection("occupati").document(data).get()
+                                .addOnSuccessListener {
+                                    if (it.exists()){
+                                        db.collection("occupati").document(data).update(
+                                            hashMapOf(
+                                                orarioInizio to "occupato",
+                                                orarioFine to "occupato"
+                                            ) as Map<String, Any>
+                                        )
+                                    }
+                                }
+                        }
+                }else{
+                    appuntamentoPath.set(emptyMap<String, Any>()).addOnSuccessListener {
+                        appuntamentoPath.collection("app")
+                            .document("$orarioInizio-$orarioFine").set(appuntamento)
+                            .addOnSuccessListener {
+                                db.collection("occupati").document(data)
+                                    .get()
+                                    .addOnSuccessListener{
+                                        if (it.exists()){
+                                            db.collection("occupati").document(data).update(
+                                                hashMapOf(
+                                                    orarioInizio to "occupato",
+                                                    orarioFine to "occupato"
+                                                ) as Map<String, Any>
+                                            )
+                                        }else{
+                                            db.collection("occupati").document(data).set(hashMapOf(
+                                                orarioInizio to "occupato",
+                                                orarioFine to "occupato"
+                                            ))
+                                        }
+                                    }
+
+
+                            }
+
+                    }
+                }
+            }
     }
 
 

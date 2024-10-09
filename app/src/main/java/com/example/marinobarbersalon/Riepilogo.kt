@@ -30,6 +30,7 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun Riepilogo(userViewModel: UserViewModel,
@@ -64,6 +65,8 @@ fun Contenuto(
     val servizio = listaServizi.find { serv->
         serv.nome == idSer
     }
+
+    Log.d("Servizio", dataSelezionata)
 
     val user = userViewModel.userState.collectAsState()
     val dataSelezionata = LocalDate.parse(dataSelezionata).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -126,7 +129,14 @@ fun Contenuto(
                 fontFamily = myFont,
                 textDecoration = TextDecoration.Underline
             )
-            Button(onClick = { },
+            Button(onClick = {
+                             userViewModel.aggiungiApp(
+                                 servizio = idSer,
+                                 orarioFine = orarioFine,
+                                 orarioInizio = orarioInizio,
+                                 dataSel = dataSelezionata.toString()
+                             )
+            },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 9.dp),
