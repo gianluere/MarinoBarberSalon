@@ -167,7 +167,7 @@ fun Contenuto(
                             showDialogSuccess = true
                         },
                         onFailed = {
-                            showDialogError = false
+                            showDialogError = true
                         }
                     )
 
@@ -188,8 +188,10 @@ fun Contenuto(
 
 
         }
-    }else{
+    }else if (showDialogSuccess){
         DialogSuccesso(onDismiss = onSuccess)
+    }else{
+        DialogErrore(onDismiss = onSuccess )
     }
 
 
@@ -261,7 +263,7 @@ fun DialogErrore(onDismiss : () -> Unit ){
                 modifier = Modifier.size(80.dp),
                 tint = Color.Black)
 
-            Text(text = "Prenotazione effettuata \ncon successo",
+            Text(text = "Errore, lo slot è già\nstato occupato",
                 fontFamily = myFont,
                 fontSize = 20.sp,
                 color = Color.Black,
