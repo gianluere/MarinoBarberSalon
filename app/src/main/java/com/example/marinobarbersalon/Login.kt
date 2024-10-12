@@ -60,7 +60,7 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun LoginScreen(navController : NavController,adminNavController : NavController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
+fun LoginScreen(navController : NavController, adminNavController : NavController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
     val context = LocalContext.current
     BackHandler {
         val activity = context as? ComponentActivity
@@ -103,9 +103,8 @@ fun LoginScreen(navController : NavController,adminNavController : NavController
         }
         when(adminState.state){
             is AuthState.Authenticated -> {
-                navController.navigate("home"){
+                adminNavController.navigate("prova"){
                     launchSingleTop = true
-                    popUpTo("login") { inclusive = true }
                 }
             }
             is AuthState.Error -> Toast.makeText(context,

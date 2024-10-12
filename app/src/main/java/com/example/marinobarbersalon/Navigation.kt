@@ -8,9 +8,11 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
     val navController = rememberNavController()
+    val adminNavController = rememberNavController()
+    NavigationAdmin(adminNavController, userViewModel, adminViewModel)
     NavHost(navController, startDestination = Screen.Login.route){
         composable(Screen.Login.route){
-            LoginScreen(navController, userViewModel, adminViewModel)
+            LoginScreen(navController, adminNavController,userViewModel, adminViewModel)
         }
         composable(Screen.SignUp.route){
             SignUpScreen(navController, userViewModel)
@@ -54,6 +56,7 @@ fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
         }
 
     }
+
 }
 
 sealed class Screen(val route:String ){

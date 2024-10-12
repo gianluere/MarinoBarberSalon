@@ -1,24 +1,22 @@
 package com.example.marinobarbersalon
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun NavigationAdmin(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
-    val adminNavController = rememberNavController()
-    NavHost(adminNavController, startDestination = ScreenAdmin.Prova.route){
-        composable(ScreenAdmin.Prova.route){
-            Prova()
-
+fun NavigationAdmin(adminNavController: NavHostController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
+    NavHost(navController = adminNavController, startDestination = ScreenAdmin.Prova.route) {
+        composable(ScreenAdmin.Prova.route) {
+            Prova() // La tua schermata Prova
         }
+
+        // Aggiungi qui altre schermate per l'amministratore
     }
-
 }
-sealed class ScreenAdmin(val route:String ){
+
+sealed class ScreenAdmin(val route: String) {
     object Prova : ScreenAdmin("prova")
-
-
 }
