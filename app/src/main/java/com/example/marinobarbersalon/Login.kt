@@ -52,13 +52,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+
+
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun LoginScreen(navController : NavController, userViewModel: UserViewModel) {
+fun LoginScreen(navController : NavController,adminNavController : NavController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
     val context = LocalContext.current
     BackHandler {
         val activity = context as? ComponentActivity
@@ -83,10 +85,23 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel) {
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
     val userState by userViewModel.userState.collectAsState()
+    val adminState by adminViewModel.adminState.collectAsState()
 
 
-    LaunchedEffect(userState.state){
+
+    LaunchedEffect(userState.state, adminState.state){
         when(userState.state){
+            is AuthState.Authenticated -> {
+                navController.navigate("home"){
+                    launchSingleTop = true
+                    popUpTo("login") { inclusive = true }
+                }
+            }
+            is AuthState.Error -> Toast.makeText(context,
+                (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            else -> Unit
+        }
+        when(adminState.state){
             is AuthState.Authenticated -> {
                 navController.navigate("home"){
                     launchSingleTop = true
@@ -155,8 +170,12 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel) {
 
             Spacer(modifier = Modifier.height(80.dp))
 
-            Button(onClick = {
-                             userViewModel.login(email, password)
+            Button(onClick = { if(adminViewModel.isAdmin(email)){
+                adminViewModel.login(email, password)
+            }
+                else {
+                userViewModel.login(email, password)
+            }
             }, enabled = userState.state != AuthState.Loading,
                 modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
                 Text(text = "ACCEDI", color = my_gold, fontFamily = myFont, fontSize = 20.sp)

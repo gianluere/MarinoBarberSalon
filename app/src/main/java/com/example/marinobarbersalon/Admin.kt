@@ -1,4 +1,4 @@
-package com.example.marinobarbersalon.Admin
+package com.example.marinobarbersalon
 
 data class Admin(
     var state : AuthState? = null,
@@ -10,11 +10,5 @@ data class Admin(
     val telefono : String? = null
 )
 
-sealed class AuthState(){
-    object Authenticated : AuthState()
-    object Unauthenticated : AuthState()
-    object Loading : AuthState()
-    data class Error(val message : String) : AuthState()
-}
 
 
