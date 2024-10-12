@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 
 
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.sharp.AccountCircle
 import androidx.compose.material.icons.sharp.ShoppingCart
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
@@ -178,6 +180,15 @@ fun HomeScreen(
                 onNavigateToSelezionaServizioBarba,
                 onNavigateToSelezionaServizioCapelli
             )
+            
+            
+            Spacer(Modifier.height(10.dp))
+            
+            Button(onClick = {
+                userViewModel.logout()
+            }) {
+                Text(text = "LOGOUT")
+            }
         }
 
     }

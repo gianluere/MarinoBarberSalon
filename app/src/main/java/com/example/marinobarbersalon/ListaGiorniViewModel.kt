@@ -53,7 +53,7 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val _listaGiorni = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
 
-    private val _listaGiorniOccupati = MutableStateFlow<List<Pair<LocalDate, List<LocalTime>>>>(emptyList())
+    private val _listaGiorniOccupati = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
 
     private val _listaGiorniAggiornata = MutableStateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>>(emptyList())
     val listaGiorniAggiornata: StateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>> = _listaGiorniAggiornata.asStateFlow()
@@ -138,9 +138,9 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
     private suspend fun generaListaOccupatiSospend(
         oggi: LocalDate,
         giorniTotali: Int
-    ): List<Pair<LocalDate, List<LocalTime>>> {
+    ): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {
         val db = FirebaseFirestore.getInstance()
-        val listaOccupati = mutableListOf<Pair<LocalDate, List<LocalTime>>>()
+        val listaOccupati = mutableListOf<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>()
         val ultimo = oggi.plusDays(giorniTotali.toLong())
 
         try {
@@ -158,17 +158,23 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
                     (giornoCorrente.isAfter(oggi) && giornoCorrente.isBefore(ultimo)) ||
                     giornoCorrente.isEqual(ultimo)
                 ) {
-                    val slotOrari = mutableListOf<LocalTime>()
-                    for (key in dati.keys) {
-                        Log.d("ListaGiorniViewModel", key)
-                        slotOrari.add(
-                            LocalTime.parse(
-                                key.toString(),
-                                DateTimeFormatter.ofPattern("HH:mm")
-                            )
-                        )
+                    Log.d("Sorted", "Giorno $giornoCorrente")
+                    val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
+                    //dati.keys.sorted()
+                    val orariOrdinati = dati.keys.sortedBy { intervallo ->
+                        val orarioInizio = intervallo.split("-")[0].trim()
+                        LocalTime.parse(orarioInizio, DateTimeFormatter.ofPattern("HH:mm"))
                     }
-                    slotOrari.sort()
+                    Log.d("Sorted", orariOrdinati.toString())
+                    for (key in orariOrdinati) {
+                        Log.d("Sorted", key)
+                        val oraInizio =  LocalTime.parse(key.take(5), DateTimeFormatter.ofPattern("HH:mm"))
+                        Log.d("Sorted", "OrIn: $oraInizio")
+                        val oraFine = LocalTime.parse(key.substring(6, 11), DateTimeFormatter.ofPattern("HH:mm"))
+                        Log.d("Sorted", "OrIn: $oraFine")
+                        slotOrari.add(oraInizio to oraFine)
+                    }
+                    //slotOrari.sort()
                     listaOccupati.add(giornoCorrente to slotOrari)
                 }
             }
@@ -179,7 +185,8 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
             Log.e("ListaGiorniViewModel", "Errore durante l'accesso a Firestore: ${e.message}", e)
         }
 
-        Log.d("Stampa", listaOccupati.toString())
+        Log.d("Sorted", listaOccupati.toString())
+
 
         return listaOccupati
     }
@@ -187,7 +194,7 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
     private fun aggiornaListaOccupati(
         listaOrari: List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>,
-        listaOccupati: List<Pair<LocalDate, List<LocalTime>>>
+        listaOccupati: List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>
     ): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {
 
         // Crea una nuova lista modificata a partire dalla listaOrari
@@ -199,33 +206,11 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
             // Se ci sono orari occupati per questa data, rimuovili da orariDisponibili
             val orariAggiornati = if (occupatiPerQuestaData != null) {
-                Log.d("ListaGiorniViewModel", "ciao")
-                /*orariDisponibili.filterNot {
-                    val isOcc = occupatiPerQuestaData.contains(it.first)
-                    Log.d("ListaGiorniViewModel", "Orario: ${it.first}, Occupato: $isOcc")
-                    isOcc
-                    //val isOccupato = occupatiPerQuestaData.contains(orarioInizio)
-                    //Log.d("ListaGiorniViewModel", "Orario: $orarioInizio, Occupato: $isOccupato")
-                    //isOccupato
-                }
-                 */
-                val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
-                var orarioCorrente = LocalTime.of(9,0)
-                while (orarioCorrente.isBefore(LocalTime.of(20,0))) {
-                    val orarioSuccessivo = orarioCorrente.plusMinutes(30)
-                    //Verifica se l'orario corrente è occupato confrontando solo ore e minuti
-                    val isOccupato = occupatiPerQuestaData.any { occupato ->
-                        occupato.hour == orarioCorrente.hour && occupato.minute == orarioCorrente.minute
-                                && occupatiPerQuestaData.contains(orarioSuccessivo)
+                orariDisponibili.filterNot { orarioDisponibile ->
+                    occupatiPerQuestaData.any { orarioOccupato ->
+                        orarioDisponibile == orarioOccupato
                     }
-
-                    if (!isOccupato) {
-                        slotOrari.add(orarioCorrente to orarioSuccessivo)
-                    }
-                    orarioCorrente = orarioSuccessivo
                 }
-                //Log.d("Stampa", slotOrari.toString())
-                slotOrari
             } else {
                 Log.d("ListaGiorniViewModel", "Diverso")
                 orariDisponibili

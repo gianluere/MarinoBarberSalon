@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
@@ -110,34 +111,39 @@ class UserViewModel : ViewModel() {
         servizio : String,
         orarioInizio : String,
         orarioFine : String,
-        dataSel : String
+        dataSel : String,
+        onSuccess : () -> Unit,
+        onFailed : () -> Unit
     ){
         viewModelScope.launch {
             aggiungiAppuntamento(servizio,
                 orarioInizio,
                 orarioFine,
-                dataSel)
+                dataSel,
+                onSuccess,
+                onFailed)
         }
     }
 
     suspend fun aggiungiAppuntamento(
-        servizio : String,
-        orarioInizio : String,
-        orarioFine : String,
-        dataSel : String
-    ){
+        servizio: String,
+        orarioInizio: String,
+        orarioFine: String,
+        dataSel: String,
+        onSuccess : () -> Unit,
+        onFailed : () -> Unit
+    ) {
         val data = dataSel.replace("/", "-")
         Log.d("Appuntamento", servizio)
-        var idServizio : String = ""
+        var idServizio: String = ""
         val results = db.collection("servizi").whereEqualTo("nome", servizio).limit(1)
             .get().await()
 
         idServizio = results.documents[0].id
 
-
         Log.d("Appuntamento", idServizio)
-        val servizioRiferimento : DocumentReference = db.collection("servizi").document(idServizio)
-        val utenteRiferimento : DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
+        val servizioRiferimento: DocumentReference = db.collection("servizi").document(idServizio)
+        val utenteRiferimento: DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
 
         val appuntamento = hashMapOf(
             "cliente" to utenteRiferimento,
@@ -148,56 +154,62 @@ class UserViewModel : ViewModel() {
         )
 
         val appuntamentoPath = db.collection("appuntamenti").document(data)
+        val occupatiPath = db.collection("occupati").document(data)
 
-        appuntamentoPath.get()
-            .addOnSuccessListener{ documento ->
-                if (documento.exists()){
-                    Log.d("Appuntamento", "primo esiste")
-                    appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine")
-                        .set(appuntamento)
-                        .addOnSuccessListener {
-                            Log.d("Appuntamento", "Secondo esiste")
-                            db.collection("occupati").document(data).get()
-                                .addOnSuccessListener {
-                                    if (it.exists()){
-                                        db.collection("occupati").document(data).update(
-                                            hashMapOf(
-                                                orarioInizio to "occupato",
-                                                orarioFine to "occupato"
-                                            ) as Map<String, Any>
-                                        )
-                                    }
-                                }
-                        }
-                }else{
-                    appuntamentoPath.set(emptyMap<String, Any>()).addOnSuccessListener {
-                        appuntamentoPath.collection("app")
-                            .document("$orarioInizio-$orarioFine").set(appuntamento)
-                            .addOnSuccessListener {
-                                db.collection("occupati").document(data)
-                                    .get()
-                                    .addOnSuccessListener{
-                                        if (it.exists()){
-                                            db.collection("occupati").document(data).update(
-                                                hashMapOf(
-                                                    orarioInizio to "occupato",
-                                                    orarioFine to "occupato"
-                                                ) as Map<String, Any>
-                                            )
-                                        }else{
-                                            db.collection("occupati").document(data).set(hashMapOf(
-                                                orarioInizio to "occupato",
-                                                orarioFine to "occupato"
-                                            ))
-                                        }
-                                    }
+        try {
+            // Esegui una transazione per garantire che solo una scrittura avvenga alla volta
+            db.runTransaction { transaction ->
+                val appuntamentoSnapshot = transaction.get(appuntamentoPath)
+                val occupatiSnapshot = transaction.get(occupatiPath)
+                val chiave = "$orarioInizio-$orarioFine"
 
-
-                            }
-
-                    }
+                if (appuntamentoSnapshot.exists()) {
+                    Log.d("Appuntamento", "Documento appuntamento già esistente")
+                    // Aggiorna il documento esistente nell'app collection
+                    transaction.set(
+                        appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine"),
+                        appuntamento
+                    )
+                } else {
+                    // Crea il documento principale e aggiungi il sottodocumento
+                    transaction.set(appuntamentoPath, emptyMap<String, Any>())
+                    transaction.set(
+                        appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine"),
+                        appuntamento
+                    )
                 }
+
+                // Gestisci la collezione occupati
+                if (occupatiSnapshot.exists()) {
+                    // Verifica se lo slot è già occupato
+                    val occupatiMap = occupatiSnapshot.data
+                    if (occupatiMap?.containsKey(chiave) == true) {
+                        throw FirebaseFirestoreException(
+                            "Lo slot $orarioInizio-$orarioFine è già occupato",
+                            FirebaseFirestoreException.Code.ABORTED
+                        )
+                    } else {
+                        // Aggiorna lo slot come occupato
+                        transaction.update(occupatiPath, chiave, "occupato")
+                    }
+                } else {
+                    // Crea un nuovo documento per la data e segna lo slot come occupato
+                    transaction.set(occupatiPath, hashMapOf(chiave to "occupato"))
+                }
+                onSuccess()
+            }.await()
+
+            Log.d("Appuntamento", "Prenotazione aggiunta con successo")
+
+        } catch (e: FirebaseFirestoreException) {
+            onFailed()
+            Log.e("Appuntamento", "Errore durante l'aggiunta dell'appuntamento: ${e.message}", e)
+            // Gestisci il conflitto (es. mostra un messaggio all'utente)
+            if (e.code == FirebaseFirestoreException.Code.ABORTED) {
+                // Lo slot è già stato occupato
+                Log.e("Appuntamento", "Lo slot è già occupato!")
             }
+        }
     }
 
 

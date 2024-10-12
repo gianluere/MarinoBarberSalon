@@ -112,6 +112,9 @@ fun Navigation(userViewModel : UserViewModel) {
                 dataSelezionata = dataSelezionata.toString(),
                 onBack = {
                     navController.popBackStack()
+                },
+                onSuccess = {
+                    navController.popBackStack(route = Screen.Home.route, inclusive = false)
                 }
             )
 

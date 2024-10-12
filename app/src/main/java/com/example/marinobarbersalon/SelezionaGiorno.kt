@@ -198,7 +198,11 @@ fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateTo
                 .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
             enabled = bottone,
             shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
+            colors = ButtonDefaults.buttonColors(
+                containerColor = my_bordeaux,
+                disabledContainerColor = my_bordeaux
+            )
+        ) {
             Text(text = "PROSEGUI", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
         }
 
