@@ -165,9 +165,6 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel) {
             TextButton(onClick = { navController.navigate("signup") }) {
                 Text(text = "Non hai un account, registrati", fontFamily = myFont, color = my_gold, textDecoration = TextDecoration.Underline)
             }
-
-
-
         }
 
     }
