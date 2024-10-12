@@ -52,13 +52,14 @@ class UserViewModel : ViewModel() {
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful){
                     _userState.value = _userState.value.copy(state = AuthState.Authenticated)
+                    caricaDati()
                 }else{
                     _userState.value = _userState.value.copy(state = AuthState.Error(task.exception?.message?:"Errore"))
                 }
             }
     }
 
-    fun signup(email : String, password : String){
+    fun signup(email : String, password : String, nome: String, cognome : String, eta: Int, telefono : String){
 
         if (email.isEmpty() || password.isEmpty()){
             _userState.value = _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
@@ -68,7 +69,20 @@ class UserViewModel : ViewModel() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful){
-                    _userState.value = _userState.value.copy(state = AuthState.Authenticated)
+                    db.collection("utenti").document(auth.currentUser?.email.toString())
+                        .set(
+                            hashMapOf(
+                                "nome" to nome,
+                                "cognome" to cognome,
+                                "email" to email,
+                                "eta" to eta,
+                                "telefono" to telefono
+                            )
+                        ).addOnSuccessListener {
+                            caricaDati()
+                            _userState.value = _userState.value.copy(state = AuthState.Authenticated)
+                        }
+
                 }else{
                     _userState.value = _userState.value.copy(state = AuthState.Error(task.exception?.message?:"Errore"))
                 }

@@ -126,7 +126,7 @@ fun HomeScreen(
                      horizontalAlignment = Alignment.CenterHorizontally
                      ) {
                      Text(
-                         text = "BENVENUTO GIANLUCA",
+                         text = "BENVENUTO " + userState.nome.toString().uppercase(),
                          color = my_white,
                          fontSize = 25.sp,
                          fontWeight = FontWeight.Bold,
@@ -180,15 +180,7 @@ fun HomeScreen(
                 onNavigateToSelezionaServizioBarba,
                 onNavigateToSelezionaServizioCapelli
             )
-            
-            
-            Spacer(Modifier.height(10.dp))
-            
-            Button(onClick = {
-                userViewModel.logout()
-            }) {
-                Text(text = "LOGOUT")
-            }
+
         }
 
     }
@@ -273,6 +265,12 @@ fun SelezionaTipo(userViewModel : UserViewModel,
                     .padding(bottom = 60.dp)
             )
 
+        }
+
+        Button(onClick = {
+            userViewModel.logout()
+        }) {
+            Text(text = "LOGOUT")
         }
     }
     //}
