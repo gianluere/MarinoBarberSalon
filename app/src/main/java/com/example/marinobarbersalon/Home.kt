@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.sharp.AccountCircle
 import androidx.compose.material.icons.sharp.ShoppingCart
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
@@ -263,6 +264,14 @@ fun SelezionaTipo(userViewModel : UserViewModel,
             )
 
         }
+        Button(onClick = {
+            userViewModel.logout()
+        }) {
+            Text(text = "Logout")
+        }
+
+
+
     }
     //}
 

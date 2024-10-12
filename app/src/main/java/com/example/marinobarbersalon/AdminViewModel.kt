@@ -27,13 +27,18 @@ class AdminViewModel : ViewModel() {
         }
     }
 
-    fun isAdmin(email : String): Boolean {
-        var a = false
-        db.collection("utenti").whereEqualTo("email", email).get().addOnSuccessListener {
-           a = true
-        }
-        return a
+    fun isAdmin(email: String, callback: (Boolean) -> Unit) {
+        db.collection("admin").document(email).get()
+            .addOnSuccessListener { result ->
+                // Chiama il callback con il risultato
+                callback(result.exists())
+            }
+            .addOnFailureListener {
+                // In caso di errore, chiama il callback con false
+                callback(false)
+            }
     }
+
 
     fun login(email : String, password : String){
 

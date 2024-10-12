@@ -6,7 +6,6 @@ data class Admin(
     val cognome : String? = null,
     val email : String? = null,
     val eta : Int? = 0,
-    val password : String? = null,
     val telefono : String? = null
 )
 

@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -89,29 +90,38 @@ fun LoginScreen(navController : NavController, adminNavController : NavControlle
 
 
 
-    LaunchedEffect(userState.state, adminState.state){
-        when(userState.state){
+    LaunchedEffect(userState.state, adminState.state) {
+        // Controlla prima lo stato dell'amministratore
+        when (adminState.state) {
             is AuthState.Authenticated -> {
-                navController.navigate("home"){
+                Log.d("prova", "Admin authenticated with state: $userState.state")
+                // Naviga verso la schermata per gli amministratori
+                adminNavController.navigate("prova") {
                     launchSingleTop = true
-                    popUpTo("login") { inclusive = true }
+                    // Se desideri anche gestire il popUpTo qui, puoi farlo
                 }
             }
-            is AuthState.Error -> Toast.makeText(context,
-                (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-            else -> Unit
-        }
-        when(adminState.state){
-            is AuthState.Authenticated -> {
-                adminNavController.navigate("prova"){
-                    launchSingleTop = true
+            is AuthState.Error -> {
+                Toast.makeText(context, (adminState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                // Solo quando l'amministratore non è autenticato, controlla lo stato dell'utente
+                when (userState.state) {
+                    is AuthState.Authenticated -> {
+                        navController.navigate("home") {
+                            launchSingleTop = true
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                    is AuthState.Error -> {
+                        Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                    }
+                    else -> Unit
                 }
             }
-            is AuthState.Error -> Toast.makeText(context,
-                (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-            else -> Unit
         }
     }
+
 
     Box(
         modifier = Modifier
@@ -169,12 +179,17 @@ fun LoginScreen(navController : NavController, adminNavController : NavControlle
 
             Spacer(modifier = Modifier.height(80.dp))
 
-            Button(onClick = { if(adminViewModel.isAdmin(email)){
-                adminViewModel.login(email, password)
-            }
-                else {
-                userViewModel.login(email, password)
-            }
+            Button(onClick = {
+                adminViewModel.isAdmin(email) { isAdmin ->
+                    Log.d("prova", isAdmin.toString())
+                    if (isAdmin) {
+                        adminViewModel.login(email, password)
+                        Log.d("prova", adminViewModel.login(email, password).toString())
+                    } else {
+                        userViewModel.login(email, password)
+                        Log.d("prova", userViewModel.login(email, password).toString())
+                    }
+                }
             }, enabled = userState.state != AuthState.Loading,
                 modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
                 Text(text = "ACCEDI", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
