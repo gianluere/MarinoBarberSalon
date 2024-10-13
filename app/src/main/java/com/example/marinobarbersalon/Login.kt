@@ -61,7 +61,7 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun LoginScreen(navController : NavController, adminNavController : NavController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
+fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
     val context = LocalContext.current
     BackHandler {
         val activity = context as? ComponentActivity
@@ -96,7 +96,7 @@ fun LoginScreen(navController : NavController, adminNavController : NavControlle
             is AuthState.Authenticated -> {
                 Log.d("prova", "Admin authenticated with state: $userState.state")
                 // Naviga verso la schermata per gli amministratori
-                adminNavController.navigate("prova") {
+                navController.navigate("Prova") {
                     launchSingleTop = true
                     // Se desideri anche gestire il popUpTo qui, puoi farlo
                 }

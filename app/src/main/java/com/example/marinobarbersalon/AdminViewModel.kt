@@ -57,5 +57,10 @@ class AdminViewModel : ViewModel() {
             }
     }
 
+    fun logout(){
+        auth.signOut()
+        _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)
+    }
+
 
 }
