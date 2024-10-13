@@ -6,8 +6,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 
+
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavArgument
+import androidx.navigation.NavType
+
+
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
 @Composable
 fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
+
+    val listaServiziViewModel : ListaServiziViewModel = viewModel()
     val navController = rememberNavController()
     NavHost(navController, startDestination = Screen.Login.route){
         composable(Screen.Login.route){
@@ -17,7 +30,7 @@ fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
             route = "clientGraph",
             startDestination = Screen.Home.route
         ) {
-            composable(Screen.SignUp.route) {
+            composable(Screen.SignUp.route){
                 SignUpScreen(navController, userViewModel)
             }
             composable(Screen.Home.route) {
@@ -31,32 +44,90 @@ fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
                     onNavigateToSelezionaServizioCapelli = {
                         navController.navigate(Screen.SelezionaServizioCapelli.route)
                     },
-                    userViewModel
-                )
+                    userViewModel)
             }
             composable(Screen.SelezionaServizioCapelli.route) {
                 SelezioneServizioCapelli(
+                    viewModel = listaServiziViewModel,
                     onBack = {
                         navController.popBackStack()
                     },
-                    onNavigateToSelezionaGiorno = {
-                        navController.navigate(Screen.SelezionaGiorno.route)
+                    onNavigateToSelezionaGiorno = {idSer ->
+                        navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
                     })
             }
             composable(Screen.SelezionaServizioBarba.route) {
                 SelezionaServiziobarba(
+                    viewModel = listaServiziViewModel,
                     onBack = {
                         navController.popBackStack()
                     },
-                    onNavigateToSelezionaGiorno = {
-                        navController.navigate(Screen.SelezionaGiorno.route)
+                    onNavigateToSelezionaGiorno = {idSer ->
+                        navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
                     }
                 )
             }
-            composable(Screen.SelezionaGiorno.route) {
+            composable(Screen.SelezionaGiorno.route + "/{idSer}",
+                arguments =  listOf(
+                    navArgument(name = "idSer"){
+                        type = NavType.StringType
+                    }
+                )
+            ){ backStackEntry ->
+                val id = backStackEntry.arguments?.getString("idSer")
+                SelezionaGiorno(
+                    listaServiziViewModel = listaServiziViewModel,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    idSer = id.toString(),
+                    onNavigateToRiepilogo = {idSer, orarioInizio, orarioFine, dataSelezionata->
+                        navController.navigate(Screen.Riepilogo.route + "/$idSer" + "/$orarioInizio" +"/$orarioFine" + "/$dataSelezionata")
+                    }
+                )
+            }
+            /*{
                 SelezionaGiorno(onBack = {
                     navController.popBackStack()
                 })
+            }
+
+             */
+
+            composable(Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
+                arguments =  listOf(
+                    navArgument(name = "idSer"){
+                        type = NavType.StringType
+                    },
+                    navArgument(name = "orarioInizio"){
+                        type = NavType.StringType
+                    },
+                    navArgument(name = "orarioFine"){
+                        type = NavType.StringType
+                    },
+                    navArgument(name = "dataSelezionata"){
+                        type = NavType.StringType
+                    }
+                )){backStackEntry ->
+                val id = backStackEntry.arguments?.getString("idSer")
+                val orarioInizio = backStackEntry.arguments?.getString("orarioInizio")
+                val orarioFine = backStackEntry.arguments?.getString("orarioFine")
+                val dataSelezionata = backStackEntry.arguments?.getString("dataSelezionata")
+                Riepilogo(
+                    userViewModel = userViewModel,
+                    listaServiziViewModel = listaServiziViewModel,
+                    idSer = id.toString(),
+                    orarioInizio = orarioInizio.toString(),
+                    orarioFine = orarioFine.toString(),
+                    dataSelezionata = dataSelezionata.toString(),
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onSuccess = {
+                        navController.popBackStack(route = Screen.Home.route, inclusive = false)
+                    }
+                )
+
             }
         }
         adminNavGraph(navController, adminViewModel)
@@ -72,6 +143,7 @@ sealed class Screen(val route:String ){
     object SelezionaServizioCapelli : Screen("selezionaServizioCapelli")
     object SelezionaServizioBarba : Screen("selezionaServizioBarba")
     object SelezionaGiorno : Screen("selezionaGiorno")
+    object Riepilogo : Screen("riepilogo")
 
     ///////////////////////////////////////////////////////
     object HomeAdmin : Screen("homeAdmin")
