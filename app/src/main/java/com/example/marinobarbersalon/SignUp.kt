@@ -205,7 +205,7 @@ fun SignUpScreen(navController : NavController, userViewModel: UserViewModel) {
             )
             Spacer(Modifier.height(70.dp))
             Button(onClick = {
-                             userViewModel.signup(email, password)
+                             userViewModel.signup(email, password, nome, cognome, eta.toInt(), telefono)
 
             }, enabled = userState.state != AuthState.Loading, modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
                 Text(text = "CONFERMA", color = my_gold, fontFamily = myFont, fontSize = 20.sp)

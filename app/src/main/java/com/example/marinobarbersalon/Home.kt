@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 
 
 import androidx.compose.foundation.layout.fillMaxSize
@@ -125,7 +126,7 @@ fun HomeScreen(
                      horizontalAlignment = Alignment.CenterHorizontally
                      ) {
                      Text(
-                         text = "BENVENUTO GIANLUCA",
+                         text = "BENVENUTO " + userState.nome.toString().uppercase(),
                          color = my_white,
                          fontSize = 25.sp,
                          fontWeight = FontWeight.Bold,
@@ -179,6 +180,7 @@ fun HomeScreen(
                 onNavigateToSelezionaServizioBarba,
                 onNavigateToSelezionaServizioCapelli
             )
+
         }
 
     }
@@ -264,14 +266,12 @@ fun SelezionaTipo(userViewModel : UserViewModel,
             )
 
         }
+
         Button(onClick = {
             userViewModel.logout()
         }) {
-            Text(text = "Logout")
+            Text(text = "LOGOUT")
         }
-
-
-
     }
     //}
 
