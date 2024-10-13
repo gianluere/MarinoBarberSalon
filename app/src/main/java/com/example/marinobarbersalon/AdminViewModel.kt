@@ -23,7 +23,14 @@ class AdminViewModel : ViewModel() {
         if (auth.currentUser == null){
             _adminState.value.state = AuthState.Unauthenticated
         }else{
-            _adminState.value.state = AuthState.Authenticated
+            isAdmin(auth.currentUser?.email ?: "") { isAdmin ->
+                if (isAdmin) {
+                    _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
+                } else {
+                    // Se non è un admin, non lo autentichiamo
+                    _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)
+                }
+            }
         }
     }
 

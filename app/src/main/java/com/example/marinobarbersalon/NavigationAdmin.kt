@@ -11,10 +11,18 @@ import androidx.navigation.compose.navigation
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
     navigation(
         route = "adminGraph",
-        startDestination = "prova"
+        startDestination = Screen.HomeAdmin.route
     ) {
-        composable("prova"){
-            Prova(adminViewModel = adminViewModel)
+        composable(Screen.HomeAdmin.route){
+            HomeAdmin(
+                adminViewModel = adminViewModel,
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo("adminGraph") { inclusive = true }
+                        popUpTo("clientGraph") { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

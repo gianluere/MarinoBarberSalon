@@ -94,11 +94,13 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
         // Controlla prima lo stato dell'amministratore
         when (adminState.state) {
             is AuthState.Authenticated -> {
-                Log.d("prova", "Admin authenticated with state: $userState.state")
+                Log.d("prova", "Admin authenticated with state: $adminState.state")
+                Log.d("prova", "Stato utente: $userState.state")
                 // Naviga verso la schermata per gli amministratori
-                navController.navigate("Prova") {
+                navController.navigate("adminGraph") {
                     launchSingleTop = true
                     // Se desideri anche gestire il popUpTo qui, puoi farlo
+                    popUpTo("login"){inclusive = true}
                 }
             }
             is AuthState.Error -> {
@@ -108,7 +110,8 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
                 // Solo quando l'amministratore non è autenticato, controlla lo stato dell'utente
                 when (userState.state) {
                     is AuthState.Authenticated -> {
-                        navController.navigate("home") {
+                        Log.d("prova", "User authenticated with state: $userState.state")
+                        navController.navigate("clientGraph") {
                             launchSingleTop = true
                             popUpTo("login") { inclusive = true }
                         }
@@ -184,13 +187,13 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
                     Log.d("prova", isAdmin.toString())
                     if (isAdmin) {
                         adminViewModel.login(email, password)
-                        Log.d("prova", adminViewModel.login(email, password).toString())
+                        Log.d("prova", "Admin loggato")
                     } else {
                         userViewModel.login(email, password)
-                        Log.d("prova", userViewModel.login(email, password).toString())
+                        Log.d("prova","Utente loggato")
                     }
                 }
-            }, enabled = userState.state != AuthState.Loading,
+            }, enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
                 modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
                 Text(text = "ACCEDI", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
             }

@@ -72,4 +72,8 @@ sealed class Screen(val route:String ){
     object SelezionaServizioCapelli : Screen("selezionaServizioCapelli")
     object SelezionaServizioBarba : Screen("selezionaServizioBarba")
     object SelezionaGiorno : Screen("selezionaGiorno")
+
+    ///////////////////////////////////////////////////////
+    object HomeAdmin : Screen("homeAdmin")
+
 }
