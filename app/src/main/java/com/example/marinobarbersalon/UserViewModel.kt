@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -175,6 +177,7 @@ class UserViewModel : ViewModel() {
             db.runTransaction { transaction ->
                 val appuntamentoSnapshot = transaction.get(appuntamentoPath)
                 val occupatiSnapshot = transaction.get(occupatiPath)
+                val userSnapshot = transaction.get(utenteRiferimento)
                 val chiave = "$orarioInizio-$orarioFine"
 
                 if (appuntamentoSnapshot.exists()) {
@@ -210,6 +213,16 @@ class UserViewModel : ViewModel() {
                     // Crea un nuovo documento per la data e segna lo slot come occupato
                     transaction.set(occupatiPath, hashMapOf(chiave to "occupato"))
                 }
+
+                if (userSnapshot.exists()){
+                    transaction.update(
+                        utenteRiferimento,
+                        "appuntamenti",
+                        FieldValue.arrayUnion(appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine"))
+                    )
+                }
+
+
                 onSuccess()
             }.await()
 

@@ -1,6 +1,5 @@
 package com.example.marinobarbersalon
 
-import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.lang.Thread.State
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -96,6 +94,17 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
     }
 
 
+    private fun pimoOrarioDisponibile(currentTime: LocalTime): LocalTime {
+        val nextMinute = if (currentTime.minute % 30 == 0) {
+            currentTime.minute
+        } else {
+            (currentTime.minute / 30 + 1) * 30
+        }
+
+        return currentTime.withMinute(nextMinute % 60).withHour(currentTime.hour + nextMinute / 60)
+            .withSecond(0).withNano(0)
+    }
+
     fun generateListaDate(
         oggi: LocalDate,
         giorniTotali: Int,
@@ -119,7 +128,12 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
             } else {
                 val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
 
-                var orarioCorrente = orarioInizio
+                var orarioCorrente = if (i == 0 && LocalTime.now().isAfter(orarioInizio)) {
+                    pimoOrarioDisponibile(LocalTime.now())
+                } else {
+                    orarioInizio
+                }
+                Log.d("ORARIO", orarioCorrente.toString())
                 while (orarioCorrente.isBefore(orarioFine)) {
                     val orarioSuccessivo = orarioCorrente.plusMinutes(durataSlot)
                     slotOrari.add(orarioCorrente to orarioSuccessivo)
@@ -172,7 +186,19 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
                         Log.d("Sorted", "OrIn: $oraInizio")
                         val oraFine = LocalTime.parse(key.substring(6, 11), DateTimeFormatter.ofPattern("HH:mm"))
                         Log.d("Sorted", "OrIn: $oraFine")
-                        slotOrari.add(oraInizio to oraFine)
+
+                        val durataSlot = oraFine.toSecondOfDay() - oraInizio.toSecondOfDay()
+
+                        if (durataSlot >= 60 * 60) { // Se la durata è di almeno un'ora
+                            // Aggiungi due slot da 30 minuti
+                            val primoSlotFine = oraInizio.plusMinutes(30)
+                            slotOrari.add(oraInizio to primoSlotFine)
+                            slotOrari.add(primoSlotFine to oraFine)
+                            Log.d("Sorted", "Aggiunti due")
+                        } else {
+                            // Aggiungi lo slot originale
+                            slotOrari.add(oraInizio to oraFine)
+                        }
                     }
                     //slotOrari.sort()
                     listaOccupati.add(giornoCorrente to slotOrari)
