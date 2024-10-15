@@ -113,7 +113,8 @@ class UserViewModel : ViewModel() {
                             eta = dati.eta,
                             email = auth.currentUser?.email,
                             telefono = dati.telefono,
-                            password = auth.currentUser!!.uid
+                            password = auth.currentUser!!.uid,
+                            appuntamenti = dati.appuntamenti
                         )
                     }
                 }

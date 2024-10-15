@@ -47,6 +47,7 @@ import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
 fun ScaffoldPersonalizzato(titolo : String,
+                           showIcon : Boolean,
                            onBack : () -> Unit = {},
                            content : @Composable () -> Unit = {}) {
     Scaffold(
@@ -63,11 +64,13 @@ fun ScaffoldPersonalizzato(titolo : String,
                     contentAlignment = Alignment.Center
                 ){
 
-                    IconButton(onClick = {onBack()},
-                        modifier = Modifier.size(25.dp).align(Alignment.CenterStart)) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
-                            tint = my_white,
-                            modifier = Modifier.size(25.dp))
+                    if (showIcon){
+                        IconButton(onClick = {onBack()},
+                            modifier = Modifier.size(25.dp).align(Alignment.CenterStart)) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                                tint = my_white,
+                                modifier = Modifier.size(25.dp))
+                        }
                     }
 
                     Text(

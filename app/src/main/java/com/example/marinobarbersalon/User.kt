@@ -1,5 +1,7 @@
 package com.example.marinobarbersalon
 
+import com.google.firebase.firestore.DocumentReference
+
 data class User(
     var state : AuthState? = null,
     val nome : String? = null,
@@ -7,7 +9,8 @@ data class User(
     val email : String? = null,
     val eta : Int? = 0,
     val password : String? = null,
-    val telefono : String? = null
+    val telefono : String? = null,
+    val appuntamenti: List<DocumentReference> = emptyList()
 )
 
 sealed class AuthState(){

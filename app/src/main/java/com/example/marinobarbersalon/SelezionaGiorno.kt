@@ -56,6 +56,7 @@ fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel,
     
     ScaffoldPersonalizzato(
         titolo = "Scegli un giorno e un orario",
+        showIcon = true,
         onBack = {
             onBack()
         },

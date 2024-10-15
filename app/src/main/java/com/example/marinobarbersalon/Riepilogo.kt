@@ -59,7 +59,9 @@ fun Riepilogo(userViewModel: UserViewModel,
               onSuccess : () -> Unit
 ) {
     Log.d("Input", idSer)
-    ScaffoldPersonalizzato(titolo = "Riepilogo appuntamento",
+    ScaffoldPersonalizzato(
+        titolo = "Riepilogo appuntamento",
+        showIcon = true,
         onBack = onBack,
         content = {
             Contenuto(userViewModel, listaServiziViewModel, idSer, orarioInizio, orarioFine, dataSelezionata, onSuccess)

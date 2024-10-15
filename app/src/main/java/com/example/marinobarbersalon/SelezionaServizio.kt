@@ -46,7 +46,9 @@ fun SelezioneServizioCapelli(viewModel: ListaServiziViewModel, onNavigateToSelez
 
     val servizi by serviziViewModel.listaServizi.collectAsState()
 
-    ScaffoldPersonalizzato(titolo = "Prenota un appuntamento",
+    ScaffoldPersonalizzato(
+        titolo = "Prenota un appuntamento",
+        showIcon = true,
         onBack = {
                  onBack()
         },
@@ -66,7 +68,9 @@ fun SelezionaServiziobarba(viewModel: ListaServiziViewModel, onNavigateToSelezio
     val servizi by serviziViewModel.listaServizi.collectAsState()
     Log.d("PROVA", "DIM: ${servizi.size} : $servizi ")
 
-    ScaffoldPersonalizzato(titolo = "Prenota un appuntamento",
+    ScaffoldPersonalizzato(
+        titolo = "Prenota un appuntamento",
+        showIcon = true,
         onBack = {
                  onBack()
         },
