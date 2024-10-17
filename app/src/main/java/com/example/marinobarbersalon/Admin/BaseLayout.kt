@@ -42,7 +42,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyNavDrawer(navController: NavController) {
      val navItem = listOf(
-         AdminNavItem("Home Admin", Icons.Filled.Home ,Icons.Outlined.Home, Screen.HomeAdmin.route)
+         AdminNavItem("Home Admin", Icons.Filled.Home ,Icons.Outlined.Home, Screen.HomeAdmin.route),
+         AdminNavItem("Pagina prova", Icons.Filled.Home, Icons.Outlined.Home, Screen.PaginaProva.route)
      )
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)

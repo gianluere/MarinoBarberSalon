@@ -25,5 +25,17 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
                 }
             )
         }
+        composable(Screen.PaginaProva.route){
+            MyNavDrawer(navController)
+            PaginaProva(
+                adminViewModel = adminViewModel,
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo("adminGraph") { inclusive = true }
+                        popUpTo("clientGraph") { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
