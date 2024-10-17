@@ -8,6 +8,6 @@ data class AdminNavItem (
     val description : String,
     val selectedIcon: ImageVector,
     val unselectedItem : ImageVector,
-    val route : Screen? = null
+    val route : String
 )
 

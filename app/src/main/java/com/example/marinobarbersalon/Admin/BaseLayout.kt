@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyNavDrawer(navController: NavController) {
      val navItem = listOf(
-         AdminNavItem(Screen.HomeAdmin.route, Icons.Filled.Home ,Icons.Outlined.Home)
+         AdminNavItem("Home Admin", Icons.Filled.Home ,Icons.Outlined.Home, Screen.HomeAdmin.route)
      )
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -60,9 +60,9 @@ fun MyNavDrawer(navController: NavController) {
                         label= {
                             Text(text= item.description)
                         } ,
-                        selected= index==selectedItemIndex  ,
+                        selected= index==selectedItemIndex,
                         onClick = {
-//                            navController.navigate(item.route)
+                            navController.navigate(item.route)
                             selectedItemIndex = index
                             scope.launch {
                                 drawerState.close()

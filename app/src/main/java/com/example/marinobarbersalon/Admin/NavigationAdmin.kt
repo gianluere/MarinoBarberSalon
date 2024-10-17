@@ -1,5 +1,7 @@
 package com.example.marinobarbersalon.Admin
 
+import MyNavDrawer
+import androidx.compose.material3.Scaffold
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -12,17 +14,7 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
         startDestination = Screen.HomeAdmin.route
     ) {
         composable(Screen.HomeAdmin.route){
-            HomeAdmin(
-                adminViewModel = adminViewModel,
-                onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo("adminGraph") { inclusive = true }
-                        popUpTo("clientGraph") { inclusive = true }
-                    }
-                }
-            )
-        }
-        composable(NavDrawerItem.HomeAdmin.route){
+            MyNavDrawer(navController)
             HomeAdmin(
                 adminViewModel = adminViewModel,
                 onNavigateToLogin = {
