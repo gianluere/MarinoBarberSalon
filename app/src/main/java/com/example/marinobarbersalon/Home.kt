@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.sharp.AccountCircle
 import androidx.compose.material.icons.sharp.ShoppingCart
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
@@ -82,6 +84,7 @@ import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier,
     onNavigateToLogin: () -> Unit,
     onNavigateToSelezionaServizioBarba: () -> Unit,
     onNavigateToSelezionaServizioCapelli: () -> Unit,
@@ -106,84 +109,28 @@ fun HomeScreen(
     }
 
 
-    val navItemList = listOf(
-        NavItem("", ImageVector.vectorResource(R.drawable.sharp_content_cut_24)),
-        NavItem("", Icons.Outlined.AccountCircle),
-        NavItem("", Icons.Outlined.ShoppingCart),
-        NavItem("", Icons.Default.Settings)
-    )
-
-    var selectedIndex by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-
-    Scaffold(
-        containerColor = Color(0xFF333333),
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-                 Column(Modifier.fillMaxWidth(),
-                     verticalArrangement = Arrangement.Center,
-                     horizontalAlignment = Alignment.CenterHorizontally
-                     ) {
-                     Text(
-                         text = "BENVENUTO " + userState.nome.toString().uppercase(),
-                         color = my_white,
-                         fontSize = 25.sp,
-                         fontWeight = FontWeight.Bold,
-                         modifier = Modifier.padding(bottom = 25.dp)
-                     )
-
-                     HorizontalDivider(
-                         modifier = Modifier
-                             .fillMaxWidth(),// altezza della bottom bar
-                         thickness = 2.dp,
-                         color = my_gold
-                     )
-                 }
-        },
-        bottomBar = {
-            Box{
-
-                NavigationBar(containerColor = Color(0xFF333333)) {
-                    navItemList.forEachIndexed { index, navItem ->
-                        NavigationBarItem(
-                            selected = false,
-                            onClick = { selectedIndex = index },
-                            icon = {
-                                Icon(imageVector = navItem.icon, contentDescription = "Icon",
-                                    tint = if (index != selectedIndex){
-                                        my_white
-                                    }else{
-                                        my_bordeaux
-                                    },
-                                    modifier = Modifier.size(45.dp))
-                            }
-                        )
-                    }
-
-                }
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    thickness = 2.dp,
-                    color = my_white
-                )
-            }
-
+    if (userState.nome.isNullOrEmpty() ) {
+        // Mostra una schermata di caricamento o uno stato intermedio
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator() // Indicatore di caricamento
         }
-    ){innerPadding ->
+    } else{
         Column(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize()) {
+            modifier.fillMaxSize()
+        ) {
+
+            Log.d("NAVBAR", userState.nome.toString())
+
             SelezionaTipo(userViewModel,
                 onNavigateToSelezionaServizioBarba,
-                onNavigateToSelezionaServizioCapelli
-            )
-
+                onNavigateToSelezionaServizioCapelli)
         }
-
     }
+
+
     
     /*Text(text = "HOME")
     

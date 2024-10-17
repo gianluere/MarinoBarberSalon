@@ -2,10 +2,13 @@ package com.example.marinobarbersalon
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -21,9 +24,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
 
@@ -41,17 +46,40 @@ fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
                 SignUpScreen(navController, userViewModel)
             }
             composable(Screen.Home.route) {
-                HomeScreen(
-                    onNavigateToLogin = {
-                        navController.navigate(Screen.Login.route)
+
+                Scaffold(
+                    containerColor = my_grey,
+                    topBar = {
+                        TopBarMia(
+                            titolo = "BENVENUTO " + userViewModel.userState.value.nome,
+                            showIcon = false,
+                            onBack = {
+                                navController.popBackStack()
+                            }
+                        )
                     },
-                    onNavigateToSelezionaServizioBarba = {
-                        navController.navigate(Screen.SelezionaServizioBarba.route)
-                    },
-                    onNavigateToSelezionaServizioCapelli = {
-                        navController.navigate(Screen.SelezionaServizioCapelli.route)
-                    },
-                    userViewModel)
+                    bottomBar = { BarraNavigazione(navController) }
+                ) { padding ->
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        thickness = 2.dp,
+                        color = my_gold
+                    )
+                    HomeScreen(
+                        modifier = Modifier.padding(padding),
+                        onNavigateToLogin = {
+                            navController.navigate(Screen.Login.route)
+                        },
+                        onNavigateToSelezionaServizioBarba = {
+                            navController.navigate(Screen.SelezionaServizioBarba.route)
+                        },
+                        onNavigateToSelezionaServizioCapelli = {
+                            navController.navigate(Screen.SelezionaServizioCapelli.route)
+                        },
+                        userViewModel)
+                }
+
             }
             composable(Screen.SelezionaServizioCapelli.route) {
 

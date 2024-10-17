@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -154,10 +155,10 @@ fun TopBarMia(
         navigationIcon = {
             if (showIcon){
                 IconButton(onClick = {onBack()},
-                    modifier = Modifier.size(25.dp)) {
+                    modifier = Modifier.size(30.dp)) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier.size(25.dp).padding(horizontal = 8.dp))
+                        tint = my_white,
+                        modifier = Modifier.size(30.dp).padding(horizontal = 8.dp))
                 }
             }
 
@@ -181,10 +182,11 @@ fun BarraNavigazione(navController : NavController) {
     val rottaDaEvidenziare = when (rottaCorrente) {
         Screen.SelezionaServizioBarba.route -> Screen.Home.route
         Screen.SelezionaServizioCapelli.route -> Screen.Home.route
-        Screen.SelezionaGiorno.route -> Screen.Home.route
-        Screen.Riepilogo.route -> Screen.Home.route
+        Screen.SelezionaGiorno.route + "/{idSer}" -> Screen.Home.route
+        Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}" -> Screen.Home.route
         else -> rottaCorrente
     }
+    Log.d("NAVBAR", rottaDaEvidenziare.toString())
 
     Box{
 

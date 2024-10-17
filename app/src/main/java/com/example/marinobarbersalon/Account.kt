@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
@@ -44,6 +45,7 @@ fun Account(modifier: Modifier, userViewModel: UserViewModel) {
             Text(text = "PANORAMICA",
                 fontSize = 25.sp,
                 fontFamily = myFont,
+                color = my_grey,
                 textAlign = TextAlign.Left,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,6 +81,7 @@ fun Contenuto() {
                 fontSize = 25.sp,
                 fontFamily = myFont,
                 textAlign = TextAlign.Left,
+                color = my_grey,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = my_yellow)
@@ -110,12 +113,13 @@ fun Riga(testo : String) {
     ) {
         Text(text = testo,
             fontFamily = myFont,
-            fontSize = 18.sp
+            fontSize = 18.sp,
+            color = my_grey
         )
 
         IconButton(onClick = { /*TODO*/ }) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "rightArrow",
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(35.dp),
                 tint = Color.Black)
         }
     }

@@ -41,6 +41,7 @@ class UserViewModel : ViewModel() {
             checkIfCliente(auth.currentUser?.email ?: "") { isCliente ->
                 if (isCliente) {
                     _userState.value = _userState.value.copy(state = AuthState.Authenticated)
+                    caricaDati()
                 } else {
                     // Se non è un admin, non lo autentichiamo
                     _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
