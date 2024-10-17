@@ -1,6 +1,7 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Admin
 
 import androidx.lifecycle.ViewModel
+import com.example.marinobarbersalon.AuthState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -59,7 +60,10 @@ class AdminViewModel : ViewModel() {
                 if (task.isSuccessful){
                     _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
                 }else{
-                    _adminState.value = _adminState.value.copy(state = AuthState.Error(task.exception?.message?:"Errore"))
+                    _adminState.value = _adminState.value.copy(state = AuthState.Error(
+                        task.exception?.message ?: "Errore"
+                    )
+                    )
                 }
             }
     }

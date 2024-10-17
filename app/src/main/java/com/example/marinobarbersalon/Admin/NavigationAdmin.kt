@@ -1,12 +1,10 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Admin
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.marinobarbersalon.Screen
 
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
     navigation(
