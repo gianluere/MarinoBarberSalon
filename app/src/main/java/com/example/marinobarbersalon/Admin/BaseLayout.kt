@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.marinobarbersalon.Admin.AdminNavItem
 import com.example.marinobarbersalon.Screen
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyNavDrawer(modifier: Modifier = Modifier) {
+fun MyNavDrawer(navController: NavController) {
      val navItem = listOf(
          AdminNavItem(Screen.HomeAdmin.route, Icons.Filled.Home ,Icons.Outlined.Home)
      )
@@ -61,6 +62,7 @@ fun MyNavDrawer(modifier: Modifier = Modifier) {
                         } ,
                         selected= index==selectedItemIndex  ,
                         onClick = {
+//                            navController.navigate(item.route)
                             selectedItemIndex = index
                             scope.launch {
                                 drawerState.close()
