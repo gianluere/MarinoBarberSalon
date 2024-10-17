@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +26,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,15 +40,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 
 
-
+/*
 @Composable
 fun ScaffoldPersonalizzato(titolo : String,
                            showIcon : Boolean,
@@ -106,16 +114,76 @@ fun ScaffoldPersonalizzato(titolo : String,
 }
 
 
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BarraNavigazione() {
-    val navItemList = listOf(
-        NavItem("", ImageVector.vectorResource(R.drawable.sharp_content_cut_24)),
-        NavItem("", Icons.Outlined.AccountCircle),
-        NavItem("", Icons.Outlined.ShoppingCart),
-        NavItem("", Icons.Default.Settings)
+fun TopBarMia(
+    titolo : String,
+    showIcon : Boolean,
+    onBack : () -> Unit = {}
+){
+
+    TopAppBar(
+        title = {
+            Column(
+                Modifier.fillMaxWidth().background(Color(0xFF333333)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = titolo,
+                    fontSize = 25.sp,
+                    color = my_white,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 25.dp),
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    thickness = 2.dp,
+                    color = my_gold
+                )
+
+            }
+
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = my_grey
+        ),
+        navigationIcon = {
+            if (showIcon){
+                IconButton(onClick = {onBack()},
+                    modifier = Modifier.size(25.dp)) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                        tint = Color.Black,
+                        modifier = Modifier.size(25.dp).padding(horizontal = 8.dp))
+                }
+            }
+
+        }
+
     )
-    var selectedIndex by rememberSaveable {
-        mutableIntStateOf(0)
+
+}
+
+
+@Composable
+fun BarraNavigazione(navController : NavController) {
+    val navItemList = listOf(
+        NavItem(Screen.Home.route, ImageVector.vectorResource(R.drawable.sharp_content_cut_24)),
+        NavItem(Screen.Account.route, Icons.Outlined.AccountCircle),
+        NavItem(Screen.Shop.route, Icons.Outlined.ShoppingCart),
+        NavItem(Screen.Impostazioni.route, Icons.Default.Settings)
+    )
+    val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val rottaDaEvidenziare = when (rottaCorrente) {
+        Screen.SelezionaServizioBarba.route -> Screen.Home.route
+        Screen.SelezionaServizioCapelli.route -> Screen.Home.route
+        Screen.SelezionaGiorno.route -> Screen.Home.route
+        Screen.Riepilogo.route -> Screen.Home.route
+        else -> rottaCorrente
     }
 
     Box{
@@ -124,10 +192,18 @@ fun BarraNavigazione() {
             navItemList.forEachIndexed { index, navItem ->
                 NavigationBarItem(
                     selected = false,
-                    onClick = { selectedIndex = index },
+                    onClick = {
+                        if(rottaDaEvidenziare != navItem.route){
+                            navController.navigate(navItem.route){
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    },
                     icon = {
                         Icon(imageVector = navItem.icon, contentDescription = "Icon",
-                            tint = if (index != selectedIndex){
+                            tint = if (rottaDaEvidenziare != navItem.route){
                                 my_white
                             }else{
                                 my_bordeaux

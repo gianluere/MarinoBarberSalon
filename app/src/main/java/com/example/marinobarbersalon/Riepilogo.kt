@@ -49,156 +49,137 @@ import java.time.format.DateTimeFormatter
 import kotlin.coroutines.coroutineContext
 
 @Composable
-fun Riepilogo(userViewModel: UserViewModel,
-              listaServiziViewModel: ListaServiziViewModel,
-              idSer : String,
-              orarioInizio : String,
-              orarioFine : String,
-              dataSelezionata : String,
-              onBack : () -> Unit,
-              onSuccess : () -> Unit
-) {
-    Log.d("Input", idSer)
-    ScaffoldPersonalizzato(
-        titolo = "Riepilogo appuntamento",
-        showIcon = true,
-        onBack = onBack,
-        content = {
-            Contenuto(userViewModel, listaServiziViewModel, idSer, orarioInizio, orarioFine, dataSelezionata, onSuccess)
-        })
-}
-
-
-@Composable
-fun Contenuto(
+fun Riepilogo(
+    modifier: Modifier,
     userViewModel: UserViewModel,
-    listaServViewModel: ListaServiziViewModel,
-    idSer: String,
+    listaServiziViewModel: ListaServiziViewModel,
+    idSer : String,
     orarioInizio : String,
     orarioFine : String,
-    dataSelezionata: String,
+    dataSelezionata : String,
     onSuccess : () -> Unit
 ) {
-
-    var showDialogSuccess by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    var showDialogError by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-
-    val listaServiziViewModel = listaServViewModel
-    val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
-    val servizio = listaServizi.find { serv->
-        serv.nome == idSer
-    }
-
-    Log.d("Servizio", dataSelezionata)
-
-    val user = userViewModel.userState.collectAsState()
-    val dataSelezionata = LocalDate.parse(dataSelezionata).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-
-
-    if (!showDialogError && !showDialogSuccess){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 20.dp, start = 14.dp, end = 14.dp, bottom = 10.dp)
-        ) {
-            Text(text = "Servizio: " + servizio!!.nome,
-                color = my_gold,
-                fontFamily = myFont,
-                fontSize = 25.sp
-            )
-            HorizontalDivider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
-
-            Text(modifier = Modifier.fillMaxWidth(),
-                text = "Durata: ${servizio.durata} minuti",
-                color = my_gold,
-                fontFamily = myFont,
-                fontSize = 25.sp
-            )
-            HorizontalDivider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
-
-            Text(modifier = Modifier.fillMaxWidth(),
-                text = "Data: $dataSelezionata",
-                color = my_gold,
-                fontFamily = myFont,
-                fontSize = 25.sp
-            )
-            HorizontalDivider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
-
-            Text(modifier = Modifier.fillMaxWidth(),
-                text = "Ora: $orarioInizio - $orarioFine",
-                color = my_gold,
-                fontFamily = myFont,
-                fontSize = 25.sp
-            )
-            HorizontalDivider(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
-
-            Column(Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.End){
-                Text(modifier = Modifier.padding(bottom = 10.dp),
-                    text = "Totale: " + String.format("%.2f", servizio.prezzo) + "€",
-                    color = my_gold,
-                    fontSize = 25.sp,
-                    fontFamily = myFont,
-                    textDecoration = TextDecoration.Underline
-                )
-                Button(onClick = {
-                    userViewModel.aggiungiApp(
-                        servizio = idSer,
-                        orarioFine = orarioFine,
-                        orarioInizio = orarioInizio,
-                        dataSel = dataSelezionata.toString(),
-                        onSuccess = {
-                            showDialogSuccess = true
-                        },
-                        onFailed = {
-                            showDialogError = true
-                        }
-                    )
-
-                },
-                    enabled = !showDialogError && !showDialogSuccess,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 9.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = my_bordeaux,
-                        disabledContainerColor = my_bordeaux
-                    )
-                ) {
-                    Text(text = "PRENOTA", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
-                }
-            }
-
-
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        var showDialogSuccess by rememberSaveable {
+            mutableStateOf(false)
         }
-    }else if (showDialogSuccess){
-        DialogSuccesso(onDismiss = onSuccess)
-    }else{
-        DialogErrore(onDismiss = onSuccess )
+
+        var showDialogError by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+
+        val listaServiziViewModel = listaServiziViewModel
+        val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
+        val servizio = listaServizi.find { serv->
+            serv.nome == idSer
+        }
+
+        Log.d("Servizio", dataSelezionata)
+
+        val user = userViewModel.userState.collectAsState()
+        val dataSelezionata = LocalDate.parse(dataSelezionata).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+
+
+        if (!showDialogError && !showDialogSuccess){
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp, start = 14.dp, end = 14.dp, bottom = 10.dp)
+            ) {
+                Text(text = "Servizio: " + servizio!!.nome,
+                    color = my_gold,
+                    fontFamily = myFont,
+                    fontSize = 25.sp
+                )
+                HorizontalDivider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
+
+                Text(modifier = Modifier.fillMaxWidth(),
+                    text = "Durata: ${servizio.durata} minuti",
+                    color = my_gold,
+                    fontFamily = myFont,
+                    fontSize = 25.sp
+                )
+                HorizontalDivider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
+
+                Text(modifier = Modifier.fillMaxWidth(),
+                    text = "Data: $dataSelezionata",
+                    color = my_gold,
+                    fontFamily = myFont,
+                    fontSize = 25.sp
+                )
+                HorizontalDivider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
+
+                Text(modifier = Modifier.fillMaxWidth(),
+                    text = "Ora: $orarioInizio - $orarioFine",
+                    color = my_gold,
+                    fontFamily = myFont,
+                    fontSize = 25.sp
+                )
+                HorizontalDivider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 25.dp), thickness = 2.dp, color = my_white)
+
+                Column(Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.End){
+                    Text(modifier = Modifier.padding(bottom = 10.dp),
+                        text = "Totale: " + String.format("%.2f", servizio.prezzo) + "€",
+                        color = my_gold,
+                        fontSize = 25.sp,
+                        fontFamily = myFont,
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Button(onClick = {
+                        userViewModel.aggiungiApp(
+                            servizio = idSer,
+                            orarioFine = orarioFine,
+                            orarioInizio = orarioInizio,
+                            dataSel = dataSelezionata.toString(),
+                            onSuccess = {
+                                showDialogSuccess = true
+                            },
+                            onFailed = {
+                                showDialogError = true
+                            }
+                        )
+
+                    },
+                        enabled = !showDialogError && !showDialogSuccess,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 9.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = my_bordeaux,
+                            disabledContainerColor = my_bordeaux
+                        )
+                    ) {
+                        Text(text = "PRENOTA", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
+                    }
+                }
+
+
+            }
+        }else if (showDialogSuccess){
+            DialogSuccesso(onDismiss = onSuccess)
+        }else{
+            DialogErrore(onDismiss = onSuccess )
+        }
     }
-
-
-
 }
+
 
 
 @Composable

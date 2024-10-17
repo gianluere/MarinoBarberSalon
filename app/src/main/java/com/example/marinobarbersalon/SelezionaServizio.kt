@@ -40,51 +40,36 @@ import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
 @Composable
-fun SelezioneServizioCapelli(viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer: String) -> Unit, onBack: () -> Unit) {
+fun SelezioneServizioCapelli(modifier: Modifier, viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer: String) -> Unit) {
 
     val serviziViewModel = viewModel
 
     val servizi by serviziViewModel.listaServizi.collectAsState()
 
-    ScaffoldPersonalizzato(
-        titolo = "Prenota un appuntamento",
-        showIcon = true,
-        onBack = {
-                 onBack()
-        },
-        content =  {
 
-            Contenuto(servizi = servizi.filter{ it.tipo == "Capelli"}, titolo = "Capelli", onNavigateToSelezionaGiorno)
-        }
-    )
+    Contenuto(modifier = modifier, servizi = servizi.filter{ it.tipo == "Capelli"}, titolo = "Capelli", onNavigateToSelezionaGiorno)
+
 
 }
 
 @Composable
-fun SelezionaServiziobarba(viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer : String) -> Unit, onBack: () -> Unit) {
+fun SelezionaServiziobarba(modifier: Modifier, viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
 
     val serviziViewModel = viewModel
 
     val servizi by serviziViewModel.listaServizi.collectAsState()
-    Log.d("PROVA", "DIM: ${servizi.size} : $servizi ")
 
-    ScaffoldPersonalizzato(
-        titolo = "Prenota un appuntamento",
-        showIcon = true,
-        onBack = {
-                 onBack()
-        },
-        content =  {
-            Contenuto(servizi = servizi.filter{ it.tipo == "Barba"}, "Barba", onNavigateToSelezionaGiorno)
-        }
-    )
+
+
+    Contenuto(modifier = modifier, servizi = servizi.filter{ it.tipo == "Barba"}, "Barba", onNavigateToSelezionaGiorno)
+
 
 }
 
 
 @Composable
-private fun Contenuto(servizi: List<Servizio>, titolo : String, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
-    Column(Modifier.fillMaxSize(),
+private fun Contenuto(modifier: Modifier, servizi: List<Servizio>, titolo : String, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
+    Column(modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
         

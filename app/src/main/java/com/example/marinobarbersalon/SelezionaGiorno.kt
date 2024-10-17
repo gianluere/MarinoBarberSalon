@@ -49,170 +49,156 @@ import java.util.Locale
 
 
 @Composable
-fun SelezionaGiorno(listaServiziViewModel: ListaServiziViewModel,
-                    onBack : () -> Unit,
-                    idSer : String,
-                    onNavigateToRiepilogo : (String, String, String, String) -> Unit) {
+fun SelezionaGiorno(
+    modifier : Modifier,
+    listaServiziViewModel: ListaServiziViewModel,
+    idSer : String,
+    onNavigateToRiepilogo : (String, String, String, String) -> Unit) {
     
-    ScaffoldPersonalizzato(
-        titolo = "Scegli un giorno e un orario",
-        showIcon = true,
-        onBack = {
-            onBack()
-        },
-        content = {
-            Data(idSer, listaServiziViewModel, onNavigateToRiepilogo)
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        val listaServiziViewModel = listaServiziViewModel
+        val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
+
+        Log.d("PROVA", "sono qui")
+        Log.d("PROVA", "Contenuto listaServizi: $listaServizi")
+        val servizio = listaServizi.find { serv->
+            serv.nome == idSer
         }
+        Log.d("PROVA", "sono sotto")
+        if (servizio != null) {
+            Log.d("FINALE", servizio.nome.toString())
+        }
+        val listaGiorniViewModel : ListaGiorniViewModel = viewModel(
+            factory = servizio?.let { ListaGiorniViewModelFactory(it) }
         )
 
-}
+        val listaGiorni by listaGiorniViewModel.listaGiorniAggiornata.collectAsState()
 
-@Composable
-fun Data(idSer : String, listaServViewModel: ListaServiziViewModel, onNavigateToRiepilogo : (String, String, String, String) -> Unit) {
-
-    Log.d("PROVA", idSer)
-    val listaServiziViewModel = listaServViewModel
-    val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
-
-    Log.d("PROVA", "sono qui")
-    Log.d("PROVA", "Contenuto listaServizi: $listaServizi")
-    val servizio = listaServizi.find { serv->
-        serv.nome == idSer
-    }
-    Log.d("PROVA", "sono sotto")
-    if (servizio != null) {
-        Log.d("FINALE", servizio.nome.toString())
-    }
-    val listaGiorniViewModel : ListaGiorniViewModel = viewModel(
-        factory = servizio?.let { ListaGiorniViewModelFactory(it) }
-    )
-
-    val listaGiorni by listaGiorniViewModel.listaGiorniAggiornata.collectAsState()
-
-    var indexGiornoSelezionato by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-
-    var indexOrarioSelezionato by rememberSaveable {
-        mutableIntStateOf(0)
-    }
-
-    var bottone by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    var dataSelezionata by rememberSaveable {
-        mutableStateOf(LocalDate.now())
-    }
-    var orarioInizio : LocalTime = LocalTime.now()
-    var orarioFine : LocalTime = LocalTime.now()
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(top = 30.dp)) {
-        LazyRow(
-            modifier = Modifier.background(color = Color(0xFFF5F5DC)),
-            contentPadding = PaddingValues(25.dp),
-            horizontalArrangement = Arrangement.spacedBy(23.dp)
-        ) {
-            items(listaGiorni.size){index ->
-                CardGiorno(
-                    giorno = listaGiorni[index].first,
-                    index = index,
-                    isSelected = index == indexGiornoSelezionato,
-                    onCardSelected = { selectedIndex ->
-                        indexGiornoSelezionato = selectedIndex
-                        indexOrarioSelezionato = 0
-                        dataSelezionata = listaGiorni[indexGiornoSelezionato].first
-                        Log.d("Servizio", dataSelezionata.toString())
-                    }
-                )
-
-            }
+        var indexGiornoSelezionato by rememberSaveable {
+            mutableIntStateOf(0)
         }
 
-        Spacer(Modifier.height(30.dp))
+        var indexOrarioSelezionato by rememberSaveable {
+            mutableIntStateOf(0)
+        }
 
-        Box(modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .weight(1f)){
+        var bottone by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+        var dataSelezionata by rememberSaveable {
+            mutableStateOf(LocalDate.now())
+        }
+        var orarioInizio : LocalTime = LocalTime.now()
+        var orarioFine : LocalTime = LocalTime.now()
+
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 30.dp)) {
+            LazyRow(
+                modifier = Modifier.background(color = Color(0xFFF5F5DC)),
+                contentPadding = PaddingValues(25.dp),
+                horizontalArrangement = Arrangement.spacedBy(23.dp)
+            ) {
+                items(listaGiorni.size){index ->
+                    CardGiorno(
+                        giorno = listaGiorni[index].first,
+                        index = index,
+                        isSelected = index == indexGiornoSelezionato,
+                        onCardSelected = { selectedIndex ->
+                            indexGiornoSelezionato = selectedIndex
+                            indexOrarioSelezionato = 0
+                            dataSelezionata = listaGiorni[indexGiornoSelezionato].first
+                            Log.d("Servizio", dataSelezionata.toString())
+                        }
+                    )
+
+                }
+            }
+
+            Spacer(Modifier.height(30.dp))
 
             Box(modifier = Modifier
-                .fillMaxSize()
-                .border(2.dp, my_gold, RoundedCornerShape(17.dp))
-                .background(color = my_yellow, RoundedCornerShape(17.dp)),
-                contentAlignment = Alignment.Center){
+                .padding(horizontal = 8.dp)
+                .weight(1f)){
 
-                val orariDisponibili = listaGiorni[indexGiornoSelezionato].second
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .border(2.dp, my_gold, RoundedCornerShape(17.dp))
+                    .background(color = my_yellow, RoundedCornerShape(17.dp)),
+                    contentAlignment = Alignment.Center){
 
-                if (orariDisponibili.isEmpty()){
-                    Text(text = "NESSUN ORARIO DISPONIBILE\n" +
-                            "\n" +
-                            "SELEZIONARE UN’ALTRA DATA",
-                        fontSize = 23.sp,
-                        fontFamily = myFont,
-                        color = Color.Black,
-                        lineHeight = 14.sp
+                    val orariDisponibili = listaGiorni[indexGiornoSelezionato].second
+
+                    if (orariDisponibili.isEmpty()){
+                        Text(text = "NESSUN ORARIO DISPONIBILE\n" +
+                                "\n" +
+                                "SELEZIONARE UN’ALTRA DATA",
+                            fontSize = 23.sp,
+                            fontFamily = myFont,
+                            color = Color.Black,
+                            lineHeight = 14.sp
                         )
-                    bottone = false
-                }else{
-                    LazyColumn(
-                        contentPadding = PaddingValues(25.dp),
-                        verticalArrangement = Arrangement.spacedBy(23.dp)
-                    ) {
-                        items(orariDisponibili.size) { index ->
-                            if (index == 0){
-                                orarioInizio = orariDisponibili[indexOrarioSelezionato].first
-                                orarioFine = orariDisponibili[indexOrarioSelezionato].second
-                            }
-                            CardOrario(
-                                orario = orariDisponibili[index],
-                                index = index,
-                                indexGiornoSelezionato = indexGiornoSelezionato,
-                                isSelected = index == indexOrarioSelezionato,
-                                onCardSelected = { selectedIndex ->
-                                    indexOrarioSelezionato = selectedIndex
+                        bottone = false
+                    }else{
+                        LazyColumn(
+                            contentPadding = PaddingValues(25.dp),
+                            verticalArrangement = Arrangement.spacedBy(23.dp)
+                        ) {
+                            items(orariDisponibili.size) { index ->
+                                if (index == 0){
                                     orarioInizio = orariDisponibili[indexOrarioSelezionato].first
                                     orarioFine = orariDisponibili[indexOrarioSelezionato].second
                                 }
-                            )
+                                CardOrario(
+                                    orario = orariDisponibili[index],
+                                    index = index,
+                                    indexGiornoSelezionato = indexGiornoSelezionato,
+                                    isSelected = index == indexOrarioSelezionato,
+                                    onCardSelected = { selectedIndex ->
+                                        indexOrarioSelezionato = selectedIndex
+                                        orarioInizio = orariDisponibili[indexOrarioSelezionato].first
+                                        orarioFine = orariDisponibili[indexOrarioSelezionato].second
+                                    }
+                                )
 
+                            }
                         }
+                        bottone = true
                     }
-                    bottone = true
-                }
 
+
+
+                }
 
 
             }
 
+            Spacer(modifier = Modifier.height(25.dp))
+            Button(onClick = {
+                Log.d("Servizio", "data scritta $dataSelezionata")
+                onNavigateToRiepilogo(idSer, orarioInizio.toString(), orarioFine.toString(), dataSelezionata.toString())
+            },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
+                enabled = bottone,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = my_bordeaux,
+                    disabledContainerColor = my_bordeaux
+                )
+            ) {
+                Text(text = "PROSEGUI", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
+            }
+
 
         }
-        
-        Spacer(modifier = Modifier.height(25.dp))
-        Button(onClick = {
-            Log.d("Servizio", "data scritta $dataSelezionata")
-            onNavigateToRiepilogo(idSer, orarioInizio.toString(), orarioFine.toString(), dataSelezionata.toString())
-        },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
-            enabled = bottone,
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = my_bordeaux,
-                disabledContainerColor = my_bordeaux
-            )
-        ) {
-            Text(text = "PROSEGUI", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
-        }
-
-
     }
 
-
 }
-
 
 @Composable
 fun CardGiorno(giorno : LocalDate, index : Int, isSelected: Boolean, onCardSelected: (Int) -> Unit) {

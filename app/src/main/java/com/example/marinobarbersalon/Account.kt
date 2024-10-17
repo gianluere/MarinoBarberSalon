@@ -31,17 +31,38 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun Account(userViewModel: UserViewModel) {
-    ScaffoldPersonalizzato(
-        titolo = "ACCOUNT",
-        showIcon = false,
-        content = {
-            //Contenuto(userViewModel)
+fun Account(modifier: Modifier, userViewModel: UserViewModel) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "PANORAMICA",
+                fontSize = 25.sp,
+                fontFamily = myFont,
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = my_yellow)
+                    .padding(vertical = 3.dp)
+            )
+
+            Riga(testo = "Dati personali")
+            Riga(testo = "Prenotazioni")
+            Riga(testo = "Acquisti in app")
+            Riga(testo = "Rilascia feedback")
+
+
+
+
         }
-    )
+    }
 }
 
-@Preview
 @Composable
 fun Contenuto() {
 
