@@ -38,9 +38,26 @@ class UserViewModel : ViewModel() {
         if (auth.currentUser == null){
             _userState.value.state = AuthState.Unauthenticated
         }else{
-            _userState.value.state = AuthState.Authenticated
-            caricaDati()
+            checkIfCliente(auth.currentUser?.email ?: "") { isCliente ->
+                if (isCliente) {
+                    _userState.value = _userState.value.copy(state = AuthState.Authenticated)
+                } else {
+                    // Se non è un admin, non lo autentichiamo
+                    _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
+                }
+            }
         }
+    }
+
+    private fun checkIfCliente(email: String, callback: (Boolean) -> Unit) {
+        // Funzione per verificare se l'email è associata a un amministratore
+        db.collection("utenti").document(email).get()
+            .addOnSuccessListener { document ->
+                callback(document.exists())
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
     }
 
     fun login(email : String, password : String){
