@@ -22,5 +22,16 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
                 }
             )
         }
+        composable(NavDrawerItem.HomeAdmin.route){
+            HomeAdmin(
+                adminViewModel = adminViewModel,
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo("adminGraph") { inclusive = true }
+                        popUpTo("clientGraph") { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
