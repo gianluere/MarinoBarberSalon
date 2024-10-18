@@ -116,55 +116,61 @@ fun ScaffoldPersonalizzato(titolo : String,
 
 
  */
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarMia(
-    titolo : String,
-    showIcon : Boolean,
+    titolo : String = "prova",
+    showIcon : Boolean = true,
     onBack : () -> Unit = {}
 ){
+    Column(
+        Modifier.fillMaxWidth()
+    ) {
+        TopAppBar(
+            title = {
 
-    TopAppBar(
-        title = {
-            Column(
-                Modifier.fillMaxWidth().background(Color(0xFF333333)),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
                 Text(
                     text = titolo,
                     fontSize = 25.sp,
                     color = my_white,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 25.dp),
-                )
-
-                HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    thickness = 2.dp,
-                    color = my_gold
                 )
 
-            }
 
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = my_grey
-        ),
-        navigationIcon = {
-            if (showIcon){
-                IconButton(onClick = {onBack()},
-                    modifier = Modifier.size(30.dp)) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
-                        tint = my_white,
-                        modifier = Modifier.size(30.dp).padding(horizontal = 8.dp))
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = my_grey
+            ),
+            navigationIcon = {
+                if (showIcon){
+                    IconButton(onClick = {onBack()},
+                        ) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                            tint = my_white,
+                            modifier = Modifier
+                                .size(24.dp)
+                                )
+                    }
                 }
+
             }
 
-        }
+        )
 
-    )
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top=1.dp),
+            thickness = 2.dp,
+            color = my_gold
+        )
+    }
+
+
 
 }
 
