@@ -1,9 +1,8 @@
 package com.example.marinobarbersalon
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,10 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -23,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.ui.theme.myFont
@@ -32,73 +29,76 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun Account(modifier: Modifier, userViewModel: UserViewModel) {
+fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "PANORAMICA",
-                fontSize = 25.sp,
-                fontFamily = myFont,
-                color = my_grey,
-                textAlign = TextAlign.Left,
+            Box(modifier = Modifier.fillMaxWidth()
+                .height(60.dp)
+                .background(color = my_yellow),
+                contentAlignment = Alignment.CenterStart
+            ){
+                Text(text = "PANORAMICA",
+                    fontSize = 25.sp,
+                    fontFamily = myFont,
+                    color = my_grey,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                )
+
+            }
+
+            HorizontalDivider(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = my_yellow)
-                    .padding(vertical = 3.dp)
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = my_grey
             )
 
             Riga(testo = "Dati personali")
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = my_gold
+            )
+
             Riga(testo = "Prenotazioni")
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = my_gold
+            )
+
             Riga(testo = "Acquisti in app")
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = my_gold
+            )
+
             Riga(testo = "Rilascia feedback")
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                thickness = 2.dp,
+                color = my_gold
+            )
 
 
 
 
         }
     }
-}
-
-@Composable
-fun Contenuto() {
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "PANORAMICA",
-                fontSize = 25.sp,
-                fontFamily = myFont,
-                textAlign = TextAlign.Left,
-                color = my_grey,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = my_yellow)
-                    .padding(vertical = 3.dp)
-            )
-            
-            Riga(testo = "Dati personali")
-            Riga(testo = "Prenotazioni")
-            Riga(testo = "Acquisti in app")
-            Riga(testo = "Rilascia feedback")
-
-            
-
-
-        }
-    }
-    
 }
 
 @Composable
@@ -113,8 +113,9 @@ fun Riga(testo : String) {
     ) {
         Text(text = testo,
             fontFamily = myFont,
-            fontSize = 18.sp,
-            color = my_grey
+            fontSize = 19.sp,
+            color = my_grey,
+            modifier = Modifier.padding(start = 7.dp)
         )
 
         IconButton(onClick = { /*TODO*/ }) {
