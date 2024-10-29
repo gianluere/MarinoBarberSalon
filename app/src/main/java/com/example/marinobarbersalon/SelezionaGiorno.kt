@@ -183,7 +183,7 @@ fun SelezionaGiorno(
             },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 9.dp, start = 14.dp, end = 14.dp),
+                    .padding(bottom = 18.dp, start = 14.dp, end = 14.dp),
                 enabled = bottone,
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(

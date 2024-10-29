@@ -1,0 +1,363 @@
+package com.example.marinobarbersalon
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.marinobarbersalon.ui.theme.myFont
+import com.example.marinobarbersalon.ui.theme.my_bordeaux
+import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_white
+
+@Composable
+fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
+
+    val userState by userViewModel.userState.collectAsState()
+
+    var readOnly by remember {
+        mutableStateOf(true)
+    }
+
+    var loading by remember {
+        mutableStateOf(false)
+    }
+
+    var nome by remember {
+        mutableStateOf(userState.nome.toString())
+    }
+
+    var cognome by remember {
+        mutableStateOf(userState.cognome.toString())
+    }
+
+    var email by remember {
+        mutableStateOf(userState.email.toString())
+    }
+
+    var eta by remember {
+        mutableStateOf(userState.eta.toString())
+    }
+
+    var telefono by remember {
+        mutableStateOf(userState.telefono.toString())
+    }
+
+    var password by remember {
+        mutableStateOf(userState.password.toString())
+    }
+
+    var passwordVisibility by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val image = if (passwordVisibility)
+        painterResource(id = R.drawable.visibility_24dp_f5f5dc_fill0_wght400_grad0_opsz24)
+    else
+        painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
+
+    Box(modifier = modifier.fillMaxSize()){
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                IconButton(
+                    onClick = if (readOnly){
+                        {
+                            readOnly = !readOnly
+                        }
+                    }else {
+                        {
+                            loading = true
+                            userViewModel.updateDati(
+                                nome, cognome, eta.toInt(), telefono, callback = {
+                                    loading = false
+                                    readOnly = !readOnly
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    if(readOnly){
+                        Icon(
+                            Icons.Outlined.Edit,
+                            null,
+                            tint = my_bordeaux,
+                            modifier = Modifier.size(30.dp)
+
+                        )
+                    }else{
+                        Icon(
+                            Icons.Outlined.Done,
+                            null,
+                            tint = Color(0xFF50C878),
+                            modifier = Modifier.size(30.dp)
+
+                        )
+                    }
+
+                }
+            }
+
+            /*
+            Column {
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "Nome: ",
+                        color = my_white,
+                        fontSize = 20.sp,
+                        fontFamily = myFont
+                    )
+
+                    TextField(
+                        value = nome, onValueChange = {nome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 20.sp),
+                        colors= TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedTextColor = my_white,
+                            unfocusedTextColor = my_white,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = my_white
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        maxLines = 1,
+                        readOnly = readOnly,
+
+                        )
+
+
+
+
+                }
+
+                HorizontalDivider(
+                    Modifier
+                        .fillMaxWidth(), thickness = 2.dp, color = my_white)
+
+            }
+
+
+            Column {
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "Cognome: ",
+                        color = my_white,
+                        fontSize = 20.sp,
+                        fontFamily = myFont
+                    )
+
+                    TextField(
+                        value = cognome, onValueChange = {cognome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 20.sp),
+                        colors= TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedTextColor = my_white,
+                            unfocusedTextColor = my_white,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = my_white
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        maxLines = 1,
+                        readOnly = readOnly,
+
+                        )
+
+
+
+
+                }
+
+                HorizontalDivider(
+                    Modifier
+                        .fillMaxWidth(), thickness = 2.dp, color = my_white)
+
+            }
+
+             */
+
+            RigaDato(
+                label = "Nome",
+                value = nome,
+                onValueChange = {nome = it},
+                readOnly = readOnly
+            )
+
+            RigaDato(
+                label = "Cognome",
+                value = cognome,
+                onValueChange = {cognome = it},
+                readOnly = readOnly
+            )
+
+            RigaDato(
+                label = "Email",
+                value = email,
+                onValueChange = {email = it},
+                readOnly = readOnly
+            )
+
+            RigaDato(
+                label = "Età",
+                value = eta,
+                onValueChange = {eta = it},
+                readOnly = readOnly
+            )
+
+            RigaDato(
+                label = "Telefono",
+                value = telefono,
+                onValueChange = {telefono = it},
+                readOnly = readOnly
+            )
+
+
+
+        }
+
+        if (loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .align(Alignment.Center),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(80.dp),
+                )
+            }
+        }
+    }
+
+
+}
+
+
+@Composable
+fun RigaDato(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    readOnly: Boolean
+) {
+    Column {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "$label: ",
+                color = my_white,
+                fontSize = 24.sp,
+                fontFamily = myFont
+            )
+
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                readOnly = readOnly,
+                textStyle = TextStyle(fontFamily = myFont, fontSize = 24.sp, color = my_white),
+                modifier = Modifier
+                    .fillMaxWidth().wrapContentHeight(), // Altezza più ridotta
+                singleLine = true // Evita di andare a capo
+            )
+            /*
+            TextField(
+                modifier = Modifier.padding(vertical = 0.dp),
+                value = value,
+                onValueChange = onValueChange,
+                textStyle = TextStyle(fontFamily = myFont, fontSize = 20.sp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedTextColor = my_white,
+                    unfocusedTextColor = my_white,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = my_white
+                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                maxLines = 1,
+                readOnly = readOnly
+            )
+
+            TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Password", color = Color(0xFFF5F5DC), fontFamily = myFont,  fontSize = 22.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_white,
+                        unfocusedTextColor = my_white,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    ), trailingIcon = {
+                        IconButton(onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }) {
+                            Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
+
+                        }
+                    }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    maxLines = 1
+                )
+
+             */
+        }
+        HorizontalDivider(
+            Modifier.fillMaxWidth(),
+            thickness = 2.dp,
+            color = my_white
+        )
+    }
+}

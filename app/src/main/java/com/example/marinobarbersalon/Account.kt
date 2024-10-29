@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,7 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
+fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, onNavigareDatiPersonali : () -> Unit) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -59,10 +60,10 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 thickness = 2.dp,
-                color = my_grey
+                color = Color.Gray
             )
 
-            Riga(testo = "Dati personali")
+            Riga(testo = "Dati personali", modifier = Modifier.clickable { onNavigareDatiPersonali() })
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -70,7 +71,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
                 color = my_gold
             )
 
-            Riga(testo = "Prenotazioni")
+            Riga(testo = "Prenotazioni", modifier = Modifier)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -78,7 +79,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
                 color = my_gold
             )
 
-            Riga(testo = "Acquisti in app")
+            Riga(testo = "Acquisti in app",modifier = Modifier)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -86,7 +87,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
                 color = my_gold
             )
 
-            Riga(testo = "Rilascia feedback")
+            Riga(testo = "Rilascia feedback", modifier = Modifier)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -102,9 +103,9 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel) {
 }
 
 @Composable
-fun Riga(testo : String) {
+fun Riga(testo : String, modifier : Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
             .background(color = my_yellow),

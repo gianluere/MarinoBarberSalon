@@ -34,9 +34,9 @@ class UserViewModel : ViewModel() {
 
     }
 
-    fun checkAuthState(){
+    private fun checkAuthState(){
         if (auth.currentUser == null){
-            _userState.value.state = AuthState.Unauthenticated
+            _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
         }else{
             checkIfCliente(auth.currentUser?.email ?: "") { isCliente ->
                 if (isCliente) {
@@ -85,7 +85,7 @@ class UserViewModel : ViewModel() {
             _userState.value = _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
             return
         }
-        _userState.value.state = AuthState.Loading
+        _userState.value = _userState.value.copy(state = AuthState.Loading)
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful){
@@ -160,7 +160,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    suspend fun aggiungiAppuntamento(
+    private suspend fun aggiungiAppuntamento(
         servizio: String,
         orarioInizio: String,
         orarioFine: String,
@@ -256,6 +256,37 @@ class UserViewModel : ViewModel() {
                 Log.e("Appuntamento", "Lo slot è già occupato!")
             }
         }
+    }
+
+    fun updateDati(
+        nome : String,
+        cognome : String,
+        eta : Int,
+        telefono : String,
+        callback: () -> Unit
+    ){
+
+        val daAggiornare = mapOf(
+            "nome" to nome,
+            "cognome" to cognome,
+            "eta" to eta,
+            "telefono" to telefono
+        )
+
+        auth.currentUser!!.email?.let {
+            db.collection("utenti").document(it).update(daAggiornare)
+                .addOnSuccessListener {
+                    _userState.value = _userState.value.copy(
+                        nome = nome,
+                        cognome = cognome,
+                        eta = eta,
+                        telefono = telefono
+                    )
+                    callback()
+                }
+        }
+
+
     }
 
 

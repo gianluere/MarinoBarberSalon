@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -15,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 
 
@@ -25,213 +28,19 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun Navigation(userViewModel : UserViewModel, adminViewModel: AdminViewModel) {
+fun Navigation(modifier: Modifier, navController : NavHostController, userViewModel : UserViewModel, logout : () -> Unit) {
 
     val listaServiziViewModel : ListaServiziViewModel = viewModel()
-    val navController = rememberNavController()
-    NavHost(navController, startDestination = Screen.Login.route){
+    NavHost(navController, startDestination = "clientGraph"){
+        /*
         composable(Screen.Login.route){
             LoginScreen(navController, userViewModel, adminViewModel)
         }
-        navigation(
-            route = "clientGraph",
-            startDestination = Screen.Home.route
-        ) {
-            composable(Screen.SignUp.route){
-                SignUpScreen(navController, userViewModel)
-            }
-            composable(Screen.Home.route) {
 
-                Scaffold(
-                    containerColor = my_grey,
-                    topBar = {
-                        TopBarMia(
-                            titolo = "BENVENUTO " + userViewModel.userState.value.nome,
-                            showIcon = false,
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    bottomBar = { BarraNavigazione(navController) }
-                ) { padding ->
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        thickness = 2.dp,
-                        color = my_gold
-                    )
-                    HomeScreen(
-                        modifier = Modifier.padding(padding),
-                        onNavigateToLogin = {
-                            navController.navigate(Screen.Login.route)
-                        },
-                        onNavigateToSelezionaServizioBarba = {
-                            navController.navigate(Screen.SelezionaServizioBarba.route)
-                        },
-                        onNavigateToSelezionaServizioCapelli = {
-                            navController.navigate(Screen.SelezionaServizioCapelli.route)
-                        },
-                        userViewModel)
-                }
+         */
 
-            }
-            composable(Screen.SelezionaServizioCapelli.route) {
-
-                Scaffold(
-                    containerColor = my_grey,
-                    topBar = {
-                        TopBarMia(
-                            titolo = "Prenota un appuntamento",
-                            showIcon = true,
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    bottomBar = { BarraNavigazione(navController) }
-                ) { padding ->
-                    SelezioneServizioCapelli(
-                        modifier = Modifier.padding(padding),
-                        viewModel = listaServiziViewModel,
-                        onNavigateToSelezionaGiorno = {idSer ->
-                            navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
-                        })
-                }
-
-
-            }
-            composable(Screen.SelezionaServizioBarba.route) {
-                Scaffold(
-                    containerColor = my_grey,
-                    topBar = {
-                        TopBarMia(
-                            titolo = "Prenota un appuntamento",
-                            showIcon = true,
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    bottomBar = { BarraNavigazione(navController) }
-                ){padding ->
-                    SelezionaServiziobarba(
-                        modifier = Modifier.padding(padding),
-                        viewModel = listaServiziViewModel,
-                        onNavigateToSelezionaGiorno = {idSer ->
-                            navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
-                        }
-                    )
-                }
-
-            }
-            composable(Screen.SelezionaGiorno.route + "/{idSer}",
-                arguments =  listOf(
-                    navArgument(name = "idSer"){
-                        type = NavType.StringType
-                    }
-                )
-            ){ backStackEntry ->
-                val id = backStackEntry.arguments?.getString("idSer")
-
-                Scaffold(
-                    containerColor = my_grey,
-                    topBar = {
-                        TopBarMia(
-                            titolo = "Scegli un giorno e un orario",
-                            showIcon = true,
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    bottomBar = { BarraNavigazione(navController) }
-                ){padding ->
-                    SelezionaGiorno(
-                        modifier = Modifier.padding(padding),
-                        listaServiziViewModel = listaServiziViewModel,
-                        idSer = id.toString(),
-                        onNavigateToRiepilogo = {idSer, orarioInizio, orarioFine, dataSelezionata->
-                            navController.navigate(Screen.Riepilogo.route + "/$idSer" + "/$orarioInizio" +"/$orarioFine" + "/$dataSelezionata")
-                        }
-                    )
-                }
-
-
-            }
-
-            composable(Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
-                arguments =  listOf(
-                    navArgument(name = "idSer"){
-                        type = NavType.StringType
-                    },
-                    navArgument(name = "orarioInizio"){
-                        type = NavType.StringType
-                    },
-                    navArgument(name = "orarioFine"){
-                        type = NavType.StringType
-                    },
-                    navArgument(name = "dataSelezionata"){
-                        type = NavType.StringType
-                    }
-                )){backStackEntry ->
-                val id = backStackEntry.arguments?.getString("idSer")
-                val orarioInizio = backStackEntry.arguments?.getString("orarioInizio")
-                val orarioFine = backStackEntry.arguments?.getString("orarioFine")
-                val dataSelezionata = backStackEntry.arguments?.getString("dataSelezionata")
-
-                Scaffold(
-                    containerColor = my_grey,
-                    topBar = {
-                        TopBarMia(
-                            titolo = "Riepilogo",
-                            showIcon = true,
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    bottomBar = { BarraNavigazione(navController) }
-                ){padding ->
-                    Riepilogo(
-                        modifier = Modifier.padding(padding),
-                        userViewModel = userViewModel,
-                        listaServiziViewModel = listaServiziViewModel,
-                        idSer = id.toString(),
-                        orarioInizio = orarioInizio.toString(),
-                        orarioFine = orarioFine.toString(),
-                        dataSelezionata = dataSelezionata.toString(),
-                        onSuccess = {
-                            navController.popBackStack(route = Screen.Home.route, inclusive = false)
-                        }
-                    )
-                }
-
-
-
-            }
-
-            composable(Screen.Account.route){
-                Scaffold(
-                    containerColor = my_grey,
-                    topBar = {
-                        TopBarMia(
-                            titolo = "Account",
-                            showIcon = false,
-                            onBack = {
-                                navController.popBackStack()
-                            }
-                        )
-                    },
-                    bottomBar = { BarraNavigazione(navController) }
-                ) { padding ->
-                    Account(modifier = Modifier.padding(padding), userViewModel)
-                }
-
-
-            }
-        }
-        adminNavGraph(navController, adminViewModel)
+        clienteNavGraph(modifier = modifier, navController, userViewModel, listaServiziViewModel, logout)
+        //adminNavGraph(navController, adminViewModel)
 
     }
 
@@ -246,6 +55,7 @@ sealed class Screen(val route:String ){
     object SelezionaGiorno : Screen("selezionaGiorno")
     object Riepilogo : Screen("riepilogo")
     object Account : Screen("account")
+    object DatiPersonali : Screen("datiPersonali")
     object Shop : Screen("shop")
     object Impostazioni : Screen("impostazioni")
 

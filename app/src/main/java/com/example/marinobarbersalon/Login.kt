@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -52,16 +55,24 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 
 
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adminViewModel: AdminViewModel) {
+fun LoginScreen(userViewModel: UserViewModel,
+                adminViewModel: AdminViewModel,
+                navigaHomeCliente : () -> Unit,
+                navigaSignUp : () -> Unit) {
+
+    val userState by userViewModel.userState.collectAsState()
+    val adminState by adminViewModel.adminState.collectAsState()
     val context = LocalContext.current
     BackHandler {
         val activity = context as? ComponentActivity
@@ -85,8 +96,101 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
     else
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
-    val userState by userViewModel.userState.collectAsState()
-    val adminState by adminViewModel.adminState.collectAsState()
+
+
+
+    if (userState.state == AuthState.Authenticated || adminState.state == AuthState.Authenticated){
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(my_grey),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = my_gold) // Indicatore di caricamento
+        }
+    }else{
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF333333))
+                .padding(top = 30.dp),
+        ){
+            Column(
+                verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(color = Color(0xFF7B2B31))){
+                    Image(painter = painterResource(id = R.drawable.logo_scontornato), contentDescription ="logo",
+                        Modifier
+                            .height(180.dp)
+                            .aspectRatio(16 / 9f)
+                            .align(Alignment.Center))
+                }
+                Spacer(modifier = Modifier.height(70.dp))
+                TextField(
+                    value = email, onValueChange = {email = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Email", color = Color(0xFFF5F5DC), fontFamily = myFont, fontSize = 22.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_white,
+                        unfocusedTextColor = my_white,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
+                    maxLines = 1
+                )
+
+                Spacer(modifier = Modifier.height(60.dp))
+
+                TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Password", color = Color(0xFFF5F5DC), fontFamily = myFont,  fontSize = 22.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_white,
+                        unfocusedTextColor = my_white,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    ), trailingIcon = {
+                        IconButton(onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }) {
+                            Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
+
+                        }
+                    }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    maxLines = 1
+                )
+
+                Spacer(modifier = Modifier.height(80.dp))
+
+                Button(onClick = {
+                    adminViewModel.isAdmin(email) { isAdmin ->
+                        Log.d("prova", isAdmin.toString())
+                        if (isAdmin) {
+                            adminViewModel.login(email, password)
+                            Log.d("prova", "Admin loggato")
+                        } else {
+                            userViewModel.login(email, password)
+                            Log.d("prova","Utente loggato")
+                        }
+                    }
+                }, enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
+                    modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
+                    Text(text = "ACCEDI", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
+                }
+
+                TextButton(onClick = { navigaSignUp() }) {
+                    Text(text = "Non hai un account, registrati", fontFamily = myFont, color = my_gold, textDecoration = TextDecoration.Underline)
+                }
+            }
+
+        }
+    }
 
 
 
@@ -97,11 +201,14 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
                 Log.d("prova", "Admin authenticated with state: $adminState.state")
                 Log.d("prova", "Stato utente: $userState.state")
                 // Naviga verso la schermata per gli amministratori
+                /*
                 navController.navigate("adminGraph") {
                     launchSingleTop = true
                     // Se desideri anche gestire il popUpTo qui, puoi farlo
                     popUpTo("login"){inclusive = true}
                 }
+
+                 */
             }
             is AuthState.Error -> {
                 Toast.makeText(context, (adminState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
@@ -110,11 +217,17 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
                 // Solo quando l'amministratore non è autenticato, controlla lo stato dell'utente
                 when (userState.state) {
                     is AuthState.Authenticated -> {
+
+                        navigaHomeCliente()
+
+                        /*
                         Log.d("prova", "User authenticated with state: $userState.state")
                         navController.navigate("clientGraph") {
                             launchSingleTop = true
                             popUpTo("login") { inclusive = true }
                         }
+
+                         */
                     }
                     is AuthState.Error -> {
                         Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
@@ -126,83 +239,7 @@ fun LoginScreen(navController : NavController, userViewModel: UserViewModel, adm
     }
 
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF333333))
-            .padding(top = 30.dp),
-    ){
-        Column(
-            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(color = Color(0xFF7B2B31))){
-                Image(painter = painterResource(id = R.drawable.logo_scontornato), contentDescription ="logo",
-                    Modifier
-                        .height(180.dp)
-                        .aspectRatio(16 / 9f)
-                        .align(Alignment.Center))
-            }
-            Spacer(modifier = Modifier.height(70.dp))
-            TextField(value = email, onValueChange = {email = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Email", color = Color(0xFFF5F5DC), fontFamily = myFont, fontSize = 22.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_white,
-                    unfocusedTextColor = my_white,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
-                ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
 
-            Spacer(modifier = Modifier.height(60.dp))
 
-            TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Password", color = Color(0xFFF5F5DC), fontFamily = myFont,  fontSize = 22.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_white,
-                    unfocusedTextColor = my_white,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
-                ), trailingIcon = {
-                    IconButton(onClick = {
-                        passwordVisibility = !passwordVisibility
-                    }) {
-                        Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
-
-                    }
-                }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
-
-            Spacer(modifier = Modifier.height(80.dp))
-
-            Button(onClick = {
-                adminViewModel.isAdmin(email) { isAdmin ->
-                    Log.d("prova", isAdmin.toString())
-                    if (isAdmin) {
-                        adminViewModel.login(email, password)
-                        Log.d("prova", "Admin loggato")
-                    } else {
-                        userViewModel.login(email, password)
-                        Log.d("prova","Utente loggato")
-                    }
-                }
-            }, enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
-                modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
-                Text(text = "ACCEDI", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
-            }
-
-            TextButton(onClick = { navController.navigate("signup") }) {
-                Text(text = "Non hai un account, registrati", fontFamily = myFont, color = my_gold, textDecoration = TextDecoration.Underline)
-            }
-        }
-
-    }
 
 }

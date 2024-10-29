@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -48,10 +50,10 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun SignUpScreen(navController : NavController, userViewModel: UserViewModel) {
+fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzione : () -> Unit) {
 
     BackHandler {
-        navController.popBackStack("login", false)
+       distruzione()
     }
 
     val userState by userViewModel.userState.collectAsState()
@@ -92,7 +94,7 @@ fun SignUpScreen(navController : NavController, userViewModel: UserViewModel) {
     val context = LocalContext.current
     LaunchedEffect(userState.state){
         when(userState.state){
-            is AuthState.Authenticated -> navController.navigate("home")
+            is AuthState.Authenticated -> navigaHome()
             is AuthState.Error -> Toast.makeText(context,
                 (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
@@ -104,114 +106,120 @@ fun SignUpScreen(navController : NavController, userViewModel: UserViewModel) {
             .fillMaxSize()
             .background(Color(0xFF333333))
             .padding(top = 30.dp, bottom = 50.dp),
+        contentAlignment = Alignment.Center
     ){
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "CREA ACCOUNT", color = my_white, fontSize = 30.sp)
-            Text(text = "Inserisci le informazioni di seguito per completare la registrazione",Modifier.width(300.dp), color = my_white, textAlign = TextAlign.Center)
+        if (userState.state == AuthState.Loading){
+            CircularProgressIndicator(color = my_gold)
+        }else{
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "CREA ACCOUNT", color = my_white, fontSize = 30.sp)
+                Text(text = "Inserisci le informazioni di seguito per completare la registrazione",Modifier.width(300.dp), color = my_white, textAlign = TextAlign.Center)
 
-            Spacer(Modifier.height(50.dp))
+                Spacer(Modifier.height(50.dp))
 
-            TextField(value = nome, onValueChange = {nome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Nome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_gold,
-                    unfocusedTextColor = my_gold,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
+                TextField(value = nome, onValueChange = {nome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Nome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_gold,
+                        unfocusedTextColor = my_gold,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    )
                 )
-            )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            TextField(value = cognome, onValueChange = {cognome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Cognome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_gold,
-                    unfocusedTextColor = my_gold,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
+                TextField(value = cognome, onValueChange = {cognome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Cognome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_gold,
+                        unfocusedTextColor = my_gold,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    )
                 )
-            )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            TextField(value = email, onValueChange = {email = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Email", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_gold,
-                    unfocusedTextColor = my_gold,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
-                ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            TextField(value = eta, onValueChange = {eta = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Età", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_gold,
-                    unfocusedTextColor = my_gold,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
+                TextField(value = email, onValueChange = {email = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Email", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_gold,
+                        unfocusedTextColor = my_gold,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
-            )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Password", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_gold,
-                    unfocusedTextColor = my_gold,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
-                ), trailingIcon = {
-                    IconButton(onClick = {
-                        passwordVisibility = !passwordVisibility
-                    }) {
-                        Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
+                TextField(value = eta, onValueChange = {eta = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Età", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_gold,
+                        unfocusedTextColor = my_gold,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    )
+                )
 
-                    }
-                }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )
+                Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(16.dp))
+                TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Password", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_gold,
+                        unfocusedTextColor = my_gold,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    ), trailingIcon = {
+                        IconButton(onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }) {
+                            Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
 
-            TextField(value = telefono, onValueChange = {telefono = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp, textAlign = TextAlign.Left), placeholder = { Text(text = "Telefono", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-                colors= TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_gold,
-                    unfocusedTextColor = my_gold,
-                    focusedIndicatorColor = my_white,
-                    unfocusedIndicatorColor = my_white,
-                    cursorColor = my_white
-                ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), maxLines = 1
-            )
-            Spacer(Modifier.height(70.dp))
-            Button(onClick = {
-                             userViewModel.signup(email, password, nome, cognome, eta.toInt(), telefono)
+                        }
+                    }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                )
 
-            }, enabled = userState.state != AuthState.Loading, modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
-                Text(text = "CONFERMA", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
+                Spacer(Modifier.height(16.dp))
+
+                TextField(value = telefono, onValueChange = {telefono = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp, textAlign = TextAlign.Left), placeholder = { Text(text = "Telefono", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors= TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedTextColor = my_gold,
+                        unfocusedTextColor = my_gold,
+                        focusedIndicatorColor = my_white,
+                        unfocusedIndicatorColor = my_white,
+                        cursorColor = my_white
+                    ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), maxLines = 1
+                )
+                Spacer(Modifier.height(70.dp))
+                Button(onClick = {
+                    userViewModel.signup(email, password, nome, cognome, eta.toInt(), telefono)
+
+                }, enabled = userState.state != AuthState.Loading, modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
+                    Text(text = "CONFERMA", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
+                }
+
             }
-
         }
+
     }
 }
 

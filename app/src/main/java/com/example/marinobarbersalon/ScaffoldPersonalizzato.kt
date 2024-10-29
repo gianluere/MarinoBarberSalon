@@ -173,6 +173,7 @@ fun BarraNavigazione(navController : NavController) {
         Screen.SelezionaServizioCapelli.route -> Screen.Home.route
         Screen.SelezionaGiorno.route + "/{idSer}" -> Screen.Home.route
         Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}" -> Screen.Home.route
+        Screen.DatiPersonali.route -> Screen.Account.route
         else -> rottaCorrente
     }
     Log.d("NAVBAR", rottaDaEvidenziare.toString())
