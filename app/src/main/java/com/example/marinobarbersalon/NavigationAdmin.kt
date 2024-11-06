@@ -1,6 +1,8 @@
 package com.example.marinobarbersalon
 
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -25,4 +27,22 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
             )
         }
     }
+}
+
+@Composable
+fun NavigationAdmin(modifier: Modifier, navController : NavHostController, adminViewModel : AdminViewModel, logout : () -> Unit) {
+
+    NavHost(navController, startDestination = "homeAdmin"){
+
+        composable(Screen.HomeAdmin.route){
+            HomeAdmin(
+                adminViewModel = adminViewModel,
+                onNavigateToLogin = {
+                    logout()
+                }
+            )
+        }
+    }
+
+
 }

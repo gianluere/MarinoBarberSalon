@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Edit
@@ -39,12 +42,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
+import kotlinx.coroutines.launch
 
 @Composable
 fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
@@ -87,6 +100,20 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
         mutableStateOf(false)
     }
 
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+
+
+    LaunchedEffect(readOnly) {
+        if (!readOnly) {
+            focusRequester.requestFocus()
+        }
+    }
+
+
+
+
     val image = if (passwordVisibility)
         painterResource(id = R.drawable.visibility_24dp_f5f5dc_fill0_wght400_grad0_opsz24)
     else
@@ -95,7 +122,9 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
     Box(modifier = modifier.fillMaxSize()){
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 10.dp),
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .verticalScroll(scrollState)
+                .imePadding(),
             verticalArrangement = Arrangement.spacedBy(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -228,7 +257,8 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
                 label = "Nome",
                 value = nome,
                 onValueChange = {nome = it},
-                readOnly = readOnly
+                readOnly = readOnly,
+                focusRequester = if (!readOnly) {focusRequester} else {null}
             )
 
             RigaDato(
@@ -256,7 +286,14 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
                 label = "Telefono",
                 value = telefono,
                 onValueChange = {telefono = it},
-                readOnly = readOnly
+                readOnly = readOnly,
+                onFocusChanged = { focused ->
+                    if (focused.isFocused) {
+                        coroutineScope.launch {
+                            scrollState.animateScrollTo(scrollState.maxValue)
+                        }
+                    }
+                }
             )
 
 
@@ -267,12 +304,13 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
+                    .background(my_grey.copy(alpha = 0.6f))
                     .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(80.dp),
+                    color = my_gold
                 )
             }
         }
@@ -287,7 +325,9 @@ fun RigaDato(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    readOnly: Boolean
+    readOnly: Boolean,
+    onFocusChanged: ((FocusState) -> Unit)? = null,
+    focusRequester: FocusRequester? = null
 ) {
     Column {
         Row(
@@ -308,7 +348,12 @@ fun RigaDato(
                 readOnly = readOnly,
                 textStyle = TextStyle(fontFamily = myFont, fontSize = 24.sp, color = my_white),
                 modifier = Modifier
-                    .fillMaxWidth().wrapContentHeight(), // Altezza più ridotta
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .onFocusChanged { focusState ->
+                    onFocusChanged?.invoke(focusState) // Invoca onFocusChanged se è definito
+                    }
+                    .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier),
                 singleLine = true // Evita di andare a capo
             )
             /*

@@ -67,7 +67,7 @@ class UserViewModel : ViewModel() {
             _userState.value= _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
             return
         }
-        _userState.value.state = AuthState.Loading
+        _userState.value = _userState.value.copy(state = AuthState.Loading)
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful){

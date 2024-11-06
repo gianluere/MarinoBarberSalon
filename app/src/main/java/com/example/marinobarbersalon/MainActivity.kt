@@ -32,6 +32,12 @@ class MainActivity : ComponentActivity() {
                                 finish()
                             }
                         },
+                        navigaHomeAdmin = {
+                            Intent(applicationContext, HomeAdminActivity::class.java).also {
+                                startActivity(it)
+                                finish()
+                            }
+                        },
                         navigaSignUp = {
                             Intent(applicationContext, SignUpActivity::class.java).also {
                                 startActivity(it)

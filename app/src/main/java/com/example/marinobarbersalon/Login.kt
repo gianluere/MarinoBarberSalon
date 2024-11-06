@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -69,6 +70,7 @@ import com.example.marinobarbersalon.ui.theme.my_white
 fun LoginScreen(userViewModel: UserViewModel,
                 adminViewModel: AdminViewModel,
                 navigaHomeCliente : () -> Unit,
+                navigaHomeAdmin : () -> Unit,
                 navigaSignUp : () -> Unit) {
 
     val userState by userViewModel.userState.collectAsState()
@@ -99,13 +101,16 @@ fun LoginScreen(userViewModel: UserViewModel,
 
 
 
-    if (userState.state == AuthState.Authenticated || adminState.state == AuthState.Authenticated){
+    if (userState.state == null || userState.state == AuthState.Authenticated || adminState.state == AuthState.Authenticated || adminState.state == null){
         Box(
             modifier = Modifier.fillMaxSize()
                 .background(my_grey),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = my_gold) // Indicatore di caricamento
+            CircularProgressIndicator(
+                modifier = Modifier.size(80.dp),
+                color = my_gold
+            )
         }
     }else{
         Box(
@@ -169,6 +174,7 @@ fun LoginScreen(userViewModel: UserViewModel,
                 Spacer(modifier = Modifier.height(80.dp))
 
                 Button(onClick = {
+                    Log.d("LOGIN", email)
                     adminViewModel.isAdmin(email) { isAdmin ->
                         Log.d("prova", isAdmin.toString())
                         if (isAdmin) {
@@ -189,6 +195,19 @@ fun LoginScreen(userViewModel: UserViewModel,
                 }
             }
 
+            if(userState.state == AuthState.Loading || adminState.state == AuthState.Loading){
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .background(my_grey),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(80.dp),
+                        color = my_gold
+                    )
+                }
+            }
+
         }
     }
 
@@ -201,6 +220,9 @@ fun LoginScreen(userViewModel: UserViewModel,
                 Log.d("prova", "Admin authenticated with state: $adminState.state")
                 Log.d("prova", "Stato utente: $userState.state")
                 // Naviga verso la schermata per gli amministratori
+
+                navigaHomeAdmin()
+
                 /*
                 navController.navigate("adminGraph") {
                     launchSingleTop = true

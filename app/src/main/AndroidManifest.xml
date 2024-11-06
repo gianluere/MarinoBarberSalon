@@ -14,9 +14,14 @@
         tools:targetApi="31">
         <activity
             android:name=".HomeClienteActivity"
+            android:launchMode="singleTask"
             android:exported="false" />
         <activity
             android:name=".SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeAdminActivity"
+            android:launchMode="singleTask"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

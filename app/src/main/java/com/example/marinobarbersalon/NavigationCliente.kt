@@ -47,7 +47,7 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
             if (userState.nome.isNullOrEmpty() ) {
                 // Mostra una schermata di caricamento o uno stato intermedio
                 Box(
-                    modifier = Modifier.fillMaxSize().background(my_grey),
+                    modifier = modifier.fillMaxSize().background(my_grey),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = my_gold) // Indicatore di caricamento
@@ -58,7 +58,7 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
                     containerColor = my_grey,
                     topBar = {
                         TopBarMia(
-                            titolo = "BENVENUTO " + userState.nome,
+                            titolo = "BENVENUTO " + userState.nome!!.uppercase(),
                             showIcon = false,
                             onBack = {
                                 navController.popBackStack()
@@ -85,7 +85,7 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
                         onNavigateToSelezionaServizioCapelli = {
                             navController.navigate(Screen.SelezionaServizioCapelli.route)
                         },
-                        userViewModel)
+                        userViewModel = userViewModel)
                 }
             }
 
@@ -230,6 +230,7 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
 
         }
 
+        /*
         composable(Screen.Account.route){
             Scaffold(
                 modifier = modifier,
@@ -248,6 +249,7 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
                 Account(
                     modifier = Modifier.padding(padding),
                     userViewModel,
+                    notificheClienteViewModel = null,
                     onNavigareDatiPersonali = {
                         navController.navigate(Screen.DatiPersonali.route)
                     }
@@ -255,7 +257,9 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
             }
 
 
-        }
+
+
+        }*/
 
         composable(Screen.DatiPersonali.route){
             Scaffold(

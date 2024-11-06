@@ -7,9 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.sharp.AccountCircle
+import androidx.compose.material.icons.twotone.AccountCircle
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -30,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
@@ -159,7 +168,10 @@ fun TopBarMia(
 
 
 @Composable
-fun BarraNavigazione(navController : NavController) {
+fun BarraNavigazione(navController : NavController, notificheClienteViewModel: NotificheClienteViewModel) {
+
+    val notifiche by notificheClienteViewModel.notifiche.collectAsState()
+
     val navItemList = listOf(
         NavItem(Screen.Home.route, ImageVector.vectorResource(R.drawable.sharp_content_cut_24)),
         NavItem(Screen.Account.route, Icons.Outlined.AccountCircle),
@@ -194,13 +206,28 @@ fun BarraNavigazione(navController : NavController) {
                         }
                     },
                     icon = {
-                        Icon(imageVector = navItem.icon, contentDescription = "Icon",
-                            tint = if (rottaDaEvidenziare != navItem.route){
-                                my_white
-                            }else{
-                                my_bordeaux
-                            },
-                            modifier = Modifier.size(45.dp))
+
+                        BadgedBox(badge = {
+                            if (navItem.route == Screen.Account.route && notifiche>0){
+                                Badge(containerColor = my_bordeaux){
+                                    Text(
+                                        text = notifiche.toString(),
+                                        color = my_gold,
+
+                                    )
+                                }
+                            }
+                        }) {
+                            Icon(imageVector = navItem.icon, contentDescription = "Icon",
+                                tint = if (rottaDaEvidenziare != navItem.route){
+                                    my_white
+                                }else{
+                                    my_bordeaux
+                                },
+                                modifier = Modifier.size(45.dp)
+                            )
+                        }
+
                     }
                 )
             }

@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -21,7 +22,7 @@ class AdminViewModel : ViewModel() {
 
     fun checkAuthState(){
         if (auth.currentUser == null){
-            _adminState.value.state = AuthState.Unauthenticated
+            _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)
         }else{
             isAdmin(auth.currentUser?.email ?: "") { isAdmin ->
                 if (isAdmin) {
@@ -53,7 +54,7 @@ class AdminViewModel : ViewModel() {
             _adminState.value= _adminState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
             return
         }
-        _adminState.value.state = AuthState.Loading
+        _adminState.value = _adminState.value.copy(state = AuthState.Loading)
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener{ task ->
                 if (task.isSuccessful){

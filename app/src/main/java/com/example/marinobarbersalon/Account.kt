@@ -11,26 +11,38 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Badge
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.ui.theme.myFont
+import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, onNavigareDatiPersonali : () -> Unit) {
+fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, notificheClienteViewModel : NotificheClienteViewModel, onNavigareDatiPersonali : () -> Unit) {
+
+
+    val notifiche by notificheClienteViewModel.notifiche.collectAsState()
+    
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -40,7 +52,8 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, onNavig
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(modifier = Modifier.fillMaxWidth()
+            Box(modifier = Modifier
+                .fillMaxWidth()
                 .height(60.dp)
                 .background(color = my_yellow),
                 contentAlignment = Alignment.CenterStart
@@ -71,7 +84,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, onNavig
                 color = my_gold
             )
 
-            Riga(testo = "Prenotazioni", modifier = Modifier)
+            Riga(testo = "Prenotazioni", modifier = Modifier, notifiche= notifiche)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -103,7 +116,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, onNavig
 }
 
 @Composable
-fun Riga(testo : String, modifier : Modifier) {
+fun Riga(testo : String, modifier : Modifier, notifiche : Int = 0) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -112,12 +125,34 @@ fun Riga(testo : String, modifier : Modifier) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = testo,
-            fontFamily = myFont,
-            fontSize = 19.sp,
-            color = my_grey,
-            modifier = Modifier.padding(start = 7.dp)
-        )
+        Row {
+            Text(text = testo,
+                fontFamily = myFont,
+                fontSize = 19.sp,
+                color = my_grey,
+                modifier = Modifier.padding(start = 7.dp)
+            )
+
+            if(notifiche > 0){
+                Box(
+                    modifier = Modifier
+                        .padding(start = 15.dp)
+                        .size(25.dp)
+                        .clip(CircleShape) // Applica la forma circolare
+                        .background(color = my_bordeaux), // Imposta il colore di sfondo
+                    contentAlignment = Alignment.Center // Centra il testo all'interno
+                ) {
+                    Text(
+                        text = notifiche.toString(),
+                        color = my_gold, // Colore del testo
+
+                        fontSize = 13.sp
+                    )
+                }
+            }
+
+        }
+
 
         IconButton(onClick = { /*TODO*/ }) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "rightArrow",

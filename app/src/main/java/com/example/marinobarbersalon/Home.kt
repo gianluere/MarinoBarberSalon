@@ -94,9 +94,15 @@ fun HomeScreen(
     val activity = LocalContext.current as? ComponentActivity
 
 
+    /*
     BackHandler {
+
         activity?.finish()
     }
+
+     */
+
+
 
 
     val userState by userViewModel.userState.collectAsState()

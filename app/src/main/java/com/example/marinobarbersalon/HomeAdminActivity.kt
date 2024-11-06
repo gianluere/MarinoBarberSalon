@@ -1,11 +1,9 @@
 package com.example.marinobarbersalon
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -17,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.marinobarbersalon.ui.theme.MarinoBarberSalonTheme
 
-class HomeClienteActivity: ComponentActivity() {
+class HomeAdminActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -28,25 +26,25 @@ class HomeClienteActivity: ComponentActivity() {
                     //color = Color(0xFF333333)
                     //color = MaterialTheme.colorScheme.background
                 ) {
-                    val userViewModel : UserViewModel = viewModel()
+                    val adminViewModel : AdminViewModel = viewModel()
                     val navController = rememberNavController()
-                    val notificheClienteViewModel : NotificheClienteViewModel = viewModel()
+                    //val adminState by adminViewModel.adminState.collectAsState()
 
+                    //Parte da modificare
 
-                    //val userState by userViewModel.userState.collectAsState()
-                    Scaffold(
-                        bottomBar = { BarraNavigazione(navController, notificheClienteViewModel) }
-                    ) {innerpadding->
-                        Navigation(Modifier.padding(innerpadding), navController, userViewModel, notificheClienteViewModel,
-                            logout = {
-                                Intent(applicationContext, MainActivity::class.java).also {
-                                    startActivity(it)
-                                    finish()
-                                }
-                            })
-                    }
-
+                    NavigationAdmin(
+                        modifier = Modifier,
+                        navController = navController,
+                        adminViewModel = adminViewModel,
+                        logout = {
+                            Intent(applicationContext, MainActivity::class.java).also {
+                                startActivity(it)
+                                finish()
+                            }
+                        }
+                    )
                 }
+
             }
         }
     }
