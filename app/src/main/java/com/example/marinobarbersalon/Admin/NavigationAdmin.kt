@@ -1,5 +1,10 @@
 package com.example.marinobarbersalon.Admin
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -29,6 +34,7 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationAdmin(modifier: Modifier, navController : NavHostController, adminViewModel : AdminViewModel, logout : () -> Unit) {
 
@@ -45,7 +51,16 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
         }
 
         composable(Screen.Prova.route){
-            Prova(modifier = modifier)
+            Prova(modifier = modifier,
+                clicca = {
+                    navController.navigate(Screen.Provadue.route)
+                })
+        }
+
+        composable(Screen.Provadue.route){
+
+            Provadue(modifier = Modifier)
+
         }
 
     }

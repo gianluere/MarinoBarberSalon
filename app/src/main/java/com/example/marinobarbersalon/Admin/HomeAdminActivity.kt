@@ -57,7 +57,7 @@ class HomeAdminActivity: ComponentActivity() {
                     val items = listOf(
                         NavDrawerItem(
                             title = "Visualizza appuntamenti",
-                            route = Screen.Home.route,
+                            route = Screen.HomeAdmin.route,
                             selectedIcon = Icons.Filled.Home,
                             unselectedIcon = Icons.Outlined.Home,
                         ),

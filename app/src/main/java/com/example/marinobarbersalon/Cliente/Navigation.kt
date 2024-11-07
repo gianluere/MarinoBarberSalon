@@ -339,5 +339,6 @@ sealed class Screen(val route:String ){
     ///////////////////////////////////////////////////////
     object HomeAdmin : Screen("homeAdmin")
     object Prova : Screen("prova")
+    object Provadue : Screen("provadue")
 
 }
