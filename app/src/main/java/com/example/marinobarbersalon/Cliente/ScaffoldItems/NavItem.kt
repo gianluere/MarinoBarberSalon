@@ -1,4 +1,4 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Cliente.ScaffoldItems
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

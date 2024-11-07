@@ -1,6 +1,5 @@
 package com.example.marinobarbersalon
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,21 +8,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import com.example.marinobarbersalon.Cliente.Account.DatiPersonali
+import com.example.marinobarbersalon.Cliente.Home.HomeScreen
+import com.example.marinobarbersalon.Cliente.Home.ListaServiziViewModel
+import com.example.marinobarbersalon.Cliente.Home.Riepilogo
+import com.example.marinobarbersalon.Cliente.Screen
+import com.example.marinobarbersalon.Cliente.Home.SelezionaGiorno
+import com.example.marinobarbersalon.Cliente.Home.SelezionaServiziobarba
+import com.example.marinobarbersalon.Cliente.Home.SelezioneServizioCapelli
+import com.example.marinobarbersalon.Cliente.ScaffoldItems.TopBarMia
+import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 
@@ -142,7 +147,8 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
             }
 
         }
-        composable(Screen.SelezionaGiorno.route + "/{idSer}",
+        composable(
+            Screen.SelezionaGiorno.route + "/{idSer}",
             arguments =  listOf(
                 navArgument(name = "idSer"){
                     type = NavType.StringType
@@ -178,7 +184,8 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
 
         }
 
-        composable(Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
+        composable(
+            Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
             arguments =  listOf(
                 navArgument(name = "idSer"){
                     type = NavType.StringType

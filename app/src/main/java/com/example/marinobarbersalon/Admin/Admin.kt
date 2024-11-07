@@ -1,4 +1,6 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Admin
+
+import com.example.marinobarbersalon.Cliente.Home.AuthState
 
 data class Admin(
     var state : AuthState? = null,

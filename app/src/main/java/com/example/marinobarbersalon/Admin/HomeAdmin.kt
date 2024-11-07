@@ -1,4 +1,4 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Admin
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.example.marinobarbersalon.Cliente.Home.AuthState
 
 @Composable
 fun HomeAdmin(modifier: Modifier = Modifier, adminViewModel: AdminViewModel, onNavigateToLogin : () -> Unit) {

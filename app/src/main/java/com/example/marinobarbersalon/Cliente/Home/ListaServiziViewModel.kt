@@ -1,7 +1,5 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Cliente.Home
 
-import android.util.Log
-import android.widget.TextView
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore

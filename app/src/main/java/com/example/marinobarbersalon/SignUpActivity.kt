@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.marinobarbersalon.Cliente.Home.HomeClienteActivity
+import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.ui.theme.MarinoBarberSalonTheme
 
 class SignUpActivity: ComponentActivity() {

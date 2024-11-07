@@ -1,6 +1,4 @@
-package com.example.marinobarbersalon
-
-import android.animation.FloatArrayEvaluator
+package com.example.marinobarbersalon.Cliente.Home
 
 data class Servizio(
     var nome : String? = null,

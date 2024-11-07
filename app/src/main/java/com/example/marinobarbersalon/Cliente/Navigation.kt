@@ -1,4 +1,4 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Cliente
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -17,8 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
 
 
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,6 +25,17 @@ import androidx.navigation.NavType
 
 
 import androidx.navigation.navArgument
+import com.example.marinobarbersalon.Cliente.Account.Account
+import com.example.marinobarbersalon.Cliente.Account.DatiPersonali
+import com.example.marinobarbersalon.Cliente.Account.NotificheClienteViewModel
+import com.example.marinobarbersalon.Cliente.Home.HomeScreen
+import com.example.marinobarbersalon.Cliente.Home.ListaServiziViewModel
+import com.example.marinobarbersalon.Cliente.Home.Riepilogo
+import com.example.marinobarbersalon.Cliente.Home.SelezionaGiorno
+import com.example.marinobarbersalon.Cliente.Home.SelezionaServiziobarba
+import com.example.marinobarbersalon.Cliente.Home.SelezioneServizioCapelli
+import com.example.marinobarbersalon.Cliente.Home.UserViewModel
+import com.example.marinobarbersalon.Cliente.ScaffoldItems.TopBarMia
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 
@@ -144,7 +153,8 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             }
 
         }
-        composable(Screen.SelezionaGiorno.route + "/{idSer}",
+        composable(
+            Screen.SelezionaGiorno.route + "/{idSer}",
             arguments =  listOf(
                 navArgument(name = "idSer"){
                     type = NavType.StringType
@@ -180,7 +190,8 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
 
         }
 
-        composable(Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
+        composable(
+            Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}",
             arguments =  listOf(
                 navArgument(name = "idSer"){
                     type = NavType.StringType

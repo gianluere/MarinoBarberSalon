@@ -1,7 +1,7 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Admin
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.marinobarbersalon.Cliente.Home.AuthState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore

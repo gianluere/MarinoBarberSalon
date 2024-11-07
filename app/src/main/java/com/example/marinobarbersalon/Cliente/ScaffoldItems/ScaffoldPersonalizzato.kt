@@ -1,4 +1,4 @@
-package com.example.marinobarbersalon
+package com.example.marinobarbersalon.Cliente.ScaffoldItems
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
@@ -7,13 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.sharp.AccountCircle
-import androidx.compose.material.icons.twotone.AccountCircle
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.marinobarbersalon.ui.theme.myFont
+import com.example.marinobarbersalon.Cliente.Account.NotificheClienteViewModel
+import com.example.marinobarbersalon.Cliente.Screen
+import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
