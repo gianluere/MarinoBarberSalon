@@ -28,6 +28,7 @@ import androidx.navigation.navArgument
 import com.example.marinobarbersalon.Cliente.Account.Account
 import com.example.marinobarbersalon.Cliente.Account.DatiPersonali
 import com.example.marinobarbersalon.Cliente.Account.NotificheClienteViewModel
+import com.example.marinobarbersalon.Cliente.Account.Prenotazioni
 import com.example.marinobarbersalon.Cliente.Home.HomeScreen
 import com.example.marinobarbersalon.Cliente.Home.ListaServiziViewModel
 import com.example.marinobarbersalon.Cliente.Home.Riepilogo
@@ -262,8 +263,11 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     modifier = Modifier.padding(padding),
                     userViewModel = userViewModel,
                     notificheClienteViewModel = notificheClienteViewModel,
-                    onNavigareDatiPersonali = {
+                    onNavigaDatiPersonali = {
                         navController.navigate(Screen.DatiPersonali.route)
+                    },
+                    onNavigaPrenotazioni = {
+                        navController.navigate(Screen.Prenotazioni.route)
                     }
                 )
             }
@@ -292,6 +296,27 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             }
         }
 
+        composable(Screen.Prenotazioni.route){
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "Prenotazioni",
+                        showIcon = true,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                Prenotazioni(
+                    modifier = Modifier.padding(paddingValues),
+                    userViewModel = userViewModel
+                )
+            }
+        }
+
 
     }
 
@@ -307,10 +332,12 @@ sealed class Screen(val route:String ){
     object Riepilogo : Screen("riepilogo")
     object Account : Screen("account")
     object DatiPersonali : Screen("datiPersonali")
+    object Prenotazioni : Screen("prenotazioni")
     object Shop : Screen("shop")
     object Impostazioni : Screen("impostazioni")
 
     ///////////////////////////////////////////////////////
     object HomeAdmin : Screen("homeAdmin")
+    object Prova : Screen("prova")
 
 }

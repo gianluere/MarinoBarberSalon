@@ -21,7 +21,9 @@ fun HomeAdmin(modifier: Modifier = Modifier, adminViewModel: AdminViewModel, onN
         }
     }
 
-    Column { Text("Visualizza appuntamenti")
+    Column(
+        modifier = modifier
+    ) { Text("Visualizza appuntamenti")
         Button(onClick = {
             adminViewModel.logout()
         }) {

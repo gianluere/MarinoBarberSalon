@@ -36,7 +36,13 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, notificheClienteViewModel : NotificheClienteViewModel, onNavigareDatiPersonali : () -> Unit) {
+fun Account(
+    modifier: Modifier = Modifier,
+    userViewModel: UserViewModel,
+    notificheClienteViewModel : NotificheClienteViewModel,
+    onNavigaDatiPersonali : () -> Unit,
+    onNavigaPrenotazioni : () -> Unit
+) {
 
 
     val notifiche by notificheClienteViewModel.notifiche.collectAsState()
@@ -74,7 +80,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, notific
                 color = Color.Gray
             )
 
-            Riga(testo = "Dati personali", modifier = Modifier.clickable { onNavigareDatiPersonali() })
+            Riga(testo = "Dati personali", modifier = Modifier.clickable { onNavigaDatiPersonali() })
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -82,7 +88,7 @@ fun Account(modifier: Modifier = Modifier, userViewModel: UserViewModel, notific
                 color = my_gold
             )
 
-            Riga(testo = "Prenotazioni", modifier = Modifier, notifiche= notifiche)
+            Riga(testo = "Prenotazioni", modifier = Modifier.clickable { onNavigaPrenotazioni() }, notifiche= notifiche)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),

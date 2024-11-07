@@ -3,6 +3,7 @@ package com.example.marinobarbersalon.Cliente.Home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -22,6 +23,9 @@ class UserViewModel : ViewModel() {
     private val _userState = MutableStateFlow(User())
     val userState : StateFlow<User> = _userState.asStateFlow()
     private val db = Firebase.firestore
+
+    private val _listaNotifiche = MutableStateFlow(listOf<Appuntamento>())
+    val listaNotifiche : StateFlow<List<Appuntamento>> = _listaNotifiche.asStateFlow()
 
     init {
         checkAuthState()
@@ -151,12 +155,26 @@ class UserViewModel : ViewModel() {
         onFailed : () -> Unit
     ){
         viewModelScope.launch {
+            Log.d("Riuscito", "Inizio: " + _userState.value.appuntamenti.size.toString())
             aggiungiAppuntamento(servizio,
                 orarioInizio,
                 orarioFine,
                 dataSel,
                 onSuccess,
                 onFailed)
+
+            val docUser = db.collection("utenti").document(auth.currentUser!!.email.toString())
+                .get().await()
+            val dati = docUser.toObject(UserFirebase::class.java)
+            if (dati != null) {
+                Log.d("Riuscito", "DimDatiApp: " + dati.appuntamenti.size)
+            }
+            if (dati != null){
+                _userState.value = _userState.value.copy(
+                    appuntamenti = dati.appuntamenti
+                )
+                Log.d("Riuscito", "Fine: " + _userState.value.appuntamenti.size.toString())
+            }
         }
     }
 
@@ -174,10 +192,12 @@ class UserViewModel : ViewModel() {
         val results = db.collection("servizi").whereEqualTo("nome", servizio).limit(1)
             .get().await()
 
-        idServizio = results.documents[0].id
+        //idServizio = results.documents[0].id
+        val servizio : String = results.documents[0].get("nome").toString()
+        val descrizione : String = results.documents[0].get("descrizione").toString()
 
         Log.d("Appuntamento", idServizio)
-        val servizioRiferimento: DocumentReference = db.collection("servizi").document(idServizio)
+        //val servizioRiferimento: DocumentReference = db.collection("servizi").document(idServizio)
         val utenteRiferimento: DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
 
         val appuntamento = hashMapOf(
@@ -185,7 +205,8 @@ class UserViewModel : ViewModel() {
             "orarioInizio" to orarioInizio,
             "orarioFine" to orarioFine,
             "data" to data,
-            "servizio" to servizioRiferimento
+            "servizio" to servizio,
+            "descrizione" to descrizione
         )
 
         val appuntamentoPath = db.collection("appuntamenti").document(data)
@@ -241,10 +262,10 @@ class UserViewModel : ViewModel() {
                     )
                 }
 
-
                 onSuccess()
             }.await()
 
+            Log.d("Riuscito", "finito")
             Log.d("Appuntamento", "Prenotazione aggiunta con successo")
 
         } catch (e: FirebaseFirestoreException) {
@@ -287,6 +308,48 @@ class UserViewModel : ViewModel() {
         }
 
 
+    }
+
+
+    private suspend fun recuperaDocumenti(listaAppuntamenti : List<DocumentReference>): List<Appuntamento>{
+        val appuntamenti = mutableListOf<Appuntamento>()
+        Log.d("Notif", "size: " + listaAppuntamenti.size.toString())
+        for (document in listaAppuntamenti){
+            val result = document.get().await()
+
+            result.toObject(Appuntamento::class.java)?.let { appuntamenti.add(it)
+                Log.d("Notif", "Ci sto " + result.id)}
+        }
+
+
+        Log.d("Notif", "Lunghezza funzione: " + appuntamenti.size.toString())
+        Log.d("Notif", "Appuntamenti funzione: " + appuntamenti.toString())
+        return appuntamenti
+    }
+
+    fun sincronizzaPrenotazioni(){
+
+        auth.currentUser?.email?.let {
+            db.collection("utenti").document(it).addSnapshotListener{ snapshot, error ->
+
+                if (error != null) {
+                    Log.e("FirestoreError", "Errore nel ricevere aggiornamenti: ", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val appuntamentiList = snapshot.get("appuntamenti") as? List<DocumentReference>
+
+                    if (appuntamentiList != null) {
+                        viewModelScope.launch {
+                            val listApp = recuperaDocumenti(appuntamentiList)
+                            _listaNotifiche.value = listApp
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
 

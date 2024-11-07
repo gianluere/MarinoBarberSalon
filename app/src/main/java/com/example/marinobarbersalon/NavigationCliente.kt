@@ -33,7 +33,7 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 
 
-
+/*
 fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavController, userViewModel: UserViewModel, listaServiziViewModel: ListaServiziViewModel, logout : () -> Unit) {
 
     navigation(
@@ -291,3 +291,5 @@ fun NavGraphBuilder.clienteNavGraph(modifier: Modifier, navController: NavContro
 
     }
 }
+
+ */

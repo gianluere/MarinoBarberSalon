@@ -36,12 +36,18 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
         composable(Screen.HomeAdmin.route){
             HomeAdmin(
+                modifier = modifier,
                 adminViewModel = adminViewModel,
                 onNavigateToLogin = {
                     logout()
                 }
             )
         }
+
+        composable(Screen.Prova.route){
+            Prova(modifier = modifier)
+        }
+
     }
 
 
