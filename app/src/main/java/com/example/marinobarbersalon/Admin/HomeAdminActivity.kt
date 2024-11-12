@@ -24,7 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,6 +79,13 @@ class HomeAdminActivity: ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
 
+                    val pagineConDrawer = listOf(
+                        Screen.HomeAdmin.route,
+                        Screen.Prova.route
+                    )
+
+                    val showDraweIcon = currentRoute in pagineConDrawer
+
 
                     ModalNavigationDrawer(
                         gesturesEnabled = drawerState.isOpen,
@@ -117,6 +127,7 @@ class HomeAdminActivity: ComponentActivity() {
                     ) {
                         Scaffold(
                             topBar = {
+                                /*
                                 TopAppBar(
                                     title = {
                                         Text(text = "PROVA")
@@ -133,6 +144,18 @@ class HomeAdminActivity: ComponentActivity() {
                                                 imageVector = Icons.Default.Menu,
                                                 contentDescription = "menu"
                                             )
+                                        }
+                                    }
+                                )
+
+                                 */
+
+                                TopBarDrawer(
+                                    showDrawer = showDraweIcon,
+                                    navController = navController,
+                                    onClickDrawer = {
+                                        scope.launch {
+                                            drawerState.open()
                                         }
                                     }
                                 )
@@ -154,21 +177,6 @@ class HomeAdminActivity: ComponentActivity() {
 
 
 
-
-                    /*
-                    NavigationAdmin(
-                        modifier = Modifier,
-                        navController = navController,
-                        adminViewModel = adminViewModel,
-                        logout = {
-                            Intent(applicationContext, MainActivity::class.java).also {
-                                startActivity(it)
-                                finish()
-                            }
-                        }
-                    )
-
-                     */
                 }
 
             }

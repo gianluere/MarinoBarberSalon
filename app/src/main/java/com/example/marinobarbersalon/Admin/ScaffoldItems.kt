@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,9 +23,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.marinobarbersalon.Cliente.Screen
 import com.example.marinobarbersalon.R
+import com.example.marinobarbersalon.ui.theme.my_grey
+import com.example.marinobarbersalon.ui.theme.my_white
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -47,6 +56,67 @@ fun TopBar(scope: CoroutineScope, drawerState: DrawerState) {
         )
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDrawer : () -> Unit) {
+
+    val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val titolo = when (rottaCorrente) {
+        Screen.HomeAdmin.route -> "VISUALIZZA APPUNTAMENTI"
+        Screen.Prova.route -> "PROVA"
+        Screen.Provadue.route -> "PROVADue"
+        else -> "Default"
+    }
+
+
+    TopAppBar(
+        title = {
+
+            Text(
+                text = titolo,
+                fontSize = 25.sp,
+                color = my_white,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            )
+
+
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = my_grey
+        ),
+        navigationIcon = {
+            if (showDrawer){
+                IconButton(onClick = {onClickDrawer()},
+                ) {
+                    Icon(imageVector = Icons.Default.Menu, contentDescription = "menu",
+                        tint = my_white
+                    )
+                }
+            }else{
+                IconButton(onClick = {
+                    navController.popBackStack()
+                },
+                ) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                        tint = my_white,
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                }
+            }
+
+        }
+
+    )
+
+}
+
+
 
 /*
 //definisce come verranno visualizzati gli elementi del drawer

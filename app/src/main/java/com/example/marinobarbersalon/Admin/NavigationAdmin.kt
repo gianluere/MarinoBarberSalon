@@ -59,7 +59,7 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
         composable(Screen.Provadue.route){
 
-            Provadue(modifier = Modifier)
+            Provadue(modifier = modifier)
 
         }
 
