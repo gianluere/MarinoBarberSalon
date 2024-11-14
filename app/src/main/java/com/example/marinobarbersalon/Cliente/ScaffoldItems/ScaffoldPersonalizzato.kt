@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -118,6 +120,40 @@ fun TopBarMia(
     Column(
         Modifier.fillMaxWidth()
     ) {
+        CenterAlignedTopAppBar(
+            title = {
+
+                Text(
+                    text = titolo,
+                    fontSize = 25.sp,
+                    color = my_white,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(x = if (!showIcon) 0.dp else (-24).dp),
+                )
+
+
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = my_grey
+            ),
+            navigationIcon = {
+                if (showIcon){
+                    IconButton(onClick = {onBack()},
+                    ) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                            tint = my_white,
+                            modifier = Modifier
+                                .size(24.dp)
+                        )
+                    }
+                }
+
+            }
+        )
+        /*
         TopAppBar(
             title = {
 
@@ -128,7 +164,8 @@ fun TopBarMia(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .offset(x = if (!showIcon) 0.dp else (-24).dp),
                 )
 
 
@@ -151,6 +188,8 @@ fun TopBarMia(
             }
 
         )
+
+         */
 
         HorizontalDivider(
             modifier = Modifier
@@ -184,6 +223,7 @@ fun BarraNavigazione(navController : NavController, notificheClienteViewModel: N
         Screen.SelezionaGiorno.route + "/{idSer}" -> Screen.Home.route
         Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}" -> Screen.Home.route
         Screen.DatiPersonali.route -> Screen.Account.route
+        Screen.Prenotazioni.route -> Screen.Account.route
         else -> rottaCorrente
     }
     Log.d("NAVBAR", rottaDaEvidenziare.toString())

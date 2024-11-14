@@ -302,7 +302,7 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                 containerColor = my_grey,
                 topBar = {
                     TopBarMia(
-                        titolo = "Prenotazioni",
+                        titolo = "PRENOTAZIONI",
                         showIcon = true,
                         onBack = {
                             navController.popBackStack()

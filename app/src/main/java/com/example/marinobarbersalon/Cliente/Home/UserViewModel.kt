@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class UserViewModel : ViewModel() {
 
@@ -24,8 +27,8 @@ class UserViewModel : ViewModel() {
     val userState : StateFlow<User> = _userState.asStateFlow()
     private val db = Firebase.firestore
 
-    private val _listaNotifiche = MutableStateFlow(listOf<Appuntamento>())
-    val listaNotifiche : StateFlow<List<Appuntamento>> = _listaNotifiche.asStateFlow()
+    private val _listaAppuntamenti = MutableStateFlow(listOf<Appuntamento>())
+    val listaAppuntamenti : StateFlow<List<Appuntamento>> = _listaAppuntamenti.asStateFlow()
 
     init {
         checkAuthState()
@@ -195,6 +198,7 @@ class UserViewModel : ViewModel() {
         //idServizio = results.documents[0].id
         val servizio : String = results.documents[0].get("nome").toString()
         val descrizione : String = results.documents[0].get("descrizione").toString()
+        val prezzo : Double = results.documents[0].get("prezzo").toString().toDouble()
 
         Log.d("Appuntamento", idServizio)
         //val servizioRiferimento: DocumentReference = db.collection("servizi").document(idServizio)
@@ -206,7 +210,8 @@ class UserViewModel : ViewModel() {
             "orarioFine" to orarioFine,
             "data" to data,
             "servizio" to servizio,
-            "descrizione" to descrizione
+            "descrizione" to descrizione,
+            "prezzo" to prezzo
         )
 
         val appuntamentoPath = db.collection("appuntamenti").document(data)
@@ -342,8 +347,20 @@ class UserViewModel : ViewModel() {
 
                     if (appuntamentiList != null) {
                         viewModelScope.launch {
-                            val listApp = recuperaDocumenti(appuntamentiList)
-                            _listaNotifiche.value = listApp
+                            var listApp = recuperaDocumenti(appuntamentiList)
+                            listApp.forEach{app->
+                                app.descrizione = app.descrizione.replace(Regex("\\s+"), " ")
+                            }
+
+                            val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+                            listApp = listApp.sortedWith(compareByDescending<Appuntamento> {
+                                LocalDate.parse(it.data, dateFormatter)
+                            }.thenByDescending {
+                                LocalTime.parse(it.orarioInizio, timeFormatter)
+                            })
+
+                            _listaAppuntamenti.value = listApp
                         }
                     }
                 }
