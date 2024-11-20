@@ -2,6 +2,7 @@ package com.example.marinobarbersalon.Cliente.Account
 
 import android.util.Log
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -122,7 +123,7 @@ fun CardPrenotazione(appuntamento: Appuntamento) {
             ){
                 Text(text = appuntamento.servizio,
                     fontFamily = myFont,
-                    fontSize = 19.sp,
+                    fontSize = 21.sp,
                     color = Color.Black
                 )
             }
@@ -150,23 +151,23 @@ fun CardPrenotazione(appuntamento: Appuntamento) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom){
                 Text(
-                    text = "Data: ${appuntamento.data}",
+                    text = appuntamento.data,
                     fontFamily = myFont,
-                    fontSize = 15.sp,
+                    fontSize = 17.sp,
                     color = Color.Black
                 )
 
                 Text(
                     text = appuntamento.orarioInizio + " - " + appuntamento.orarioFine,
                     fontFamily = myFont,
-                    fontSize = 15.sp,
+                    fontSize = 17.sp,
                     color = Color.Black
                 )
 
                 Text(
                     text = String.format("%.2f", appuntamento.prezzo)+"€",
                     fontFamily = myFont,
-                    fontSize = 14.sp,
+                    fontSize = 17.sp,
                     color = Color.Black
                 )
             }
