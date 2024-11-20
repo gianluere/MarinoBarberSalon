@@ -137,21 +137,21 @@ fun Riepilogo(
                         fontFamily = myFont,
                         textDecoration = TextDecoration.Underline
                     )
-                    Button(onClick = {
-                        userViewModel.aggiungiApp(
-                            servizio = idSer,
-                            orarioFine = orarioFine,
-                            orarioInizio = orarioInizio,
-                            dataSel = dataSelezionata.toString(),
-                            onSuccess = {
-                                showDialogSuccess = true
-                            },
-                            onFailed = {
-                                showDialogError = true
-                            }
-                        )
-
-                    },
+                    Button(
+                        onClick = {
+                            userViewModel.aggiungiApp(
+                                servizio = idSer,
+                                orarioFine = orarioFine,
+                                orarioInizio = orarioInizio,
+                                dataSel = dataSelezionata.toString(),
+                                onSuccess = {
+                                    showDialogSuccess = true
+                                },
+                                onFailed = {
+                                    showDialogError = true
+                                }
+                            )
+                        },
                         enabled = !showDialogError && !showDialogSuccess,
                         modifier = Modifier
                             .fillMaxWidth()

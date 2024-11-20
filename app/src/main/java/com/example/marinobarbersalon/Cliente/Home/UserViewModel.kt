@@ -370,5 +370,46 @@ class UserViewModel : ViewModel() {
     }
 
 
+    fun annullaPrenotazione(appuntamento: Appuntamento, finito : () -> Unit){
+
+        val appuntamentoPath = db.collection("appuntamenti").document(appuntamento.data)
+        val occupatiPath = db.collection("occupati").document(appuntamento.data)
+        val utenteRiferimento: DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
+
+
+        db.runTransaction {transaction ->
+            val appuntamentoSnapshot = transaction.get(appuntamentoPath)
+            val occupatiSnapshot = transaction.get(occupatiPath)
+            val userSnapshot = transaction.get(utenteRiferimento)
+            val chiave = "${appuntamento.orarioInizio}-${appuntamento.orarioFine}"
+            val appuntamentoReference = db.collection("appuntamenti").document(appuntamento.data).collection("app").document(chiave)
+
+            if (appuntamentoSnapshot.exists()) {
+                transaction.delete(
+                    appuntamentoPath.collection("app").document(chiave)
+                )
+            }
+
+            if (occupatiSnapshot.exists()){
+                transaction.update(
+                    occupatiPath, chiave, FieldValue.delete()
+                )
+            }
+
+            if(userSnapshot.exists()){
+                transaction.update(
+                    utenteRiferimento, "appuntamenti", FieldValue.arrayRemove(appuntamentoReference)
+                )
+            }
+
+        }.addOnSuccessListener {
+            finito()
+        }
+
+
+    }
+
+
+
 }
 
