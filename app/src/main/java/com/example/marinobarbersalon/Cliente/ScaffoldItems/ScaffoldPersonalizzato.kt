@@ -224,6 +224,7 @@ fun BarraNavigazione(navController : NavController, notificheClienteViewModel: N
         Screen.Riepilogo.route + "/{idSer}/{orarioInizio}/{orarioFine}/{dataSelezionata}" -> Screen.Home.route
         Screen.DatiPersonali.route -> Screen.Account.route
         Screen.Prenotazioni.route -> Screen.Account.route
+        Screen.Recensioni.route -> Screen.Account.route
         else -> rottaCorrente
     }
     Log.d("NAVBAR", rottaDaEvidenziare.toString())

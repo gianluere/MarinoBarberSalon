@@ -29,6 +29,7 @@ import com.example.marinobarbersalon.Cliente.Account.Account
 import com.example.marinobarbersalon.Cliente.Account.DatiPersonali
 import com.example.marinobarbersalon.Cliente.Account.NotificheClienteViewModel
 import com.example.marinobarbersalon.Cliente.Account.Prenotazioni
+import com.example.marinobarbersalon.Cliente.Account.Recensioni
 import com.example.marinobarbersalon.Cliente.Home.HomeScreen
 import com.example.marinobarbersalon.Cliente.Home.ListaServiziViewModel
 import com.example.marinobarbersalon.Cliente.Home.Riepilogo
@@ -268,6 +269,9 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     },
                     onNavigaPrenotazioni = {
                         navController.navigate(Screen.Prenotazioni.route)
+                    },
+                    onNavigaRecensioni = {
+                        navController.navigate(Screen.Recensioni.route)
                     }
                 )
             }
@@ -317,6 +321,26 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             }
         }
 
+        composable(Screen.Recensioni.route){
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "RECENSIONI",
+                        showIcon = true,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                Recensioni(
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+        }
+
 
     }
 
@@ -333,6 +357,7 @@ sealed class Screen(val route:String ){
     object Account : Screen("account")
     object DatiPersonali : Screen("datiPersonali")
     object Prenotazioni : Screen("prenotazioni")
+    object Recensioni : Screen("recensioni")
     object Shop : Screen("shop")
     object Impostazioni : Screen("impostazioni")
 

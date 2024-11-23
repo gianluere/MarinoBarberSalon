@@ -41,7 +41,8 @@ fun Account(
     userViewModel: UserViewModel,
     notificheClienteViewModel : NotificheClienteViewModel,
     onNavigaDatiPersonali : () -> Unit,
-    onNavigaPrenotazioni : () -> Unit
+    onNavigaPrenotazioni : () -> Unit,
+    onNavigaRecensioni : () -> Unit
 ) {
 
 
@@ -104,7 +105,7 @@ fun Account(
                 color = my_gold
             )
 
-            Riga(testo = "Rilascia feedback", modifier = Modifier)
+            Riga(testo = "Rilascia feedback", modifier = Modifier.clickable { onNavigaRecensioni() })
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),

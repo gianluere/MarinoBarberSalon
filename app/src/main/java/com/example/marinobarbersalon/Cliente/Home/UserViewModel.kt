@@ -43,6 +43,7 @@ class UserViewModel : ViewModel() {
                 if (isCliente) {
                     _userState.value = _userState.value.copy(state = AuthState.Authenticated)
                     caricaDati()
+                    sincronizzaPrenotazioni()
                 } else {
                     // Se non è un admin, non lo autentichiamo
                     _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
@@ -370,7 +371,7 @@ class UserViewModel : ViewModel() {
     }
 
 
-    fun annullaPrenotazione(appuntamento: Appuntamento, finito : () -> Unit){
+    fun annullaPrenotazione(appuntamento: Appuntamento, finito : () -> Unit, errore : () -> Unit){
 
         val appuntamentoPath = db.collection("appuntamenti").document(appuntamento.data)
         val occupatiPath = db.collection("occupati").document(appuntamento.data)
@@ -404,6 +405,12 @@ class UserViewModel : ViewModel() {
 
         }.addOnSuccessListener {
             finito()
+        }.addOnFailureListener {
+            finito()
+            errore()
+        }.addOnCanceledListener {
+            finito()
+            errore()
         }
 
 
