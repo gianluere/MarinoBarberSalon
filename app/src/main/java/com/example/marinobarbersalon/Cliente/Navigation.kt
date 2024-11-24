@@ -27,6 +27,8 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.marinobarbersalon.Cliente.Account.Account
 import com.example.marinobarbersalon.Cliente.Account.DatiPersonali
+import com.example.marinobarbersalon.Cliente.Account.InserisciRecensione
+import com.example.marinobarbersalon.Cliente.Account.ListaRecensioniViewModel
 import com.example.marinobarbersalon.Cliente.Account.NotificheClienteViewModel
 import com.example.marinobarbersalon.Cliente.Account.Prenotazioni
 import com.example.marinobarbersalon.Cliente.Account.Recensioni
@@ -47,6 +49,8 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 fun Navigation(modifier: Modifier, navController : NavHostController, userViewModel : UserViewModel, notificheClienteViewModel: NotificheClienteViewModel, logout : () -> Unit) {
 
     val listaServiziViewModel : ListaServiziViewModel = viewModel()
+    val listaRecensioniViewModel : ListaRecensioniViewModel = viewModel()
+
     NavHost(navController, startDestination = "home"){
 
 
@@ -336,7 +340,32 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                 }
             ) { paddingValues ->
                 Recensioni(
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(paddingValues),
+                    listaRecensioniViewModel = listaRecensioniViewModel,
+                    onNavigateToInserisciRecensione = {
+                        navController.navigate(Screen.InserisciRecensione.route)
+                    }
+                )
+            }
+        }
+
+        composable(Screen.InserisciRecensione.route){
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "INSERISCI RECENSIONE",
+                        showIcon = true,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                InserisciRecensione(
+                    modifier = Modifier.padding(paddingValues),
+                    listaRecensioniViewModel = listaRecensioniViewModel
                 )
             }
         }
@@ -358,6 +387,7 @@ sealed class Screen(val route:String ){
     object DatiPersonali : Screen("datiPersonali")
     object Prenotazioni : Screen("prenotazioni")
     object Recensioni : Screen("recensioni")
+    object InserisciRecensione : Screen("inserisciRecensione")
     object Shop : Screen("shop")
     object Impostazioni : Screen("impostazioni")
 

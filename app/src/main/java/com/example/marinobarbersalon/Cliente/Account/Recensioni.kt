@@ -2,6 +2,7 @@ package com.example.marinobarbersalon.Cliente.Account
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +39,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.Cliente.Screen
 import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
@@ -45,15 +49,16 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun Recensioni(modifier: Modifier) {
+fun Recensioni(
+    modifier: Modifier,
+    listaRecensioniViewModel : ListaRecensioniViewModel,
+    onNavigateToInserisciRecensione : () -> Unit
+) {
 
-    val lista = listOf(
-        Recensione("Gian", 4.5, "Esperienza super positiva, Emilio sempre molto cordiale, gentile e simpatico, accompagnato da una grande professionalità e precisione nel servizio sempre all'altezza. Cura maniacale dei dettagli, prodotti di qualità. Servizio eccellente, locale moderno e pulito...consigliato non vi deluderà!"),
-        Recensione("Ste", 4.0, "ff"),
-        Recensione("Lui", 3.0, "ff"),
-        Recensione("GiAAAAan", 5.0, "ff"),
-        Recensione("GianA", 0.0, "ff")
-        )
+    listaRecensioniViewModel.caricaListaRecensioni()
+    val listaRecensioni by listaRecensioniViewModel.listaRecensioni.collectAsState()
+
+
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -67,7 +72,10 @@ fun Recensioni(modifier: Modifier) {
                 modifier = Modifier
                     .background(color = my_yellow, shape = RoundedCornerShape(10.dp))
                     .height(45.dp)
-                    .padding(horizontal = 5.dp),
+                    .padding(horizontal = 5.dp)
+                    .clickable {
+                        onNavigateToInserisciRecensione()
+                    },
                 //horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -85,7 +93,7 @@ fun Recensioni(modifier: Modifier) {
         LazyColumn(
             modifier = Modifier.padding(vertical = 20.dp)
         ) {
-            items(lista) { recensione ->
+            items(listaRecensioni) { recensione ->
                 CardRecensione(recensione)
             }
         }
@@ -112,6 +120,7 @@ fun CardRecensione(recensione : Recensione) {
         horizontalAlignment = Alignment.Start
     ) {
         Text(
+            modifier = Modifier.padding(top = 5.dp),
             text = recensione.nome,
             fontSize = 24.sp,
             fontFamily = myFont,
