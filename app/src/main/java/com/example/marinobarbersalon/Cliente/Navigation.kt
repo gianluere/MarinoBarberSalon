@@ -365,7 +365,11 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             ) { paddingValues ->
                 InserisciRecensione(
                     modifier = Modifier.padding(paddingValues),
-                    listaRecensioniViewModel = listaRecensioniViewModel
+                    listaRecensioniViewModel = listaRecensioniViewModel,
+                    userViewModel = userViewModel,
+                    onSuccess = {
+                        navController.popBackStack(route = Screen.Recensioni.route, inclusive = false)
+                    }
                 )
             }
         }

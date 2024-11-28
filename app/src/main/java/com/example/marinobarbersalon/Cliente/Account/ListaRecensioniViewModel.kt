@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon.Cliente.Account
 
+import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +28,16 @@ class ListaRecensioniViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { result->
                 _listaRecensioni.value = result.toObjects()
+            }
+    }
+
+    fun inserisciRecensione(
+        recensione : Recensione,
+        onCompleted : () -> Unit
+    ){
+        db.collection("recensioni").add(recensione)
+            .addOnSuccessListener {
+                onCompleted()
             }
     }
 
