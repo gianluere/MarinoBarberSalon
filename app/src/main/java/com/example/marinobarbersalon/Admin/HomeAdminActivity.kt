@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.marinobarbersalon.MainActivity
 import com.example.marinobarbersalon.ui.theme.MarinoBarberSalonTheme
 import com.example.marinobarbersalon.Cliente.Screen
+import com.example.marinobarbersalon.ui.theme.my_grey
 import kotlinx.coroutines.launch
 
 class HomeAdminActivity: ComponentActivity() {
@@ -126,6 +127,7 @@ class HomeAdminActivity: ComponentActivity() {
                         drawerState = drawerState
                     ) {
                         Scaffold(
+                            containerColor = my_grey,
                             topBar = {
                                 /*
                                 TopAppBar(
