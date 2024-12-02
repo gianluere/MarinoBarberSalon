@@ -69,6 +69,8 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         Screen.HomeAdmin.route -> "VISUALIZZA APPUNTAMENTI"
         Screen.Prova.route -> "PROVA"
         Screen.Provadue.route -> "PROVADue"
+        Screen.CalendarScreen.route -> "CALENDAR"
+        Screen.NextScreen.route -> "Prossima Pagina"
         else -> "Default"
     }
 

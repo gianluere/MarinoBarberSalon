@@ -70,6 +70,12 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.Prova.route,
                             selectedIcon = Icons.Filled.Person,
                             unselectedIcon = Icons.Outlined.Person,
+                        ),
+                        NavDrawerItem(
+                            title = "Calendario",
+                            route = Screen.CalendarScreen.route,
+                            selectedIcon = Icons.Filled.Home,
+                            unselectedIcon = Icons.Outlined.Home,
                         )
                     )
 

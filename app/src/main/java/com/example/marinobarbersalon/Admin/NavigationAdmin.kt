@@ -13,6 +13,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.CalendarScreen
+import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.NextScreen
 import com.example.marinobarbersalon.Cliente.Screen
 
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
@@ -62,6 +64,20 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             Provadue(modifier = modifier)
 
         }
+
+        composable(Screen.CalendarScreen.route) {
+            CalendarScreen(
+                onNavigateToNextPage = {
+                    navController.navigate(Screen.NextScreen.route)
+                }
+            )
+        }
+
+        composable(Screen.NextScreen.route) {
+            NextScreen()
+        }
+
+
 
     }
 

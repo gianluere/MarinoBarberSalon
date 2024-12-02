@@ -395,5 +395,7 @@ sealed class Screen(val route:String ){
     object HomeAdmin : Screen("homeAdmin")
     object Prova : Screen("prova")
     object Provadue : Screen("provadue")
+    object CalendarScreen : Screen("calendarScreen")
+    object NextScreen : Screen("nextScreen")
 
 }
