@@ -1,9 +1,17 @@
 package com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti
 
+import android.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
@@ -18,9 +26,34 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.graphics.toColor
+import com.example.marinobarbersalon.ui.theme.my_grey
+import com.example.marinobarbersalon.ui.theme.my_white
+
+import java.time.Month
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.time.LocalDate
+
+
 
 
 class VisualizzaAppuntamentiVM: ViewModel() {
@@ -41,25 +74,141 @@ class VisualizzaAppuntamentiVM: ViewModel() {
 
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Calendar(onDateSelected: (String) -> Unit) {
-    // Date di esempio per un mese
-    val dates = (1..31).map { day -> "2024-12-$day" }
+fun Calendar(
+    onDateSelected: (String) -> Unit
+) {
+    val currentDate = remember { LocalDate.now() }
+    var selectedMonth by remember { mutableStateOf(currentDate.month) }
+    var selectedYear by remember { mutableStateOf(currentDate.year) }
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(7), // Una settimana con 7 giorni
-        modifier = Modifier.padding(8.dp)
-    ) {
-        items(dates) { date ->
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clickable { onDateSelected(date) },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = date.split("-").last())
-            }
+    val daysInMonth = remember(selectedMonth, selectedYear) {
+        YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
+    }
+
+    val firstDayOfWeek = remember(selectedMonth, selectedYear) {
+        YearMonth.of(selectedYear, selectedMonth)
+            .atDay(1)
+            .dayOfWeek
+            .value % 7
+    }
+
+    val dates = remember(selectedMonth, selectedYear) {
+        buildList {
+            repeat(firstDayOfWeek) { add(null) }
+            addAll((1..daysInMonth).map { it })
         }
     }
+
+    // Locale in Italiano per mesi e giorni della settimana
+    val italianMonthNames = listOf(
+        "Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"
+    )
+
+    val italianWeekDays = listOf("Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab")
+
+    // Formatter per la data in formato GG-MM-AAAA
+    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        // Header con mese e anno, più navigazione tra i mesi
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            IconButton(onClick = {
+                if (selectedMonth == Month.JANUARY) {
+                    selectedMonth = Month.DECEMBER
+                    selectedYear -= 1
+                } else {
+                    selectedMonth = selectedMonth.minus(1)
+                }
+            }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Previous Month")
+            }
+
+            Text(
+                text = "${italianMonthNames[selectedMonth.value - 1]} $selectedYear",  // Mese in italiano
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            IconButton(onClick = {
+                if (selectedMonth == Month.DECEMBER) {
+                    selectedMonth = Month.JANUARY
+                    selectedYear += 1
+                } else {
+                    selectedMonth = selectedMonth.plus(1)
+                }
+            }) {
+                Icon(Icons.Default.ArrowForward, contentDescription = "Next Month")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Visualizzazione dei giorni della settimana in italiano
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            italianWeekDays.forEach { day ->
+                Text(
+                    text = day,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Griglia dei giorni
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(dates) { day ->
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(1f) // Mantieni la forma quadrata
+                        .clickable(enabled = day != null) {
+                            if (day != null) {
+                                // Converti la data nel formato GG-MM-AAAA
+                                val selectedDate = LocalDate.of(selectedYear, selectedMonth, day)
+                                val formattedDate = selectedDate.format(formatter)
+                                onDateSelected(formattedDate)  // Passa la data formattata
+                            }
+                        }
+                        .background(
+                            if (day == currentDate.dayOfMonth &&
+                                selectedMonth == currentDate.month &&
+                                selectedYear == currentDate.year
+                            ) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            else MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                        .padding(4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = day?.toString() ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = my_white
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+    }
 }
+
+
+
