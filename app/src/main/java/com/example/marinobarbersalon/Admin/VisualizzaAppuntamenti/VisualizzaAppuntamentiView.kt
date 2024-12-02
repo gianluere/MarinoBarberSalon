@@ -3,6 +3,7 @@ package com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +12,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.marinobarbersalon.ui.theme.myFont
+import com.example.marinobarbersalon.ui.theme.my_bordeaux
+import com.example.marinobarbersalon.ui.theme.my_gold
 import java.util.Calendar
 
 @Composable
@@ -43,14 +47,19 @@ fun CalendarScreen(
         Text(
             text = "Data selezionata: ${calendarState.selectedDate ?: "Nessuna"}",
             fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
+            fontFamily = myFont
         )
 
         Button(
             onClick = { calendarViewModel.onConfirm(onNavigateToNextPage) },
-            enabled = calendarState.selectedDate != null
+            enabled = calendarState.selectedDate != null,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = my_bordeaux,
+                disabledContainerColor = my_bordeaux
+            )
         ) {
-            Text(text = "Conferma")
+            Text(text = "Conferma", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
         }
     }
 }

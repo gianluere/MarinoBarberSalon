@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.graphics.toColor
+import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 
@@ -100,18 +101,16 @@ fun Calendar(
         }
     }
 
-    // Locale in Italiano per mesi e giorni della settimana
+
     val italianMonthNames = listOf(
         "Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"
     )
 
     val italianWeekDays = listOf("Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab")
 
-    // Formatter per la data in formato GG-MM-AAAA
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
     Column(modifier = Modifier.padding(16.dp)) {
-        // Header con mese e anno, più navigazione tra i mesi
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -125,13 +124,14 @@ fun Calendar(
                     selectedMonth = selectedMonth.minus(1)
                 }
             }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Previous Month")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Mese Precedente")
             }
 
             Text(
-                text = "${italianMonthNames[selectedMonth.value - 1]} $selectedYear",  // Mese in italiano
+                text = "${italianMonthNames[selectedMonth.value - 1]} $selectedYear",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
+                fontFamily = myFont
             )
 
             IconButton(onClick = {
@@ -142,13 +142,12 @@ fun Calendar(
                     selectedMonth = selectedMonth.plus(1)
                 }
             }) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Next Month")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Mese prossimo")
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Visualizzazione dei giorni della settimana in italiano
         Row(
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.fillMaxWidth()
@@ -158,14 +157,14 @@ fun Calendar(
                     text = day,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = myFont
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Griglia dei giorni
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth(),
@@ -175,30 +174,30 @@ fun Calendar(
             items(dates) { day ->
                 Box(
                     modifier = Modifier
-                        .aspectRatio(1f) // Mantieni la forma quadrata
+                        .aspectRatio(1f)
                         .clickable(enabled = day != null) {
                             if (day != null) {
-                                // Converti la data nel formato GG-MM-AAAA
                                 val selectedDate = LocalDate.of(selectedYear, selectedMonth, day)
                                 val formattedDate = selectedDate.format(formatter)
-                                onDateSelected(formattedDate)  // Passa la data formattata
+                                onDateSelected(formattedDate)
                             }
                         }
-                        .background(
-                            if (day == currentDate.dayOfMonth &&
-                                selectedMonth == currentDate.month &&
-                                selectedYear == currentDate.year
-                            ) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                            else MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(4.dp)
-                        )
+//                        .background(
+//                            if (day == currentDate.dayOfMonth &&
+//                                selectedMonth == currentDate.month &&
+//                                selectedYear == currentDate.year
+//                            ) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+//                            else MaterialTheme.colorScheme.surface,
+//                            shape = RoundedCornerShape(4.dp)
+//                        )
                         .padding(4.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = day?.toString() ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = my_white
+                        //style = MaterialTheme.typography.bodySmall,
+                        color = my_white,
+                        fontFamily = myFont
                     )
                 }
             }
