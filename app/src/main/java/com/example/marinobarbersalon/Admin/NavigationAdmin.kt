@@ -67,14 +67,20 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
         composable(Screen.CalendarScreen.route) {
             CalendarScreen(
-                onNavigateToNextPage = {
-                    navController.navigate(Screen.NextScreen.route)
+                onNavigateToNextPage = { date ->
+                    // Assicurati che il parametro 'date' venga passato correttamente
+                    navController.navigate("nextScreen/$date")
                 }
             )
         }
 
-        composable(Screen.NextScreen.route) {
-            NextScreen()
+        composable(Screen.NextScreen.route) { backStackEntry ->
+            val date = backStackEntry.arguments?.getString("date") // Recupera la data dalla rotta
+            if (date != null) {
+                NextScreen(date = date) // Passa la data a NextScreen
+            } else {
+                Text(text = "Data non disponibile.")
+            }
         }
 
 

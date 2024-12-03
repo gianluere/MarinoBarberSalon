@@ -1,8 +1,10 @@
 package com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti
 
 import android.graphics.Color
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,9 +48,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.graphics.toColor
+import com.example.marinobarbersalon.Cliente.Account.Appuntamento
+import com.example.marinobarbersalon.Cliente.Home.User
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 import java.time.Month
 import java.time.YearMonth
@@ -61,6 +68,13 @@ class VisualizzaAppuntamentiVM: ViewModel() {
     private val _calendarState = MutableStateFlow(CalendarState())
     val calendarState : StateFlow<CalendarState> = _calendarState.asStateFlow()
 
+    //per la seconda pagina
+    private val firestore = FirebaseFirestore.getInstance()
+
+    // Stato che contiene gli appuntamenti
+    private val _appuntamentiState = MutableStateFlow<List<Appuntamento>>(emptyList())
+    val appuntamentiState: StateFlow<List<Appuntamento>> = _appuntamentiState
+
     fun selectDate(date: String) {
         _calendarState.value = CalendarState(selectedDate = date)
     }
@@ -71,7 +85,61 @@ class VisualizzaAppuntamentiVM: ViewModel() {
             onNavigate()
         }
     }
+
+    // Funzione per recuperare gli appuntamenti da Firestore
+    suspend fun getAppuntamentiByDate(date: String) {
+        // Esegui il recupero dei dati da Firestore per la data
+        try {
+            val appuntamenti = fetchAppuntamentiFromFirestore(date)
+            Log.d("Ciao", "eccomi")
+            Log.d("Ciao", "$date")
+            _appuntamentiState.value = appuntamenti
+
+            Log.d("Ciao", "${_appuntamentiState.value}")
+        } catch (e: Exception) {
+            // Gestisci eventuali errori
+            _appuntamentiState.value = emptyList()
+        }
+    }
+
+    private suspend fun fetchAppuntamentiFromFirestore(date: String): List<Appuntamento> {
+        val db = FirebaseFirestore.getInstance()
+
+        // Recupera il documento per la data specificata (es: "14-11-2024")
+        val appuntamentiRef = db.collection("appuntamenti").document(date).collection("app")
+
+        // Esegui la query per ottenere tutti gli appuntamenti in quella data
+        val querySnapshot = appuntamentiRef.get().await()
+
+        // Mappa i risultati della query a una lista di Appuntamenti
+        return querySnapshot.documents.map { document ->
+            // Recupera i dettagli dell'appuntamento dal documento
+            val clienteRef = document.getDocumentReference("cliente")
+            val servizio = document.getString("servizio") ?: ""
+            val descrizione = document.getString("descrizione") ?: ""
+            val orarioInizio = document.getString("orarioInizio") ?: ""
+            val orarioFine = document.getString("orarioFine") ?: ""
+            val prezzo = document.getDouble("prezzo") ?: 0.0
+
+            // Restituisci l'appuntamento con tutti i dettagli
+            Appuntamento(
+                cliente = clienteRef,
+                servizio = servizio,
+                descrizione = descrizione,
+                orarioInizio = orarioInizio,
+                orarioFine = orarioFine,
+                prezzo = prezzo,
+                data = date  // La data è già fornita come parametro
+            )
+        }
+    }
 }
+
+
+
+
+
+
 
 
 
@@ -206,6 +274,61 @@ fun Calendar(
         Spacer(modifier = Modifier.height(16.dp))
 
 
+    }
+}
+
+@Composable
+fun AppointmentItem(appuntamento: Appuntamento) {
+    val db = FirebaseFirestore.getInstance()
+    val clienteDocument = remember(appuntamento.cliente) { appuntamento.cliente }
+
+    // Variabile per il nome cliente, inizialmente vuota
+    var nomeCliente by remember { mutableStateOf("") }
+
+    // Recupera il nome cliente solo una volta
+    LaunchedEffect(clienteDocument) {
+        if (clienteDocument != null) {
+            // Carica i dettagli del cliente dal Firestore
+            val clienteSnapshot = clienteDocument.get().await()
+            val user = clienteSnapshot.toObject(User::class.java)
+            nomeCliente = user?.nome ?: "Cliente non trovato"
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .border(1.dp, androidx.compose.ui.graphics.Color.Gray)
+            .padding(8.dp)
+    ) {
+        // Orario
+        Text(
+            text = "${appuntamento.orarioInizio} - ${appuntamento.orarioFine}",
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+
+        // Nome Cliente
+        Text(
+            text = nomeCliente, // Usa il nome recuperato
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+
+        // Prezzo
+        Text(
+            text = "€${"%.2f".format(appuntamento.prezzo)}",
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+
+        // Servizio
+        Text(
+            text = "${appuntamento.servizio}",
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

@@ -396,6 +396,6 @@ sealed class Screen(val route:String ){
     object Prova : Screen("prova")
     object Provadue : Screen("provadue")
     object CalendarScreen : Screen("calendarScreen")
-    object NextScreen : Screen("nextScreen")
+    object NextScreen : Screen("nextScreen/{date}")
 
 }
