@@ -1,8 +1,10 @@
 package com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +27,7 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun CalendarScreen(
@@ -104,42 +107,47 @@ fun NextScreen(date: String) {
         if (appuntamenti.isEmpty()) {
             Text(text = "Nessun appuntamento disponibile per questa data.", fontSize = 18.sp)
         } else {
-            // Mostra gli appuntamenti
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Intestazioni delle colonne
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp, top= 8.dp)
-                ) {
-                    Text(
-                        text = "Orario",
-                        modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        text = "Nome",
-                        modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        text = "Prezzo",
-                        modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        text = "Servizio",
-                        modifier = Modifier.weight(1f),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
+            // Inizia la parte scrollabile con LazyColumn
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Mostra l'intestazione una sola volta
+                item {
+                    // Intestazioni delle colonne
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp, top = 8.dp)
+                    ) {
+                        Text(
+                            text = "Orario",
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Nome",
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Prezzo",
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Servizio",
+                            modifier = Modifier.weight(1f),
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
 
-                // Lista degli appuntamenti
-                appuntamenti.forEach { appuntamento ->
+                // Mostra gli appuntamenti nella lista
+                items(appuntamenti) { appuntamento ->
                     AppointmentItem(appuntamento)
                 }
             }
