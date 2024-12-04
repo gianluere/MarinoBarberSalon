@@ -40,6 +40,7 @@ import com.example.marinobarbersalon.Cliente.Home.SelezionaServiziobarba
 import com.example.marinobarbersalon.Cliente.Home.SelezioneServizioCapelli
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.Cliente.ScaffoldItems.TopBarMia
+import com.example.marinobarbersalon.Cliente.Shopping.SelezionaShop
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 
@@ -375,6 +376,27 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
         }
 
 
+        composable(Screen.Shop.route){
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "SHOP",
+                        showIcon = false,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                SelezionaShop(
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+        }
+
+
     }
 
 }
@@ -392,7 +414,7 @@ sealed class Screen(val route:String ){
     object Prenotazioni : Screen("prenotazioni")
     object Recensioni : Screen("recensioni")
     object InserisciRecensione : Screen("inserisciRecensione")
-    object Shop : Screen("shop")
+    object Shop : Screen("selezionaShop")
     object Impostazioni : Screen("impostazioni")
 
     ///////////////////////////////////////////////////////
