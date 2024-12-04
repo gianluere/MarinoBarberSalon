@@ -4,5 +4,7 @@ data class Prodotto(
     val nome : String = "",
     val descrizione : String = "",
     val prezzo : Double = 0.0,
-    val quantita : Int = 0
+    val quantita : Int = 0,
+    val immagine : String = "",
+    val categoria : String = ""
 )

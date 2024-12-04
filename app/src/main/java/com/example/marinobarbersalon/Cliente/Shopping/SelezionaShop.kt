@@ -4,6 +4,7 @@ package com.example.marinobarbersalon.Cliente.Shopping
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,12 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun SelezionaShop(modifier: Modifier) {
+fun SelezionaShop(
+    modifier: Modifier,
+    onNavigateToShopCapelli : () -> Unit,
+    onNavigateToShopBarba : () -> Unit,
+    onNavigateToShopViso : () -> Unit
+) {
 
     Column(
         modifier = modifier
@@ -66,6 +72,9 @@ fun SelezionaShop(modifier: Modifier) {
                             .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
                             .background(color = my_white, shape = RoundedCornerShape(25.dp))
                             .aspectRatio(1f)
+                            .clickable {
+                                onNavigateToShopCapelli()
+                            }
 
                     ){
                         Image(
@@ -94,6 +103,9 @@ fun SelezionaShop(modifier: Modifier) {
                             .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
                             .background(color = my_white, shape = RoundedCornerShape(25.dp))
                             .aspectRatio(1f)
+                            .clickable {
+                                onNavigateToShopBarba()
+                            }
 
                     ){
                         Image(
@@ -128,6 +140,9 @@ fun SelezionaShop(modifier: Modifier) {
                         .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
                         .background(color = my_white, shape = RoundedCornerShape(25.dp))
                         .fillMaxWidth(0.5f)
+                        .clickable {
+                            onNavigateToShopViso()
+                        }
 
                 ){
                     Image(
