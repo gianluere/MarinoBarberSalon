@@ -298,7 +298,7 @@ fun AppointmentItem(appuntamento: Appuntamento) {
             textAlign = TextAlign.Center
         )
         Text(
-            text = "${appuntamento.servizio}",
+            text = appuntamento.servizio,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
