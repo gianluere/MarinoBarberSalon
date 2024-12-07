@@ -30,7 +30,7 @@ import java.util.Calendar
 import androidx.compose.foundation.lazy.items
 
 @Composable
-fun CalendarScreen(
+fun VisualizzaAppuntamenti(
     calendarViewModel: VisualizzaAppuntamentiVM = viewModel(),
     onNavigateToNextPage: (String) -> Unit
 ) {
@@ -79,7 +79,7 @@ fun CalendarScreen(
 }
 
 @Composable
-fun NextScreen(date: String) {
+fun VisualizzaAppuntamenti1(date: String) {
     val viewModel: VisualizzaAppuntamentiVM = viewModel()
     val appuntamenti by viewModel.appuntamentiState.collectAsState()
 

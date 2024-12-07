@@ -13,8 +13,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.CalendarScreen
-import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.NextScreen
+import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti
+import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti1
 import com.example.marinobarbersalon.Cliente.Screen
 
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
@@ -65,19 +65,18 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
         }
 
-        composable(Screen.CalendarScreen.route) {
-            CalendarScreen(
+        composable(Screen.VisualizzaAppuntamenti.route) {
+            VisualizzaAppuntamenti(
                 onNavigateToNextPage = { date ->
-                    // Assicurati che il parametro 'date' venga passato correttamente
-                    navController.navigate("nextScreen/$date")
+                    navController.navigate("visualizzaAppuntamenti1/$date")
                 }
             )
         }
 
-        composable(Screen.NextScreen.route) { backStackEntry ->
-            val date = backStackEntry.arguments?.getString("date") // Recupera la data dalla rotta
+        composable(Screen.VisualizzaAppuntamenti1.route) { backStackEntry ->
+            val date = backStackEntry.arguments?.getString("date")
             if (date != null) {
-                NextScreen(date = date) // Passa la data a NextScreen
+                VisualizzaAppuntamenti1(date = date)
             } else {
                 Text(text = "Data non disponibile.")
             }

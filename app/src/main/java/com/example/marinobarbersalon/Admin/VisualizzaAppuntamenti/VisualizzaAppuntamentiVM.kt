@@ -78,11 +78,11 @@ class VisualizzaAppuntamentiVM: ViewModel() {
         _calendarState.value = CalendarState(selectedDate = date)
     }
 
-    /*fun onConfirm(onNavigate: () -> Unit) {
+    fun onConfirm(onNavigate: () -> Unit) {
         viewModelScope.launch{
             onNavigate()
         }
-    }*/
+    }
 
     suspend fun getAppuntamentiByDate(date: String) {
         try {

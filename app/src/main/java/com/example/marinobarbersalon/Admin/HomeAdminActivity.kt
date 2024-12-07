@@ -7,10 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,10 +75,10 @@ class HomeAdminActivity: ComponentActivity() {
                             unselectedIcon = Icons.Outlined.Person,
                         ),
                         NavDrawerItem(
-                            title = "Calendario",
-                            route = Screen.CalendarScreen.route,
-                            selectedIcon = Icons.Filled.Home,
-                            unselectedIcon = Icons.Outlined.Home,
+                            title = "Visualizza Appuntamenti",
+                            route = Screen.VisualizzaAppuntamenti.route,
+                            selectedIcon = Icons.Filled.CalendarMonth,
+                            unselectedIcon = Icons.Outlined.CalendarMonth,
                         )
                     )
 
