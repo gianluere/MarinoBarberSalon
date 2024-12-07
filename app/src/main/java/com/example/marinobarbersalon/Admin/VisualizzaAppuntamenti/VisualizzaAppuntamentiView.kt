@@ -48,8 +48,6 @@ fun CalendarScreen(
             fontSize = 24.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
-        // Semplice calendario cliccabile (puoi sostituirlo con una libreria più avanzata)
         Calendar(onDateSelected = { date ->
             calendarViewModel.selectDate(date)
         })
@@ -65,9 +63,8 @@ fun CalendarScreen(
 
         Button(
             onClick = {
-                // Quando il pulsante è cliccato, passa la data alla funzione onNavigateToNextPage
                 calendarState.selectedDate?.let { selectedDate ->
-                    onNavigateToNextPage(selectedDate) // Passa la data alla pagina successiva
+                    onNavigateToNextPage(selectedDate)
                 }
             },
             enabled = calendarState.selectedDate != null,
@@ -86,12 +83,10 @@ fun NextScreen(date: String) {
     val viewModel: VisualizzaAppuntamentiVM = viewModel()
     val appuntamenti by viewModel.appuntamentiState.collectAsState()
 
-    // Esegui il recupero dei dati per la data selezionata
     LaunchedEffect(date) {
-        viewModel.getAppuntamentiByDate(date) // Recupera gli appuntamenti per la data selezionata
+        viewModel.getAppuntamentiByDate(date)
     }
 
-    // UI per visualizzare gli appuntamenti
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -103,17 +98,13 @@ fun NextScreen(date: String) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Verifica se ci sono appuntamenti
         if (appuntamenti.isEmpty()) {
             Text(text = "Nessun appuntamento disponibile per questa data.", fontSize = 18.sp)
         } else {
-            // Inizia la parte scrollabile con LazyColumn
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Mostra l'intestazione una sola volta
                 item {
-                    // Intestazioni delle colonne
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -145,8 +136,6 @@ fun NextScreen(date: String) {
                         )
                     }
                 }
-
-                // Mostra gli appuntamenti nella lista
                 items(appuntamenti) { appuntamento ->
                     AppointmentItem(appuntamento)
                 }

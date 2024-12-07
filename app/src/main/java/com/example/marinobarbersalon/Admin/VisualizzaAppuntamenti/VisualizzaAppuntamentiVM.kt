@@ -65,13 +65,12 @@ import java.time.LocalDate
 
 
 class VisualizzaAppuntamentiVM: ViewModel() {
+    
+    //per la prima pagina
     private val _calendarState = MutableStateFlow(CalendarState())
     val calendarState : StateFlow<CalendarState> = _calendarState.asStateFlow()
-
     //per la seconda pagina
     private val firestore = FirebaseFirestore.getInstance()
-
-    // Stato che contiene gli appuntamenti
     private val _appuntamentiState = MutableStateFlow<List<Appuntamento>>(emptyList())
     val appuntamentiState: StateFlow<List<Appuntamento>> = _appuntamentiState
 
@@ -79,16 +78,13 @@ class VisualizzaAppuntamentiVM: ViewModel() {
         _calendarState.value = CalendarState(selectedDate = date)
     }
 
-    fun onConfirm(onNavigate: () -> Unit) {
-        viewModelScope.launch {
-            // Logica aggiuntiva se necessaria prima della navigazione
+    /*fun onConfirm(onNavigate: () -> Unit) {
+        viewModelScope.launch{
             onNavigate()
         }
-    }
+    }*/
 
-    // Funzione per recuperare gli appuntamenti da Firestore
     suspend fun getAppuntamentiByDate(date: String) {
-        // Esegui il recupero dei dati da Firestore per la data
         try {
             val appuntamenti = fetchAppuntamentiFromFirestore(date)
             Log.d("Ciao", "eccomi")
@@ -97,21 +93,14 @@ class VisualizzaAppuntamentiVM: ViewModel() {
 
             Log.d("Ciao", "${_appuntamentiState.value}")
         } catch (e: Exception) {
-            // Gestisci eventuali errori
             _appuntamentiState.value = emptyList()
         }
     }
 
     private suspend fun fetchAppuntamentiFromFirestore(date: String): List<Appuntamento> {
         val db = FirebaseFirestore.getInstance()
-
-        // Recupera il documento per la data specificata (es: "14-11-2024")
         val appuntamentiRef = db.collection("appuntamenti").document(date).collection("app")
-
-        // Esegui la query per ottenere tutti gli appuntamenti in quella data
         val querySnapshot = appuntamentiRef.get().await()
-
-        // Mappa i risultati della query a una lista di Appuntamenti
         return querySnapshot.documents.map { document ->
             // Recupera i dettagli dell'appuntamento dal documento
             val clienteRef = document.getDocumentReference("cliente")
@@ -129,19 +118,11 @@ class VisualizzaAppuntamentiVM: ViewModel() {
                 orarioInizio = orarioInizio,
                 orarioFine = orarioFine,
                 prezzo = prezzo,
-                data = date  // La data è già fornita come parametro
+                data = date
             )
         }
     }
 }
-
-
-
-
-
-
-
-
 
 @Composable
 fun Calendar(
@@ -282,10 +263,8 @@ fun AppointmentItem(appuntamento: Appuntamento) {
     val db = FirebaseFirestore.getInstance()
     val clienteDocument = remember(appuntamento.cliente) { appuntamento.cliente }
 
-    // Variabile per il nome cliente, inizialmente vuota
     var nomeCliente by remember { mutableStateOf("") }
 
-    // Recupera il nome cliente solo una volta
     LaunchedEffect(clienteDocument) {
         if (clienteDocument != null) {
             // Carica i dettagli del cliente dal Firestore
@@ -302,28 +281,22 @@ fun AppointmentItem(appuntamento: Appuntamento) {
             .border(1.dp, androidx.compose.ui.graphics.Color.Gray)
             .padding(8.dp)
     ) {
-        // Orario
+
         Text(
             text = "${appuntamento.orarioInizio} - ${appuntamento.orarioFine}",
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
-
-        // Nome Cliente
         Text(
-            text = nomeCliente, // Usa il nome recuperato
+            text = nomeCliente,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
-
-        // Prezzo
         Text(
             text = "€${"%.2f".format(appuntamento.prezzo)}",
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
-
-        // Servizio
         Text(
             text = "${appuntamento.servizio}",
             modifier = Modifier.weight(1f),
@@ -331,6 +304,3 @@ fun AppointmentItem(appuntamento: Appuntamento) {
         )
     }
 }
-
-
-
