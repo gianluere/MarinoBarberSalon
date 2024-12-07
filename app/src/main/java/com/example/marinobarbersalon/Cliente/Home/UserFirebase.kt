@@ -2,6 +2,7 @@ package com.example.marinobarbersalon.Cliente.Home
 
 import com.google.firebase.firestore.DocumentReference
 
+
 data class UserFirebase(
     val nome : String = "",
     val cognome : String = "",

@@ -79,6 +79,13 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.VisualizzaAppuntamenti.route,
                             selectedIcon = Icons.Filled.CalendarMonth,
                             unselectedIcon = Icons.Outlined.CalendarMonth,
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Clienti",
+                            route = Screen.VisualizzaClienti.route,
+                            selectedIcon = Icons.Filled.Person,
+                            unselectedIcon = Icons.Outlined.Person,
+
                         )
                     )
 

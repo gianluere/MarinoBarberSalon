@@ -102,7 +102,6 @@ class VisualizzaAppuntamentiVM: ViewModel() {
         val appuntamentiRef = db.collection("appuntamenti").document(date).collection("app")
         val querySnapshot = appuntamentiRef.get().await()
         return querySnapshot.documents.map { document ->
-            // Recupera i dettagli dell'appuntamento dal documento
             val clienteRef = document.getDocumentReference("cliente")
             val servizio = document.getString("servizio") ?: ""
             val descrizione = document.getString("descrizione") ?: ""
@@ -110,7 +109,6 @@ class VisualizzaAppuntamentiVM: ViewModel() {
             val orarioFine = document.getString("orarioFine") ?: ""
             val prezzo = document.getDouble("prezzo") ?: 0.0
 
-            // Restituisci l'appuntamento con tutti i dettagli
             Appuntamento(
                 cliente = clienteRef,
                 servizio = servizio,

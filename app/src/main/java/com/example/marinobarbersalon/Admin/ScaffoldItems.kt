@@ -71,6 +71,8 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         Screen.Provadue.route -> "PROVADue"
         Screen.VisualizzaAppuntamenti.route -> "VISUALIZZA APPUNTAMENTI"
         Screen.VisualizzaAppuntamenti1.route -> "VISUALIZZA APPUNTAMENTI"
+        Screen.VisualizzaClienti.route -> "VISUALIZZA CLIENTI"
+        Screen.DettagliCliente.route -> "VISUALIZZA CLIENTI"
         else -> "Default"
     }
 
