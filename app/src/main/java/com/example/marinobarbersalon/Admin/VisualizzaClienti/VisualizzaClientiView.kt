@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon.Admin.VisualizzaClienti
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,8 +21,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
 @Composable
@@ -106,21 +110,22 @@ fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM 
         clientiViewModel.getClienteByEmail(clienteEmail)
     }
 
-    // Usa la variabile innerPadding per evitare sovrapposizione sotto la TopAppBar
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)  // Padding laterale per il contenuto
-            .padding(top = 64.dp)  // Aggiungi un padding top per evitare sovrapposizione con la TopAppBar
+            .padding(16.dp)
+            .padding(top = 64.dp)
     ) {
         if (cliente != null) {
             Log.d("DettagliCliente", "Cliente trovato: ${cliente.nome}")
 
-            // Card per visualizzare i dettagli del cliente
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(
+                containerColor = my_yellow
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -130,27 +135,42 @@ fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM 
                     Text(
                         text = "Nome: ${cliente.nome}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        fontFamily = myFont,
+                        fontSize = 18.sp,
+                        color = Color.Black
                     )
                     Text(
                         text = "Cognome: ${cliente.cognome}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        fontFamily = myFont,
+                        fontSize = 18.sp,
+                        color = Color.Black
                     )
                     Text(
                         text = "Email: ${cliente.email}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        fontFamily = myFont,
+                        fontSize = 18.sp,
+                        color = Color.Black
                     )
                     Text(
                         text = "Età: ${cliente.eta}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        fontFamily = myFont,
+                        fontSize = 18.sp,
+                        color = Color.Black
                     )
                     Text(
                         text = "Telefono: ${cliente.telefono}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        fontFamily = myFont,
+                        fontSize = 18.sp,
+                        color = Color.Black
                     )
                 }
             }
