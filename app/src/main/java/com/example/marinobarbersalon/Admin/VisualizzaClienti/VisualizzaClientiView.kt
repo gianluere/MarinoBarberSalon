@@ -19,6 +19,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
 
 
 @Composable
@@ -90,6 +93,8 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
     }
 }
 
+
+
 @Composable
 fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM = viewModel()) {
     val cliente = clientiViewModel.selectedClienteState.collectAsState().value
@@ -101,25 +106,59 @@ fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM 
         clientiViewModel.getClienteByEmail(clienteEmail)
     }
 
-    if (cliente != null) {
-        Log.d("DettagliCliente", "Cliente trovato: ${cliente.nome}")
+    // Usa la variabile innerPadding per evitare sovrapposizione sotto la TopAppBar
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)  // Padding laterale per il contenuto
+            .padding(top = 64.dp)  // Aggiungi un padding top per evitare sovrapposizione con la TopAppBar
+    ) {
+        if (cliente != null) {
+            Log.d("DettagliCliente", "Cliente trovato: ${cliente.nome}")
 
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(text = "Nome: ${cliente.nome}")
-            Text(text = "Cognome: ${cliente.cognome}")
-            Text(text = "Email: ${cliente.email}")
-            Text(text = "Età: ${cliente.eta}")
-            Text(text = "Telefono: ${cliente.telefono}")
+            // Card per visualizzare i dettagli del cliente
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Nome: ${cliente.nome}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Cognome: ${cliente.cognome}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Email: ${cliente.email}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Età: ${cliente.eta}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Telefono: ${cliente.telefono}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        } else {
+            Log.d("DettagliCliente", "Cliente non trovato.")
+            Text(text = "Cliente non trovato.")
         }
-
-        Log.d("HI", "Cliente Nome: ${cliente.nome}")
-        Log.d("HI", "Cliente Cognome: ${cliente.cognome}")
-        Log.d("HI", "Cliente Email: ${cliente.email}")
-        Log.d("HI", "Cliente Età: ${cliente.eta}")
-    } else {
-        Log.d("DettagliCliente", "Cliente non trovato.")
-        Text(text = "Cliente non trovato.")
     }
 }
