@@ -27,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +44,10 @@ fun VisualizzaClienti(
 ) {
     val utentiState = clientiViewModel.usersState.collectAsState().value
 
+    //per la ricera
+    val searchText = clientiViewModel.searchText.collectAsState().value
+    //val isSearching = clientiViewModel.isSearching.collectAsState().value
+
     LaunchedEffect(Unit) {
         if (utentiState.isEmpty()) {
             clientiViewModel.fetchUsers()
@@ -54,19 +59,38 @@ fun VisualizzaClienti(
         .sortedBy { it.nome.lowercase() }
         .groupBy { it.nome.first().uppercaseChar() }
 
+    //raggr. ricerca
+    val clientiFiltrati = if (searchText.isBlank()) {
+        clientiRaggruppati
+    } else {
+        clientiRaggruppati.mapValues { (_, clienti) ->
+            clienti.filter { cliente ->
+                cliente.doesMatchSearchQuery(searchText)
+            }
+        }.filter { it.value.isNotEmpty() }
+    }
+
+//    Log.d("HI", "eccomi sono qui")
+//    Log.d("HI", "$clientiFiltrati")
+//    Log.d("HI", "$clientiFiltrati")
+//    Log.d("HI", "$searchText")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .padding(top = 16.dp)
+            .padding(top = 64.dp)
     ) {
-        Text(
-            text = "Elenco Clienti",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp),
-            fontFamily = myFont
+        TextField(
+            value = searchText,
+            onValueChange = clientiViewModel::onSearchTextChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("Cerca cliente...") },
+            singleLine = false,
+            maxLines = 1
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (utentiState.isEmpty()) {
             Text(
@@ -77,9 +101,7 @@ fun VisualizzaClienti(
             )
         } else {
             LazyColumn {
-                // Mostra i clienti raggruppati per lettera iniziale
-                clientiRaggruppati.forEach() { (lettera, clienti) ->
-                    // Intestazione per ogni gruppo
+                clientiFiltrati.forEach() { (lettera, clienti) ->
                     item {
                         Text(
                             text = lettera.toString(),
@@ -94,7 +116,6 @@ fun VisualizzaClienti(
 
                     items(clienti) { cliente ->
                         ClienteItem(cliente, onNavigateToDetails)
-
                     }
 
                     item {
@@ -105,19 +126,14 @@ fun VisualizzaClienti(
                             color = my_gold
                         )
                     }
-
                 }
             }
         }
     }
-    Log.d("HI", "eccomi sono qui")
-//    HorizontalDivider(
-//        modifier = Modifier
-//            .fillMaxWidth(),
-//        thickness = 2.dp,
-//        color = my_gold
-//    )
+    //Log.d("HI", "eccomi sono qui")
 }
+
+
 
 @Composable
 fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
@@ -140,7 +156,6 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
             textAlign = TextAlign.Start
         )
     }
-
 }
 
 

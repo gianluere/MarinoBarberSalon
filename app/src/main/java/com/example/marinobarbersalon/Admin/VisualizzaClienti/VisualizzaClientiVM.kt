@@ -5,9 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marinobarbersalon.Cliente.Home.UserFirebase
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -17,16 +22,42 @@ class VisualizzaClientiVM : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
 
-    // Stato per gli utenti
     private val _usersState = MutableStateFlow<List<UserFirebase>>(emptyList())
     val usersState: StateFlow<List<UserFirebase>> = _usersState.asStateFlow()
 
-    // Stato per un singolo cliente
+    //Stato per singolo cliente
     private val _selectedClienteState = MutableStateFlow<UserFirebase?>(null)
     val selectedClienteState: StateFlow<UserFirebase?> = _selectedClienteState.asStateFlow()
 
+    //PER LA RICERCA
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
 
-    // Recupera gli utenti da Firestore
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
+
+    private val _clientiState = MutableStateFlow<List<UserFirebase>>(emptyList())
+    val clientiState = _clientiState.asStateFlow()
+
+//    val filteredClients = searchText
+//        .debounce(1000L)
+//        .combine(_clientiState) { text, clienti ->
+//            if (text.isBlank()) {
+//                clienti
+//            } else {
+//                delay(1000L)
+//                clienti.filter {
+//                    it.doesMatchSearchQuery(text)
+//                }
+//            }
+//        }
+//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _clientiState.value)
+
+    fun onSearchTextChange(text: String) {
+        _searchText.value = text
+    }
+
+
     fun fetchUsers() {
         viewModelScope.launch {
             try {
@@ -72,13 +103,4 @@ class VisualizzaClientiVM : ViewModel() {
             null
         }
     }
-
-
-
-
-
-
-
-
-
 }
