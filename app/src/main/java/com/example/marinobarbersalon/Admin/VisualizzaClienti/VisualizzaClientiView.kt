@@ -1,5 +1,7 @@
 package com.example.marinobarbersalon.Admin.VisualizzaClienti
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,9 +24,14 @@ import androidx.compose.runtime.remember
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.material3.Card
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
+import com.example.marinobarbersalon.ui.theme.my_bordeaux
+import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
@@ -102,6 +109,7 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
 @Composable
 fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM = viewModel()) {
     val cliente = clientiViewModel.selectedClienteState.collectAsState().value
+    val context = LocalContext.current
 
     Log.d("DettagliCliente", "Caricamento dettagli per: $clienteEmail")
 
@@ -114,7 +122,7 @@ fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM 
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .padding(top = 64.dp)
+            .padding(top = 128.dp)
     ) {
         if (cliente != null) {
             Log.d("DettagliCliente", "Cliente trovato: ${cliente.nome}")
@@ -175,7 +183,27 @@ fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM 
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    // Crea un Intent per aprire l'app telefono
+                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                        data = Uri.parse("tel:${cliente.telefono}")
+                    }
+                    context.startActivity(intent) // Avvia l'app telefono
+                },
+
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = my_bordeaux,
+                    disabledContainerColor = my_bordeaux
+                )
+
+            ) {
+                Text(text = "Chiama ${cliente.nome}", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
+            }
+
         } else {
             Log.d("DettagliCliente", "Cliente non trovato.")
             Text(text = "Cliente non trovato.")
