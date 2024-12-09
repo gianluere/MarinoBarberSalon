@@ -26,6 +26,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -48,10 +49,17 @@ fun VisualizzaClienti(
         }
     }
 
+    //raggr. per lettera nome
+    val clientiRaggruppati = utentiState
+        .sortedBy { it.nome.lowercase() }
+        .groupBy { it.nome.first().uppercaseChar() }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .padding(top = 16.dp)
     ) {
         Text(
             text = "Elenco Clienti",
@@ -69,16 +77,46 @@ fun VisualizzaClienti(
             )
         } else {
             LazyColumn {
-                items(utentiState) { cliente ->
-                    ClienteItem(cliente, onNavigateToDetails)
-                    Log.d("Hi", "${cliente.email}")
+                // Mostra i clienti raggruppati per lettera iniziale
+                clientiRaggruppati.forEach() { (lettera, clienti) ->
+                    // Intestazione per ogni gruppo
+                    item {
+                        Text(
+                            text = lettera.toString(),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .padding(top = 8.dp),
+                            textAlign = TextAlign.Start
+                        )
+                    }
+
+                    items(clienti) { cliente ->
+                        ClienteItem(cliente, onNavigateToDetails)
+
+                    }
+
+                    item {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            thickness = 2.dp,
+                            color = my_gold
+                        )
+                    }
 
                 }
             }
         }
     }
     Log.d("HI", "eccomi sono qui")
-
+//    HorizontalDivider(
+//        modifier = Modifier
+//            .fillMaxWidth(),
+//        thickness = 2.dp,
+//        color = my_gold
+//    )
 }
 
 @Composable
@@ -92,16 +130,17 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
         Text(
             text = cliente.nome,
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyMedium,
+            //style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Start
         )
         Text(
             text = cliente.cognome,
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyMedium,
+            //style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Start
         )
     }
+
 }
 
 
