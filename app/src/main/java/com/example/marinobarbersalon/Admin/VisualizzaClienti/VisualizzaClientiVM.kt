@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
+//model assente in quanto utilizzo la classe UserFirebase
 class VisualizzaClientiVM : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
