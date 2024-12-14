@@ -259,7 +259,13 @@ fun AggiungiServizio(
                 //Durata
                 OutlinedTextField(
                     value = if (durata == 0) "" else durata.toString(),
-                    onValueChange = { aggiungiServizioViewModel.onDurataChange(it.toIntOrNull() ?: 0) },
+                    onValueChange = { newValue ->
+                        val validInput = newValue.toIntOrNull() != null || newValue.isEmpty()
+
+                        if (validInput) {
+                            aggiungiServizioViewModel.onDurataChange(newValue.toIntOrNull() ?: 0)
+                        }
+                    },
                     label = { Text("Durata (minuti)") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -270,10 +276,16 @@ fun AggiungiServizio(
                 //Prezzo
                 OutlinedTextField(
                     value = if (prezzo == 0.0) "" else prezzo.toString(),
-                    onValueChange = { aggiungiServizioViewModel.onPrezzoChange(it.toDoubleOrNull() ?: 0.0) },
+                    onValueChange = { newValue ->
+                        val cleanedValue = newValue.replace(',', '.')
+                        val validValue = cleanedValue.toDoubleOrNull()
+                        if (validValue != null) {
+                            aggiungiServizioViewModel.onPrezzoChange(validValue)
+                        }
+                    },
                     label = { Text("Prezzo (€)") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
             }
         }
@@ -294,7 +306,11 @@ fun AggiungiServizio(
                 Text("Aggiungi")
             }
 
-            Button(onClick = {aggiungiServizioViewModel.resetFields()}, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+            Button(
+                onClick = {
+                    aggiungiServizioViewModel.resetFields()
+                          },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
                 Text("Annulla")
             }
         }

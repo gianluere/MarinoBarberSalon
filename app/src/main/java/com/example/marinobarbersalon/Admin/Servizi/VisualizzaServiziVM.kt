@@ -37,6 +37,7 @@ class VisualizzaServiziVM: ViewModel(){
     val prezzo: StateFlow<Double> = _prezzo
 
 
+
     //------------------------------------------------------------------------------------------------------------------
     // PER LA PRIMA PAGINA
     fun fetchServizi() {
@@ -69,6 +70,7 @@ class VisualizzaServiziVM: ViewModel(){
                     .document(servizio.id)
                     .delete()
                     .await()
+                //Log.d("servizi", "$servizio.id")
             } catch (e: Exception) {
                 Log.e("VisualizzaServiziVM", "Errore durante l'eliminazione del servizio: ${servizio.id}", e)
             }
@@ -113,6 +115,7 @@ class VisualizzaServiziVM: ViewModel(){
             try {
                 firestore.collection("servizi").add(servizio).await()
                 onSuccess()
+                Log.d("servizi", "${servizio.id}")
             } catch (e: Exception) {
                 onError(e)
             }
