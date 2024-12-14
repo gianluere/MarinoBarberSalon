@@ -10,6 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.marinobarbersalon.Admin.Servizi.AggiungiServizio
+import com.example.marinobarbersalon.Admin.Servizi.VisualizzaServizi
 import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti
 import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti1
 import com.example.marinobarbersalon.Admin.VisualizzaClienti.DettagliCliente
@@ -97,6 +99,22 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
                 Text(text = "NESSUNA EMAIL PASSATA")
             }
         }
+
+        composable(Screen.VisualizzaServizi.route){
+            VisualizzaServizi(
+                onNavigateToAddServizio = {
+                    navController.navigate(Screen.AggiungiServizio.route)
+                }
+            )
+        }
+
+        composable(Screen.AggiungiServizio.route){
+            AggiungiServizio(
+                onAggiungiSuccess = { navController.popBackStack() },
+                onAnnullaClick = { navController.popBackStack() }
+            )
+        }
+
 
 
 

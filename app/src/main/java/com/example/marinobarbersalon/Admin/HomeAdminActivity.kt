@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
@@ -84,9 +86,15 @@ class HomeAdminActivity: ComponentActivity() {
                             title = "Visualizza Clienti",
                             route = Screen.VisualizzaClienti.route,
                             selectedIcon = Icons.Filled.Person,
-                            unselectedIcon = Icons.Outlined.Person,
-
+                            unselectedIcon = Icons.Outlined.Person
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Servizi",
+                            route = Screen.VisualizzaServizi.route,
+                            selectedIcon = Icons.Filled.ContentCut,
+                            unselectedIcon = Icons.Outlined.ContentCut
                         )
+
                     )
 
                     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)

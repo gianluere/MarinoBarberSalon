@@ -399,6 +399,8 @@ sealed class Screen(val route:String ){
     object VisualizzaAppuntamenti1 : Screen("visualizzaAppuntamenti1/{date}")
     object VisualizzaClienti : Screen("visualizzaClienti")
     object DettagliCliente : Screen("dettagliCliente/{clienteEmail}")
+    object VisualizzaServizi : Screen("visualizzaServizi")
+    object AggiungiServizio : Screen("aggiugniServizio")
 
 
 }
