@@ -1,8 +1,10 @@
 package com.example.marinobarbersalon.Admin.Servizi
 import android.util.Log
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
@@ -25,12 +27,13 @@ import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
+import com.example.marinobarbersalon.ui.theme.my_yellow
 
 /* TODO
 *   GRAFICA:
 *       CARDS PRIMA PAGINA:
-*           Colore sfondo;
-*           Colore testo;
+*           Colore sfondo; OK
+*           Colore testo; OK
 *           Font family;
 *           Spacer alla fine perche senno si vede male l'ultimo bottone di elimina;
 *           Un po piu di spazio tra ogni elemento;
@@ -97,8 +100,14 @@ fun VisualizzaServizi(
                             onEliminaClick = { setServizioDaEliminare(servizio) }
                         )
                     }
+
+                    item {
+                        Spacer(modifier = Modifier.height(100.dp)) //da chiedere se va bene o se diminuire
+                    }
                 }
             }
+
+
 
             FloatingActionButton(
                 onClick = onNavigateToAddServizio,
@@ -110,6 +119,8 @@ fun VisualizzaServizi(
                 Text(
                     "+",
                     color = my_gold,
+                    fontSize = 30.sp,
+                    //fontFamily = myFont
                 )
             }
         }
@@ -128,6 +139,7 @@ fun VisualizzaServizi(
             )
         }
     }
+
 }
 
 @Composable
@@ -135,8 +147,13 @@ fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .padding(8.dp)
+            .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+        shape = RoundedCornerShape(17.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = my_yellow
+        )
     ) {
         Row(
             modifier = Modifier
@@ -145,11 +162,11 @@ fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Nome: ${servizio.nome ?: "N/A"}", style = MaterialTheme.typography.bodyLarge)
-                Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Tipo: ${servizio.tipo ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Durata: ${servizio.durata ?: 0} min", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Prezzo: €${servizio.prezzo}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Nome: ${servizio.nome ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(text = "Tipo: ${servizio.tipo ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(text = "Durata: ${servizio.durata ?: 0} min", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(text = "Prezzo: €${servizio.prezzo}", style = MaterialTheme.typography.bodyMedium, fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
             }
 
             IconButton(
