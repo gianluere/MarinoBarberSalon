@@ -465,7 +465,10 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             ) { paddingValues ->
                 ProdottoShop(
                     modifier = Modifier.padding(paddingValues),
-                    nomeProdotto = nomeProdotto
+                    nomeProdotto = nomeProdotto,
+                    onSuccess = {
+                        navController.popBackStack(route = Screen.SelezionaShop.route, inclusive = false)
+                    }
                 )
             }
         }

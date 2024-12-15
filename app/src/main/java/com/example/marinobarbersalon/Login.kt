@@ -138,8 +138,10 @@ fun LoginScreen(userViewModel: UserViewModel,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
                     ),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
-                    maxLines = 1
+                    maxLines = 1,
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(60.dp))
@@ -153,16 +155,20 @@ fun LoginScreen(userViewModel: UserViewModel,
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    ), trailingIcon = {
+                    ),
+                    trailingIcon = {
                         IconButton(onClick = {
                             passwordVisibility = !passwordVisibility
                         }) {
                             Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
 
                         }
-                    }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp),
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                    maxLines = 1
+                    maxLines = 1,
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(80.dp))

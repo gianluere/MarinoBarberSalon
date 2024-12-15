@@ -25,6 +25,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +34,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,11 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
 import com.example.marinobarbersalon.Cliente.Account.CardRecensione
 import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
+import com.google.android.material.progressindicator.CircularProgressIndicator
 
 @Composable
 fun Shop(
@@ -124,7 +132,7 @@ fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
 
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = Uri.parse(prodotto.immagine),
             contentDescription = "Immagine prodotto",
             modifier = Modifier
@@ -134,7 +142,25 @@ fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
                 .clickable {
                     onNavigateToProdottoShop(prodotto.nome)
                 },
-            contentScale = ContentScale.Crop
+            loading = {
+                Box(
+                    Modifier.size(180.dp)
+                        .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                        .background(color = my_grey, shape = RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(10.dp),
+                        color = my_gold,
+                        strokeWidth = 5.dp
+                    )
+                }
+
+
+            },
+            contentScale = ContentScale.Crop,
+            colorFilter = if (prodotto.quantita == 0) {ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })} else { null}
         )
 
         Row(
