@@ -1,4 +1,5 @@
 package com.example.marinobarbersalon.Admin.Servizi
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -205,6 +206,42 @@ fun AggiungiServizio(
     val durata = aggiungiServizioViewModel.durata.collectAsState().value
     val prezzo = aggiungiServizioViewModel.prezzo.collectAsState().value
 
+    //form val
+    val formErrors = aggiungiServizioViewModel.formErrors.collectAsState().value
+    val showErrorDialog = remember { mutableStateOf(false) }
+    val isFormSubmitted = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        aggiungiServizioViewModel.validateForm()
+        if (formErrors.isNotEmpty()) {
+            showErrorDialog.value = true
+        }
+    }
+
+
+    if (showErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog.value = false },
+            title = { Text("Errore di validazione") },
+            text = {
+                Column {
+                    formErrors.forEach { error ->
+                        Text(error, color = Color.Red)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showErrorDialog.value = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -226,6 +263,7 @@ fun AggiungiServizio(
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+
                 //Nome
                 OutlinedTextField(
                     value = nome,
@@ -236,7 +274,7 @@ fun AggiungiServizio(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //Descr
+                //Descrizione
                 OutlinedTextField(
                     value = descrizione,
                     onValueChange = { aggiungiServizioViewModel.onDescrizioneChange(it) },
@@ -303,28 +341,38 @@ fun AggiungiServizio(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Button(onClick = {
-                aggiungiServizioViewModel.aggiungiServizio(
-                    onSuccess = onAggiungiSuccess,
-                    onError = { /* Mostra errore */ }
-                )
-            }) {
+            Button(
+                onClick = {
+                    isFormSubmitted.value = true
+                    aggiungiServizioViewModel.validateForm()
+                    if (formErrors.isEmpty()) {
+                        aggiungiServizioViewModel.aggiungiServizio(
+                            onSuccess = onAggiungiSuccess,
+                            onError = { /* Mostra errore */ }
+                        )
+                    } else {
+                        showErrorDialog.value = true
+                    }
+                }
+            ) {
                 Text("Aggiungi")
             }
 
             Button(
                 onClick = {
                     aggiungiServizioViewModel.resetFields()
-                          },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+                    isFormSubmitted.value = false
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
                 Text("Annulla")
             }
         }
     }
 }
+
 

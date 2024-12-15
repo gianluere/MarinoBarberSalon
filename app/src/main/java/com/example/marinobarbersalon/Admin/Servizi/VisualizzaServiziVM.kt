@@ -39,6 +39,16 @@ class VisualizzaServiziVM: ViewModel(){
     private val _id = MutableStateFlow("")
     val id: StateFlow<String> = _id
 
+    //form val
+    private val _formErrors = MutableStateFlow<List<String>>(emptyList())
+    val formErrors: StateFlow<List<String>> = _formErrors
+
+
+
+
+
+
+
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -83,18 +93,44 @@ class VisualizzaServiziVM: ViewModel(){
     }
 
 
+
     //------------------------------------------------------------------------------------------------------------------
     // PER LA SECONDA PAGNA
 
-    fun onNomeChange(newNome: String) {_nome.value = newNome}
-    fun onDescrizioneChange(newDescrizione: String) {_descrizione.value = newDescrizione}
-    fun onTipoChange(newTipo: String) {_tipo.value = newTipo}
-    fun onDurataChange(newDurata: Int) {_durata.value = newDurata}
-    fun onPrezzoChange(newPrezzo: Double) {_prezzo.value = newPrezzo}
+    fun onNomeChange(newNome: String) {
+        _nome.value = newNome
+        validateForm()
+    }
+
+    fun onDescrizioneChange(newDescrizione: String) {
+        _descrizione.value = newDescrizione
+        validateForm()
+    }
+
+    fun onTipoChange(newTipo: String) {
+        _tipo.value = newTipo
+        validateForm()
+    }
+
+    fun onDurataChange(newDurata: Int) {
+        _durata.value = newDurata
+        validateForm()
+    }
+
+    fun onPrezzoChange(newPrezzo: Double) {
+        _prezzo.value = newPrezzo
+        validateForm()
+    }
 
 
     // Funzione per aggiungere il servizio
     fun aggiungiServizio(onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+
+        if (!validateForm()) {
+            Log.d("servizi", "Form non valido, impossibile aggiungere il servizio.")
+            return
+        }
+
         val servizio = Servizio(
             nome = _nome.value,
             descrizione = _descrizione.value,
@@ -118,6 +154,23 @@ class VisualizzaServiziVM: ViewModel(){
         _descrizione.value = ""
         _durata.value = 0
         _prezzo.value = 0.00
+    }
+
+     fun validateForm(): Boolean {
+        val errors = mutableListOf<String>()
+
+        if (_nome.value.isEmpty()) errors.add("Il nome non può essere vuoto.")
+
+        if (_descrizione.value.isEmpty()) errors.add("La descrizione non può essere vuota.")
+
+        if (_tipo.value.isEmpty()) errors.add("Il tipo non può essere vuoto.")
+
+        if (_durata.value <= 0) errors.add("La durata deve essere maggiore di zero.")
+
+        if (_prezzo.value <= 0) errors.add("Il prezzo deve essere maggiore di zero.")
+
+        _formErrors.value = errors
+        return errors.isEmpty()
     }
 
 
