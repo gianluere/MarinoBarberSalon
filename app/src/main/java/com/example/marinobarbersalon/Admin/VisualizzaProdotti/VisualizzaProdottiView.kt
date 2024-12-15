@@ -90,6 +90,7 @@ import androidx.compose.runtime.*
 *        second page:
 *               mettere apposto la grafica delle card;
 *               pulsante di "+" quantità (si sovrappone se nome lungo);
+*               mettere pulsante per diminuire la quantità;
 *               passare alla pagina aggiungi prodotto la categoria su cui siamo gia;
 *        third page:
 *           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io);
