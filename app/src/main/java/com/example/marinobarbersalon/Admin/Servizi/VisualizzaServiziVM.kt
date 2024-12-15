@@ -36,6 +36,9 @@ class VisualizzaServiziVM: ViewModel(){
     private val _prezzo = MutableStateFlow(0.00)
     val prezzo: StateFlow<Double> = _prezzo
 
+    private val _id = MutableStateFlow("")
+    val id: StateFlow<String> = _id
+
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -70,6 +73,7 @@ class VisualizzaServiziVM: ViewModel(){
                     .document(servizio.id)
                     .delete()
                     .await()
+                _serviziState.value = _serviziState.value.filter { it.id != servizio.id }
                 //Log.d("servizi", "$servizio.id")
             } catch (e: Exception) {
                 Log.e("VisualizzaServiziVM", "Errore durante l'eliminazione del servizio: ${servizio.id}", e)
@@ -82,25 +86,12 @@ class VisualizzaServiziVM: ViewModel(){
     //------------------------------------------------------------------------------------------------------------------
     // PER LA SECONDA PAGNA
 
-    fun onNomeChange(newNome: String) {
-        _nome.value = newNome
-    }
+    fun onNomeChange(newNome: String) {_nome.value = newNome}
+    fun onDescrizioneChange(newDescrizione: String) {_descrizione.value = newDescrizione}
+    fun onTipoChange(newTipo: String) {_tipo.value = newTipo}
+    fun onDurataChange(newDurata: Int) {_durata.value = newDurata}
+    fun onPrezzoChange(newPrezzo: Double) {_prezzo.value = newPrezzo}
 
-    fun onDescrizioneChange(newDescrizione: String) {
-        _descrizione.value = newDescrizione
-    }
-
-    fun onTipoChange(newTipo: String) {
-        _tipo.value = newTipo
-    }
-
-    fun onDurataChange(newDurata: Int) {
-        _durata.value = newDurata
-    }
-
-    fun onPrezzoChange(newPrezzo: Double) {
-        _prezzo.value = newPrezzo
-    }
 
     // Funzione per aggiungere il servizio
     fun aggiungiServizio(onSuccess: () -> Unit, onError: (Exception) -> Unit) {
@@ -115,7 +106,7 @@ class VisualizzaServiziVM: ViewModel(){
             try {
                 firestore.collection("servizi").add(servizio).await()
                 onSuccess()
-                Log.d("servizi", "${servizio.id}")
+                //Log.d("servizi", "${servizio.id}")
             } catch (e: Exception) {
                 onError(e)
             }

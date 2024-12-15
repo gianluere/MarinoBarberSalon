@@ -37,7 +37,7 @@ second page:
     - Due bottoni: Aggiungi per invocare funzione aggiungi servizio GIA PRESENTE, Annulla per cancellare gli inserimenti
 
 BUGS:
-1) la pagina si deve aggiornare da sola quando aggiungo o modifico la lista dei servizi
+1) la pagina si deve aggiornare da sola quando aggiungo o modifico la lista dei servizi -> FATTO
 2) validazione form
 
 */
@@ -52,9 +52,10 @@ fun VisualizzaServizi(
     val (servizioDaEliminare, setServizioDaEliminare) = remember { mutableStateOf<Servizio?>(null) }
 
     LaunchedEffect(Unit) {
-        if (serviziState.isEmpty()) {
-            serviziViewModel.fetchServizi()
-        }
+        serviziViewModel.fetchServizi()
+//        if (serviziState.isEmpty()) {
+//            serviziViewModel.fetchServizi()
+//        }
     }
 
     Column(
