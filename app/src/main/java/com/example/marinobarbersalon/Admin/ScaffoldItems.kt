@@ -3,6 +3,7 @@ package com.example.marinobarbersalon.Admin
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.marinobarbersalon.Cliente.Screen
 import com.example.marinobarbersalon.R
+import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 import kotlinx.coroutines.CoroutineScope
@@ -67,10 +69,16 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         Screen.HomeAdmin.route -> "VISUALIZZA APPUNTAMENTI"
         Screen.Prova.route -> "PROVA"
         Screen.Provadue.route -> "PROVADue"
+        Screen.VisualizzaAppuntamenti.route -> "VISUALIZZA APPUNTAMENTI"
+        Screen.VisualizzaAppuntamenti1.route -> "VISUALIZZA APPUNTAMENTI"
+        Screen.VisualizzaClienti.route -> "VISUALIZZA CLIENTI"
+        Screen.DettagliCliente.route -> "VISUALIZZA CLIENTI"
+        Screen.VisualizzaServizi.route -> "VISUALIZZA SERVIZI"
+        Screen.AggiungiServizio.route -> "VISUALIZZA SERVIZI"
         else -> "Default"
     }
 
-
+Column {
     TopAppBar(
         title = {
 
@@ -90,19 +98,23 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
             containerColor = my_grey
         ),
         navigationIcon = {
-            if (showDrawer){
-                IconButton(onClick = {onClickDrawer()},
+            if (showDrawer) {
+                IconButton(
+                    onClick = { onClickDrawer() },
                 ) {
-                    Icon(imageVector = Icons.Default.Menu, contentDescription = "menu",
+                    Icon(
+                        imageVector = Icons.Default.Menu, contentDescription = "menu",
                         tint = my_white
                     )
                 }
-            }else{
-                IconButton(onClick = {
-                    navController.popBackStack()
-                },
+            } else {
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                    },
                 ) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
                         tint = my_white,
                         modifier = Modifier
                             .size(24.dp)
@@ -113,6 +125,15 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         }
 
     )
+    HorizontalDivider(
+        modifier = Modifier
+            .fillMaxWidth(),
+        thickness = 2.dp,
+        color = my_gold
+    )
+}
+
+
 
 }
 

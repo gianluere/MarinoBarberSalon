@@ -500,5 +500,12 @@ sealed class Screen(val route:String ){
     object HomeAdmin : Screen("homeAdmin")
     object Prova : Screen("prova")
     object Provadue : Screen("provadue")
+    object VisualizzaAppuntamenti : Screen("visualizzaAppuntamenti")
+    object VisualizzaAppuntamenti1 : Screen("visualizzaAppuntamenti1/{date}")
+    object VisualizzaClienti : Screen("visualizzaClienti")
+    object DettagliCliente : Screen("dettagliCliente/{clienteEmail}")
+    object VisualizzaServizi : Screen("visualizzaServizi")
+    object AggiungiServizio : Screen("aggiugniServizio")
+
 
 }

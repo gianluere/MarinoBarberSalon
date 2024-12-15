@@ -1,10 +1,7 @@
 package com.example.marinobarbersalon.Admin
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -13,6 +10,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.marinobarbersalon.Admin.Servizi.AggiungiServizio
+import com.example.marinobarbersalon.Admin.Servizi.VisualizzaServizi
+import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti
+import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti1
+import com.example.marinobarbersalon.Admin.VisualizzaClienti.DettagliCliente
+import com.example.marinobarbersalon.Admin.VisualizzaClienti.VisualizzaClienti
 import com.example.marinobarbersalon.Cliente.Screen
 
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
@@ -62,6 +65,60 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             Provadue(modifier = modifier)
 
         }
+
+        composable(Screen.VisualizzaAppuntamenti.route) {
+            VisualizzaAppuntamenti(
+                onNavigateToNextPage = { date ->
+                    navController.navigate("visualizzaAppuntamenti1/$date")
+                }
+            )
+        }
+
+        composable(Screen.VisualizzaAppuntamenti1.route) { backStackEntry ->
+            val date = backStackEntry.arguments?.getString("date")
+            if (date != null) {
+                VisualizzaAppuntamenti1(date = date)
+            } else {
+                Text(text = "Data non disponibile.")
+            }
+        }
+
+        composable(Screen.VisualizzaClienti.route) {
+            VisualizzaClienti(
+                onNavigateToDetails = { clienteEmail ->
+                    navController.navigate("dettagliCliente/${clienteEmail}")
+                }
+            )
+        }
+
+        composable(Screen.DettagliCliente.route) { backStackEntry ->
+            val clienteEmail = backStackEntry.arguments?.getString("clienteEmail")
+            if (clienteEmail != null) {
+                DettagliCliente(clienteEmail)
+            } else {
+                Text(text = "NESSUNA EMAIL PASSATA")
+            }
+        }
+
+        composable(Screen.VisualizzaServizi.route){
+            VisualizzaServizi(
+                onNavigateToAddServizio = {
+                    navController.navigate(Screen.AggiungiServizio.route)
+                }
+            )
+        }
+
+        composable(Screen.AggiungiServizio.route){
+            AggiungiServizio(
+                onAggiungiSuccess = { navController.popBackStack() },
+                onAnnullaClick = { navController.popBackStack() }
+            )
+        }
+
+
+
+
+
 
     }
 

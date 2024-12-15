@@ -7,10 +7,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.marinobarbersalon.MainActivity
 import com.example.marinobarbersalon.ui.theme.MarinoBarberSalonTheme
 import com.example.marinobarbersalon.Cliente.Screen
+import com.example.marinobarbersalon.ui.theme.my_grey
 import kotlinx.coroutines.launch
 
 class HomeAdminActivity: ComponentActivity() {
@@ -69,7 +75,26 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.Prova.route,
                             selectedIcon = Icons.Filled.Person,
                             unselectedIcon = Icons.Outlined.Person,
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Appuntamenti",
+                            route = Screen.VisualizzaAppuntamenti.route,
+                            selectedIcon = Icons.Filled.CalendarMonth,
+                            unselectedIcon = Icons.Outlined.CalendarMonth,
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Clienti",
+                            route = Screen.VisualizzaClienti.route,
+                            selectedIcon = Icons.Filled.Person,
+                            unselectedIcon = Icons.Outlined.Person
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Servizi",
+                            route = Screen.VisualizzaServizi.route,
+                            selectedIcon = Icons.Filled.ContentCut,
+                            unselectedIcon = Icons.Outlined.ContentCut
                         )
+
                     )
 
                     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -126,6 +151,7 @@ class HomeAdminActivity: ComponentActivity() {
                         drawerState = drawerState
                     ) {
                         Scaffold(
+                            containerColor = my_grey,
                             topBar = {
                                 /*
                                 TopAppBar(
