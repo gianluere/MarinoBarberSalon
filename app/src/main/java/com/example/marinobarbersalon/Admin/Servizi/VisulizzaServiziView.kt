@@ -20,8 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.Cliente.Home.Servizio
+import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_white
 
 /*
 first page:
@@ -33,6 +35,11 @@ second page:
     - Card come prima vuota in cui poter inserire tutti i vari dettagli del servizio
     - Radio button "Seleziona tipo servizio" con 2 opzioni: Capelli, Barba
     - Due bottoni: Aggiungi per invocare funzione aggiungi servizio GIA PRESENTE, Annulla per cancellare gli inserimenti
+
+BUGS:
+1) la pagina si deve aggiornare da sola quando aggiungo o modifico la lista dei servizi
+2) validazione form
+
 */
 
 
@@ -61,7 +68,8 @@ fun VisualizzaServizi(
         Text(
             text = "Servizi disponibili",
             fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = my_white
         )
 
         Box(
@@ -206,7 +214,8 @@ fun AggiungiServizio(
         Text(
             text = "Aggiungi Servizio",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = my_white
         )
 
         Card(
@@ -238,12 +247,13 @@ fun AggiungiServizio(
 
                 //Tipo
                 Text(text = "Seleziona tipo servizio:", style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(16.dp))
                 Row {
                     RadioButton(
                         selected = tipo == "Capelli",
                         onClick = { aggiungiServizioViewModel.onTipoChange("Capelli") }
                     )
-                    Text("Capelli", modifier = Modifier.padding(start = 8.dp))
+                    Text("Capelli", modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically))
 
                     Spacer(modifier = Modifier.width(16.dp))
 
@@ -251,7 +261,7 @@ fun AggiungiServizio(
                         selected = tipo == "Barba",
                         onClick = { aggiungiServizioViewModel.onTipoChange("Barba") }
                     )
-                    Text("Barba", modifier = Modifier.padding(start = 8.dp))
+                    Text("Barba", modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

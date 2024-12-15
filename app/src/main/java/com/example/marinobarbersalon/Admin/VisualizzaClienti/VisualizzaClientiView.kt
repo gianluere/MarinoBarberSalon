@@ -52,6 +52,7 @@ fun VisualizzaClienti(
         if (utentiState.isEmpty()) {
             clientiViewModel.fetchUsers()
         }
+
     }
 
     //raggr. per lettera nome
@@ -89,6 +90,7 @@ fun VisualizzaClienti(
             singleLine = false,
             maxLines = 1
         )
+
 
         Spacer(modifier = Modifier.height(16.dp))
 

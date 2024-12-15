@@ -127,7 +127,6 @@ class VisualizzaServiziVM: ViewModel(){
         _descrizione.value = ""
         _durata.value = 0
         _prezzo.value = 0.00
-        _tipo.value = ""
     }
 
 
