@@ -33,6 +33,15 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
+/*
+POSSIBILE BUG:
+    quando faccio indietro bisogna ridirigere bene alla pagina indietro ( non so se non va bene ma da
+    vedere meglio perche mi è successo che tornando indietro non andasse piu e rimanesse bloccato
+    sulla stessa pagina)
+*/
+
+
+
 
 //--------------------------------------------------------------------------------------------------
 //PRIMA PAGINA
@@ -313,7 +322,8 @@ fun AggiungiServizio(
     ) {
         Text(
             text = "Aggiungi Servizio",
-            style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(bottom = 16.dp),
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(bottom = 16.dp),
             color = my_white,
             fontFamily = myFont
         )
