@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon.Admin.Servizi
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,28 +29,9 @@ import com.example.marinobarbersalon.Cliente.Home.Servizio
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
-
-/* TODO
-*   GRAFICA:
-*       CARDS PRIMA PAGINA:
-*           Colore sfondo; OK
-*           Colore testo; OK
-*           Font family;
-*           Spacer alla fine perche senno si vede male l'ultimo bottone di elimina;
-*           Un po piu di spazio tra ogni elemento;
-*       CARD SECONDA PAGINA:
-*           Colore sfondo;
-*           Colore testo;
-*           Colore bottoni;
-*           Colore Radio Button;
-*           Font family;
-*           (Forse) eliminare scritta "Aggiungi servizio";
-*/
-
-
-
 
 
 //--------------------------------------------------------------------------------------------------
@@ -192,21 +176,60 @@ fun ConfermaEliminazioneDialog(
     AlertDialog(
         onDismissRequest = onAnnulla,
         title = {
-            Text(text = "Eliminare il servizio?")
+            Text(
+                text = "Eliminare il servizio?",
+                fontFamily = myFont,
+                fontSize = 20.sp,
+            )
         },
         text = {
-            Text(text = "Sei sicuro di voler eliminare il servizio \"${servizio.nome}\"?") // \" è l'escape
+            Text(
+                text = "Sei sicuro di voler eliminare il servizio \"${servizio.nome}\"?", // \" è l'escape
+                fontFamily = myFont,
+                fontSize = 20.sp,
+            )
         },
         confirmButton = {
-            TextButton(onClick = onConferma) {
-                Text(text = "Conferma")
+            TextButton(
+                onClick = onConferma,
+                modifier = Modifier
+                    .padding(8.dp)
+//                    .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = my_bordeaux
+//                ),
+                    .background(my_bordeaux)
+            ) {
+                Text(
+                    text = "Conferma",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = my_white
+                )
             }
         },
         dismissButton = {
-            TextButton(onClick = onAnnulla) {
-                Text(text = "Annulla")
+            TextButton(
+                onClick = onAnnulla,
+                modifier = Modifier
+                    .padding(8.dp)
+//                    .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                    .background(my_bordeaux),
+            ) {
+                Text(
+                    text = "Annulla",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = my_white,
+
+                )
             }
-        }
+        },
+        shape = RoundedCornerShape(17.dp), // Rende il dialogo con angoli arrotondati
+        modifier = Modifier
+            .padding(16.dp) // Padding esterno per il dialogo
+            .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+        containerColor = my_yellow, // Colore di sfondo del dialog
     )
 }
 //--------------------------------------------------------------------------------------------------
@@ -243,11 +266,17 @@ fun AggiungiServizio(
     if (showErrorDialog.value) {
         AlertDialog(
             onDismissRequest = { showErrorDialog.value = false },
-            title = { Text("Errore di validazione") },
+            title = {
+                Text(
+                text = "Errore di validazione",
+                    fontFamily = myFont,
+                    fontSize = 20.sp
+                )
+            },
             text = {
                 Column {
                     formErrors.forEach { error ->
-                        Text(error, color = Color.Red)
+                        Text(error, color = my_bordeaux, fontFamily = myFont, fontSize = 19.sp)
                     }
                 }
             },
@@ -255,11 +284,20 @@ fun AggiungiServizio(
                 Button(
                     onClick = {
                         showErrorDialog.value = false
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = my_yellow)
                 ) {
-                    Text("OK")
+                    Text("OK", fontFamily = myFont, fontSize = 18.sp, color = my_grey)
                 }
-            }
+            },
+            shape = RoundedCornerShape(17.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+            containerColor = my_yellow
         )
     }
 
@@ -272,16 +310,19 @@ fun AggiungiServizio(
     ) {
         Text(
             text = "Aggiungi Servizio",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp),
-            color = my_white
+            style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(bottom = 16.dp),
+            color = my_white,
+            fontFamily = myFont
         )
 
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .padding(8.dp)
+                .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = my_yellow),
+            shape = RoundedCornerShape(17.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
@@ -290,7 +331,16 @@ fun AggiungiServizio(
                     value = nome,
                     onValueChange = { aggiungiServizioViewModel.onNomeChange(it) },
                     label = { Text("Nome") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
+                    colors =  OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,         // Colore del bordo selezionato
+                        focusedLabelColor = Color.Black,          // Colore della label quando il campo è selezionato
+                        cursorColor = my_bordeaux,            // Colore del cursore
+                        unfocusedBorderColor = Color.Black,     // Colore del bordo non selezionato
+                        unfocusedLabelColor = Color.Black         // Colore della label non selezionata
+                    )
+
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -300,28 +350,65 @@ fun AggiungiServizio(
                     value = descrizione,
                     onValueChange = { aggiungiServizioViewModel.onDescrizioneChange(it) },
                     label = { Text("Descrizione") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
+                    colors =  OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        focusedLabelColor = Color.Black,
+                        cursorColor = my_bordeaux,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedLabelColor = Color.Black
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 //Tipo
-                Text(text = "Seleziona tipo servizio:", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = "Seleziona tipo servizio:",
+                    fontFamily = myFont,
+                    fontSize = 25.sp,
+//                    fontWeight = FontWeight.W500
+//                    color = Color.Black.copy(alpha = 1.5f)
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row {
                     RadioButton(
                         selected = tipo == "Capelli",
-                        onClick = { aggiungiServizioViewModel.onTipoChange("Capelli") }
+                        onClick = { aggiungiServizioViewModel.onTipoChange("Capelli") },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = my_bordeaux,       // Colore del cerchio e del punto interno selezionato
+                            unselectedColor = my_bordeaux,        // Colore del cerchio non selezionato
+                        )
                     )
-                    Text("Capelli", modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically))
+                    Text(
+                        text = "Capelli",
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .align(Alignment.CenterVertically),
+                        fontFamily = myFont,
+                        fontSize = 25.sp
+                    )
 
                     Spacer(modifier = Modifier.width(16.dp))
 
                     RadioButton(
                         selected = tipo == "Barba",
-                        onClick = { aggiungiServizioViewModel.onTipoChange("Barba") }
+                        onClick = { aggiungiServizioViewModel.onTipoChange("Barba") },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = my_bordeaux,
+                            unselectedColor = my_bordeaux,
+                        )
                     )
-                    Text("Barba", modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically))
+                    Text(
+                        text ="Barba",
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .align(Alignment.CenterVertically),
+                        fontFamily = myFont,
+                        fontSize = 25.sp
+
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -338,7 +425,15 @@ fun AggiungiServizio(
                     },
                     label = { Text("Durata (minuti)") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
+                    colors =  OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        focusedLabelColor = Color.Black,
+                        cursorColor = my_bordeaux,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedLabelColor = Color.Black
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -355,7 +450,15 @@ fun AggiungiServizio(
                     },
                     label = { Text("Prezzo (€)") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
+                    colors =  OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        focusedLabelColor = Color.Black,
+                        cursorColor = my_bordeaux,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedLabelColor = Color.Black
+                    )
                 )
             }
         }
@@ -378,9 +481,18 @@ fun AggiungiServizio(
                     } else {
                         showErrorDialog.value = true
                     }
-                }
+                },
+//                modifier = Modifier
+//                    .padding(8.dp),
+////                    .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
             ) {
-                Text("Aggiungi")
+                Text(
+                    text ="Aggiungi",
+                    fontFamily = myFont,
+                    fontSize = 25.sp,
+                    color = my_gold
+                )
             }
 
             Button(
@@ -388,9 +500,14 @@ fun AggiungiServizio(
                     aggiungiServizioViewModel.resetFields()
                     isFormSubmitted.value = false
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
             ) {
-                Text("Annulla")
+                Text(
+                    text = "Annulla",
+                    fontFamily = myFont,
+                    fontSize = 25.sp,
+                    color = my_white
+                )
             }
         }
     }
