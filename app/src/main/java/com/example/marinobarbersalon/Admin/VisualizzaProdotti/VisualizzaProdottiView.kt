@@ -92,6 +92,7 @@ import androidx.compose.runtime.*
 *               pulsante di "+" quantità (si sovrappone se nome lungo);
 *               mettere pulsante per diminuire la quantità;
 *               passare alla pagina aggiungi prodotto la categoria su cui siamo gia;
+*               mettere lo stesso spacio tra ultimo elemento della lazycolumn come in Vis. Servizi;
 *        third page:
 *           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io);
 *           accettare in input la categoria e quindi impostarla automaticamente
