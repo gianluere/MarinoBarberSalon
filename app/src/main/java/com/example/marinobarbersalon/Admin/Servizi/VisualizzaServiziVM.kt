@@ -14,12 +14,15 @@ import kotlinx.coroutines.tasks.await
 
 class VisualizzaServiziVM: ViewModel(){
 
+    //----------------------------------------------------------------------------------------------
+    // PER LA PRIMA PAGINA
     private val firestore = FirebaseFirestore.getInstance()
-
     private val _serviziState = MutableStateFlow<List<Servizio>>(emptyList())
     val serviziState: StateFlow<List<Servizio>> = _serviziState.asStateFlow()
+    //----------------------------------------------------------------------------------------------
 
-    //------------------------------------------------------------------------------
+
+    //----------------------------------------------------------------------------------------------
     // PER LA SECONDA PAGINA
     private val _nome = MutableStateFlow("")
     val nome: StateFlow<String> = _nome
@@ -42,21 +45,14 @@ class VisualizzaServiziVM: ViewModel(){
     //form val
     private val _formErrors = MutableStateFlow<List<String>>(emptyList())
     val formErrors: StateFlow<List<String>> = _formErrors
+    //----------------------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-    //------------------------------------------------------------------------------------------------------------------
-    // PER LA PRIMA PAGINA
+    //----------------------------------------------------------------------------------------------
+    // FUNZIONI PER LA PRIMA PAGINA
     fun fetchServizi() {
         viewModelScope.launch {
             try {
-
                 val servizi = getServiziFromFirestore()
                 _serviziState.value = servizi
             } catch (e: Exception) {
@@ -91,12 +87,12 @@ class VisualizzaServiziVM: ViewModel(){
         }
 
     }
+    //----------------------------------------------------------------------------------------------
 
 
 
-    //------------------------------------------------------------------------------------------------------------------
-    // PER LA SECONDA PAGNA
-
+    //----------------------------------------------------------------------------------------------
+    // FUNZIONI PER LA SECONDA PAGNA
     fun onNomeChange(newNome: String) {
         _nome.value = newNome
         validateForm()
@@ -123,7 +119,6 @@ class VisualizzaServiziVM: ViewModel(){
     }
 
 
-    // Funzione per aggiungere il servizio
     fun aggiungiServizio(onSuccess: () -> Unit, onError: (Exception) -> Unit) {
 
         if (!validateForm()) {
@@ -160,20 +155,13 @@ class VisualizzaServiziVM: ViewModel(){
         val errors = mutableListOf<String>()
 
         if (_nome.value.isEmpty()) errors.add("Il nome non può essere vuoto.")
-
         if (_descrizione.value.isEmpty()) errors.add("La descrizione non può essere vuota.")
-
         if (_tipo.value.isEmpty()) errors.add("Il tipo non può essere vuoto.")
-
         if (_durata.value <= 0) errors.add("La durata deve essere maggiore di zero.")
-
         if (_prezzo.value <= 0) errors.add("Il prezzo deve essere maggiore di zero.")
 
         _formErrors.value = errors
         return errors.isEmpty()
     }
-
-
-
-
+    //----------------------------------------------------------------------------------------------
 }

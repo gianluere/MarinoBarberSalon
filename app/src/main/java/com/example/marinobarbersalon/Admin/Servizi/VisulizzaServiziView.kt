@@ -26,24 +26,9 @@ import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
-/*
-first page:
-    - tutte le card dei vari servizi gia esistenti nel sistema
-    - bottone laterale a ciascuna card con funzione elimina
-    - FAB per navigare alla schermata aggiungi servizio
 
-second page:
-    - Card come prima vuota in cui poter inserire tutti i vari dettagli del servizio
-    - Radio button "Seleziona tipo servizio" con 2 opzioni: Capelli, Barba
-    - Due bottoni: Aggiungi per invocare funzione aggiungi servizio GIA PRESENTE, Annulla per cancellare gli inserimenti
-
-BUGS:
-1) la pagina si deve aggiornare da sola quando aggiungo o modifico la lista dei servizi -> FATTO
-2) validazione form
-
-*/
-
-
+//--------------------------------------------------------------------------------------------------
+//PRIMA PAGINA
 @Composable
 fun VisualizzaServizi(
     serviziViewModel: VisualizzaServiziVM = viewModel(),
@@ -139,7 +124,6 @@ fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Informazioni del servizio
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = "Nome: ${servizio.nome ?: "N/A"}", style = MaterialTheme.typography.bodyLarge)
                 Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
@@ -188,12 +172,12 @@ fun ConfermaEliminazioneDialog(
         }
     )
 }
+//--------------------------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 //SECONDA PAGINA
-
 @Composable
 fun AggiungiServizio(
     aggiungiServizioViewModel: VisualizzaServiziVM = viewModel(),
@@ -374,5 +358,6 @@ fun AggiungiServizio(
         }
     }
 }
+//--------------------------------------------------------------------------------------------------
 
 
