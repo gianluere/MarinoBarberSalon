@@ -26,6 +26,26 @@ import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
+/* TODO
+*   GRAFICA:
+*       CARDS PRIMA PAGINA:
+*           Colore sfondo;
+*           Colore testo;
+*           Font family;
+*           Spacer alla fine perche senno si vede male l'ultimo bottone di elimina;
+*           Un po piu di spazio tra ogni elemento;
+*       CARD SECONDA PAGINA:
+*           Colore sfondo;
+*           Colore testo;
+*           Colore bottoni;
+*           Colore Radio Button;
+*           Font family;
+*           (Forse) eliminare scritta "Aggiungi servizio";
+*/
+
+
+
+
 
 //--------------------------------------------------------------------------------------------------
 //PRIMA PAGINA
