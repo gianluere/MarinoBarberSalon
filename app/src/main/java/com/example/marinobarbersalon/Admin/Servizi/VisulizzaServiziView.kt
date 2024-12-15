@@ -163,7 +163,7 @@ fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
                 Icon(
                     imageVector = Icons.Default.Block,
                     contentDescription = "Elimina servizio",
-                    tint = Color.Red
+                    tint = my_bordeaux
                 )
             }
         }
