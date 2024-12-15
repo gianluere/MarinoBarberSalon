@@ -59,12 +59,15 @@ fun VisualizzaServizi(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Servizi disponibili",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp),
-            color = my_white
-        )
+
+        if(serviziState.isNotEmpty()) {
+            Text(
+                text = "Servizi disponibili",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = my_white
+            )
+        }
 
         Box(
             modifier = Modifier.fillMaxSize()
@@ -72,9 +75,9 @@ fun VisualizzaServizi(
             if (serviziState.isEmpty()) {
                 Text(
                     text = "Nessun servizio disponibile.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 16.dp),
-                    textAlign = TextAlign.Center
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = my_white
                 )
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
