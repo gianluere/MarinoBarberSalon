@@ -87,11 +87,13 @@ import androidx.compose.ui.text.toUpperCase
 /*
 *       TODO
 *        first page:
-*               mettere apposto la grafica delle card;
+*               mettere apposto la grafica delle card; OK
 *        second page:
 *               mettere apposto la grafica delle card;
 *               pulsante di "+" quantità (si sovrappone se nome lungo);
+*               mettere pulsante per diminuire la quantità;
 *               passare alla pagina aggiungi prodotto la categoria su cui siamo gia;
+*               mettere lo stesso spacio tra ultimo elemento della lazycolumn come in Vis. Servizi;
 *        third page:
 *           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io);
 *           accettare in input la categoria e quindi impostarla automaticamente
@@ -115,98 +117,123 @@ fun VisualizzaProdotti(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .padding(top = 64.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 10.dp, horizontal = 10.dp),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.Start
     ) {
+
         Text(
-            text = "Seleziona una categoria",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp),
+            text = "Seleziona una categoria:",
+            fontFamily = myFont,
+            fontSize = 27.sp,
             color = my_white
         )
 
-        //Card per "Capelli"
-        CategoriaCard(
-            categoria = "capelli",
-            isSelected = categoriaSelezionata == "capelli",
-            onClick = {
-                prodottiViewModel.onCategoriaSelezionata("capelli")
-                onNavigateToNextPage("capelli")
-            },
-            idIcon = R.drawable.capelli_icona
-        )
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
 
-        //Card per "Barba"
-        CategoriaCard(
-            categoria = "barba",
-            isSelected = categoriaSelezionata == "barba",
-            onClick = {
-                prodottiViewModel.onCategoriaSelezionata("barba")
-                onNavigateToNextPage("barba")
-            },
-            idIcon = R.drawable.barba_icona
-        )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                            .background(color = my_white, shape = RoundedCornerShape(25.dp))
+                            .aspectRatio(1f)
+                            .clickable {
+                                prodottiViewModel.onCategoriaSelezionata("capelli")
+                                onNavigateToNextPage("capelli")
+                            }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.capelli_icona),
+                            contentDescription = "Icona capelli",
+                            modifier = Modifier.padding(30.dp)
+                        )
+                    }
 
-        //Card per "Viso"
-        CategoriaCard(
-            categoria = "viso",
-            isSelected = categoriaSelezionata == "viso",
-            onClick = {
-                prodottiViewModel.onCategoriaSelezionata("viso")
-                onNavigateToNextPage("viso")
-            },
-            idIcon = R.drawable.viso_icona
-        )
-    }
-}
+                    Text(
+                        text = "CAPELLI",
+                        fontSize = 25.sp,
+                        fontFamily = myFont,
+                        color = my_white
+                    )
+                }
 
-@Composable
-fun CategoriaCard(
-    categoria: String,
-    isSelected: Boolean,
-    idIcon: Int,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .border(2.dp, my_gold, RoundedCornerShape(17.dp))
-            .clickable { onClick() },
-        shape = RoundedCornerShape(17.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = my_yellow
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = categoria.uppercase(), fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp) , color = Color.Black,
-//                    text = categoria.uppercase(),
-//                    style = MaterialTheme.typography.headlineLarge,
-//                    //color = if (isSelected) Color.White else Color.Black
-//                    color = Color.Black
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                            .background(color = my_white, shape = RoundedCornerShape(25.dp))
+                            .aspectRatio(1f)
+                            .clickable {
+                                prodottiViewModel.onCategoriaSelezionata("barba")
+                                onNavigateToNextPage("barba")
+                            }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.barba_icona),
+                            contentDescription = "Icona barba",
+                            modifier = Modifier.padding(30.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "BARBA",
+                        fontSize = 25.sp,
+                        fontFamily = myFont,
+                        color = my_white
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                        .background(color = my_white, shape = RoundedCornerShape(25.dp))
+                        .fillMaxWidth(0.5f)
+                        .clickable {
+                            prodottiViewModel.onCategoriaSelezionata("viso")
+                            onNavigateToNextPage("viso")
+                        }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.viso),
+                        contentDescription = "Icona viso",
+                        modifier = Modifier.padding(top = 30.dp, bottom = 30.dp, start = 30.dp, end = 20.dp)
+                    )
+                }
+
+                Text(
+                    text = "VISO",
+                    fontSize = 25.sp,
+                    fontFamily = myFont,
+                    color = my_white
                 )
             }
-            Icon(
-                painter = painterResource(id = idIcon),
-                contentDescription = categoria,
-                modifier = Modifier.size(48.dp),
-                //tint = if (isSelected) Color.White else Color.Gray
-                tint = Color.Black
-            )
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
+
+
 
 //--------------------------------------------------------------------------------------------------
 
