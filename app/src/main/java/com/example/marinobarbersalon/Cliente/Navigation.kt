@@ -403,7 +403,7 @@ sealed class Screen(val route:String ){
     object AggiungiServizio : Screen("aggiugniServizio")
     object VisualizzaProdotti : Screen("visualizzaProdotti")
     object VisualizzaProdottiDettaglio: Screen("visualizzaProdottiDettaglio/{categoria}")
-    object AggiungiProdotto : Screen("aggiungiProdotto")
+    object AggiungiProdotto : Screen("aggiungiProdotto/{categoria}")
 
 
 }

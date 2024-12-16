@@ -152,6 +152,10 @@ class VisualizzaProdottiVM : ViewModel(){
         validateForm()
     }
 
+    fun setCategoria(categoria : String){
+        _categoria.value = categoria
+    }
+
     fun validateForm(): Boolean {
         val errors = mutableListOf<String>()
 
@@ -195,11 +199,13 @@ class VisualizzaProdottiVM : ViewModel(){
     fun resetFields() {
         _nome.value = ""
         _descrizione.value = ""
-        _categoria.value = ""
+        //_categoria.value = ""
         _prezzo.value = 0.0
         _quantita.value = 0
         _immagine.value = ""
     }
+
+
 
 
 

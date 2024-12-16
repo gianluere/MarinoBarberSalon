@@ -94,7 +94,7 @@ import androidx.compose.runtime.*
 *        third page:
 *           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io);
 *           accettare in input la categoria e quindi impostarla automaticamente
-*                           (fatto gia in VisualizzaProdottiDettaglio);
+*                           (fatto gia in VisualizzaProdottiDettaglio); OK
 *
 **/
 
@@ -209,7 +209,7 @@ fun CategoriaCard(
 fun VisualizzaProdottiDettaglio(
     categoria: String, //Categoria passata dalla navigazione
     prodottiViewModel: VisualizzaProdottiVM = viewModel(),
-    onNavigateToAddProdotto: () -> Unit
+    onNavigateToAddProdotto: (String) -> Unit
 ) {
     val categoriaSelezionata = categoria
     val prodotti = prodottiViewModel.prodottiState.collectAsState().value
@@ -247,7 +247,7 @@ fun VisualizzaProdottiDettaglio(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(
-                        onClick = {onNavigateToAddProdotto()},
+                        onClick = {onNavigateToAddProdotto(categoria)},
                         colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
                     ) {
                         Text(
@@ -321,15 +321,17 @@ fun ProdottoCard(
 @Composable
 fun AggiungiProdotto(
     aggiungiProdottoViewModel: VisualizzaProdottiVM = viewModel(),
+    categoria : String,
     onAggiungiSuccess: () -> Unit,
     onAnnullaClick: () -> Unit
 ) {
     val nome = aggiungiProdottoViewModel.nome.collectAsState().value
     val descrizione = aggiungiProdottoViewModel.descrizione.collectAsState().value
     val prezzo = aggiungiProdottoViewModel.prezzo.collectAsState().value
-    val categoria = aggiungiProdottoViewModel.categoria.collectAsState().value
+    val categoriaVM = aggiungiProdottoViewModel.categoria.collectAsState().value
     val quantita = aggiungiProdottoViewModel.quantita.collectAsState().value
     val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
+
 
     //Form validation
     val formErrors = aggiungiProdottoViewModel.formErrors.collectAsState().value
@@ -341,6 +343,8 @@ fun AggiungiProdotto(
         if (formErrors.isNotEmpty()) {
             showErrorDialog.value = true
         }
+        aggiungiProdottoViewModel.setCategoria(categoria)
+
     }
 
     if (showErrorDialog.value) {
@@ -445,7 +449,7 @@ fun AggiungiProdotto(
 
                 // Categoria
                 OutlinedTextField(
-                    value = categoria,
+                    value = categoriaVM,
                     onValueChange = { aggiungiProdottoViewModel.onCategoriaChange(it) },
                     label = { Text("Categoria") },
                     modifier = Modifier.fillMaxWidth(),
@@ -456,7 +460,8 @@ fun AggiungiProdotto(
                         cursorColor = my_bordeaux,
                         unfocusedBorderColor = Color.Black,
                         unfocusedLabelColor = Color.Black
-                    )
+                    ),
+                    readOnly = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
