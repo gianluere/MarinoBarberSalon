@@ -3,6 +3,8 @@ package com.example.marinobarbersalon.Admin.VisualizzaProdotti
 import android.net.Uri
 import android.text.Layout
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,8 +28,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Block
@@ -69,6 +73,8 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.toUpperCase
 import coil.compose.SubcomposeAsyncImage
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 
 
@@ -99,13 +105,13 @@ import androidx.compose.ui.text.style.TextOverflow
 *        first page:
 *               mettere apposto la grafica delle card; OK
 *        second page:
-*               mettere apposto la grafica delle card;
-*               pulsante di "+" quantità (si sovrappone se nome lungo);
-*               mettere pulsante per diminuire la quantità;
-*               passare alla pagina aggiungi prodotto la categoria su cui siamo gia;
-*               mettere lo stesso spacio tra ultimo elemento della lazycolumn come in Vis. Servizi;
+*               mettere apposto la grafica delle card; OK
+*               pulsante di "+" quantità (si sovrappone se nome lungo); OK
+*               mettere pulsante per diminuire la quantità; NON BISOGNA FARLO
+*               passare alla pagina aggiungi prodotto la categoria su cui siamo gia; OK
+*               mettere lo stesso spacio tra ultimo elemento della lazycolumn come in Vis. Servizi; OK
 *        third page:
-*           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io);
+*           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io); CAPIRE MEGLIO COME FARE
 *           accettare in input la categoria e quindi impostarla automaticamente
 *                           (fatto gia in VisualizzaProdottiDettaglio); OK
 *
@@ -257,6 +263,7 @@ fun VisualizzaProdottiDettaglio(
     prodottiViewModel: VisualizzaProdottiVM = viewModel(),
     onNavigateToAddProdotto: (String) -> Unit
 ) {
+    val context = LocalContext.current
     val categoriaSelezionata = categoria
     val prodotti = prodottiViewModel.prodottiState.collectAsState().value
 
@@ -378,7 +385,8 @@ fun ProdottoCard(
                 maxLines = 2,
                 lineHeight = 14.sp,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+
             )
             //Prezzo
             Text(
@@ -426,7 +434,7 @@ fun ProdottoCard(
 @Composable
 fun AggiungiProdotto(
     aggiungiProdottoViewModel: VisualizzaProdottiVM = viewModel(),
-    categoria : String,
+    categoria: String,
     onAggiungiSuccess: () -> Unit,
     onAnnullaClick: () -> Unit
 ) {
@@ -437,8 +445,7 @@ fun AggiungiProdotto(
     val quantita = aggiungiProdottoViewModel.quantita.collectAsState().value
     val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
 
-
-    //Form validation
+    // Form validation
     val formErrors = aggiungiProdottoViewModel.formErrors.collectAsState().value
     val showErrorDialog = remember { mutableStateOf(false) }
     val isFormSubmitted = remember { mutableStateOf(false) }
@@ -449,7 +456,6 @@ fun AggiungiProdotto(
             showErrorDialog.value = true
         }
         aggiungiProdottoViewModel.setCategoria(categoria)
-
     }
 
     if (showErrorDialog.value) {
@@ -493,16 +499,22 @@ fun AggiungiProdotto(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState()), // Aggiungi scrolling alla colonna
+        verticalArrangement = Arrangement.Top, // Allinea al top
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Titolo
         Text(
             text = "Aggiungi Prodotto",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .padding(top = 64.dp)
+                .fillMaxWidth(), // Mantieni il titolo fisso
             color = my_white,
-            fontFamily = myFont
+            fontFamily = myFont,
+            textAlign = TextAlign.Center
         )
 
         Card(
@@ -516,7 +528,7 @@ fun AggiungiProdotto(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
-                //Nome
+                // Nome
                 OutlinedTextField(
                     value = nome,
                     onValueChange = { aggiungiProdottoViewModel.onNomeChange(it) },
@@ -524,13 +536,13 @@ fun AggiungiProdotto(
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,           // Colore del bordo selezionato
-                        focusedLabelColor = Color.Black,      // Colore della label quando il campo è selezionato
-                        cursorColor = my_bordeaux,             // Colore del cursore
-                        unfocusedBorderColor = Color.Black,       // Colore del bordo non selezionato
-                        unfocusedLabelColor = Color.Black         // Colore della label non selezionata
+                        focusedBorderColor = Color.Black,
+                        focusedLabelColor = Color.Black,
+                        cursorColor = my_bordeaux,
+                        unfocusedBorderColor = Color.Black,
+                        unfocusedLabelColor = Color.Black
                     ),
-                    singleLine = true,
+                    maxLines = 2
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -548,7 +560,8 @@ fun AggiungiProdotto(
                         cursorColor = my_bordeaux,
                         unfocusedBorderColor = Color.Black,
                         unfocusedLabelColor = Color.Black
-                    )
+                    ),
+                    maxLines = 3
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -576,9 +589,11 @@ fun AggiungiProdotto(
                 OutlinedTextField(
                     value = if (prezzo == 0.0) "" else prezzo.toString(),
                     onValueChange = { newValue ->
-                        val cleanedValue = newValue.replace(',', '.')
+                        val cleanedValue = newValue.replace(',', '.') // Sostituisci virgola con punto
                         val validValue = cleanedValue.toDoubleOrNull()
-                        if (validValue != null) {
+
+                        // Controlla se il valore è valido e all'interno del range consentito
+                        if (validValue != null && validValue <= 999999.99) {
                             aggiungiProdottoViewModel.onPrezzoChange(validValue)
                         }
                     },
@@ -597,7 +612,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //Quantita
+                // Quantita
                 OutlinedTextField(
                     value = if (quantita == 0) "" else quantita.toString(),
                     onValueChange = { newValue ->
@@ -611,7 +626,7 @@ fun AggiungiProdotto(
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
-                    colors =  OutlinedTextFieldDefaults.colors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Black,
                         focusedLabelColor = Color.Black,
                         cursorColor = my_bordeaux,
@@ -622,21 +637,40 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //Immagine
-                OutlinedTextField(
-                    value = immagine,
-                    onValueChange = { aggiungiProdottoViewModel.onImmagineChange(it) },
-                    label = { Text("Immagine") },
+                // Selettore immagine
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent()
+                ) { uri: Uri? ->
+                    uri?.let {
+                        aggiungiProdottoViewModel.onImmagineChange(it.toString())
+                    }
+                }
+
+                Button(
+                    onClick = { launcher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth(),
-                    textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        focusedLabelColor = Color.Black,
-                        cursorColor = my_bordeaux,
-                        unfocusedBorderColor = Color.Black,
-                        unfocusedLabelColor = Color.Black
+                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                ) {
+                    Text(
+                        text = "Seleziona Immagine",
+                        fontFamily = myFont,
+                        fontSize = 25.sp,
+                        color = my_white
                     )
-                )
+                }
+
+                // Mostra anteprima immagine
+                if (immagine.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Image(
+                        painter = rememberAsyncImagePainter(immagine),
+                        contentDescription = "Anteprima immagine",
+                        modifier = Modifier
+                            .size(100.dp) // Ridotto a un quadrato di 100x100
+                            .border(2.dp, my_bordeaux, RoundedCornerShape(10.dp)),
+
+                    )
+                }
             }
         }
 
