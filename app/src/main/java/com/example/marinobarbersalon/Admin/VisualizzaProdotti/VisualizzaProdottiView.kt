@@ -58,7 +58,8 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.toUpperCase
 
 
 /*
@@ -121,8 +122,9 @@ fun VisualizzaProdotti(
     ) {
         Text(
             text = "Seleziona una categoria",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
+            fontSize = 24.sp,
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = my_white
         )
 
         //Card per "Capelli"
@@ -179,22 +181,29 @@ fun CategoriaCard(
             containerColor = my_yellow
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = categoria.uppercase(), fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp) , color = Color.Black,
+//                    text = categoria.uppercase(),
+//                    style = MaterialTheme.typography.headlineLarge,
+//                    //color = if (isSelected) Color.White else Color.Black
+//                    color = Color.Black
+                )
+            }
             Icon(
                 painter = painterResource(id = idIcon),
                 contentDescription = categoria,
                 modifier = Modifier.size(48.dp),
-                tint = if (isSelected) Color.White else Color.Gray
+                //tint = if (isSelected) Color.White else Color.Gray
+                tint = Color.Black
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = categoria,
-                style = MaterialTheme.typography.headlineLarge,
-                color = if (isSelected) Color.White else Color.Black
-            )
         }
     }
 }
