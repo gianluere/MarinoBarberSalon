@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon.Admin.VisualizzaProdotti
 
+import android.net.Uri
 import android.text.Layout
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -21,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -58,8 +62,14 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.toUpperCase
+import coil.compose.SubcomposeAsyncImage
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.text.style.TextOverflow
 
 
 /*
@@ -243,103 +253,159 @@ fun VisualizzaProdotti(
 
 @Composable
 fun VisualizzaProdottiDettaglio(
-    categoria: String, //Categoria passata dalla navigazione
+    categoria: String,
     prodottiViewModel: VisualizzaProdottiVM = viewModel(),
     onNavigateToAddProdotto: (String) -> Unit
 ) {
     val categoriaSelezionata = categoria
     val prodotti = prodottiViewModel.prodottiState.collectAsState().value
 
-
-    Log.d("VisualizzaProdottiDettaglio", "Prodotti visualizzati: $prodotti")
-
     LaunchedEffect(Unit) {
         prodottiViewModel.fetchProdottiPerCategoria(categoriaSelezionata)
     }
 
-    Log.d("VisualizzaProdottiDettaglio", "Prodotti visualizzati dopo launched effect: $prodotti")
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .padding(top = 64.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(10.dp)
+            .padding(top = 64.dp)
     ) {
         Text(
             text = "Categoria: $categoriaSelezionata",
-            style = MaterialTheme.typography.headlineMedium
+            fontFamily = myFont,
+            fontSize = 23.sp,
+            color = my_white,
+            modifier = Modifier.padding(bottom = 10.dp)
         )
 
-        LazyColumn {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                top = 25.dp,
+                end = 12.dp,
+                bottom = 25.dp
+            ),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.weight(1f) //togliere sovrapposizione
+        ) {
             items(prodotti) { prodotto ->
-                ProdottoCard(prodotto = prodotto)
-            }
-            item(){
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Button(
-                        onClick = {onNavigateToAddProdotto(categoria)},
-                        colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
-                    ) {
-                        Text(
-                            text = "Aggiungi Prodotto",
-                            fontFamily = myFont,
-                            fontSize = 25.sp,
-                            color = my_gold
-                        )
-                    }
-                }
+                ProdottoCard(prodotto, prodottiViewModel)
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-
-
+        //Bottone "Aggiungi Prodotto"
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        ) {
+            Button(
+                onClick = { onNavigateToAddProdotto(categoria) },
+//                modifier = Modifier
+//                    .height(48.dp)
+//                    .fillMaxWidth(0.7f),
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+//                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "Aggiungi Prodotto",
+                    fontFamily = myFont,
+                    fontSize = 25.sp,
+                    color = my_gold
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun ProdottoCard(
     prodotto: Prodotto,
-    prodottiViewModel: VisualizzaProdottiVM = viewModel()
+    prodottiViewModel: VisualizzaProdottiVM
 ) {
-    Card(
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            val painter = rememberAsyncImagePainter(prodotto.immagine)
-            Image(
-                painter = painter,
-                contentDescription = prodotto.nome,
-                modifier = Modifier.size(64.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = prodotto.nome,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "Prezzo: ${prodotto.prezzo} €"
-                )
-                Text(
-                    text = "Quantità: ${prodotto.quantita}"
-                )
-
+        //Immagine del prodotto
+        SubcomposeAsyncImage(
+            model = Uri.parse(prodotto.immagine),
+            contentDescription = "Immagine prodotto",
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(10.dp))
+                .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+            loading = {
+                Box(
+                    Modifier.size(180.dp)
+                        .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                        .background(color = my_grey, shape = RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(10.dp),
+                        color = my_gold,
+                        strokeWidth = 5.dp
+                    )
+                }
+            },
+            contentScale = ContentScale.Crop,
+            colorFilter = if (prodotto.quantita == 0) {
+                ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+            } else {
+                null
             }
+        )
+
+        //Dettagli del prodotto
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            //Nome
+            Text(
+                text = prodotto.nome,
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 18.sp,
+                maxLines = 2,
+                lineHeight = 14.sp,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            //Prezzo
+            Text(
+                text = String.format("%.2f", prodotto.prezzo) + "€",
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 18.sp,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 6.dp, bottom = 4.dp)
+            )
+        }
+
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            //Quantita
+            Text(
+                text = "Quantità: ${prodotto.quantita}",
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 16.sp
+            )
+            //Aumenta quantita
             IconButton(
-                onClick = {prodottiViewModel.increaseStock(prodotto)},
-                modifier = Modifier.padding(start = 8.dp)
+                onClick = { prodottiViewModel.increaseStock(prodotto) }
             ) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
@@ -350,6 +416,9 @@ fun ProdottoCard(
         }
     }
 }
+
+
+
 //--------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------
@@ -460,7 +529,8 @@ fun AggiungiProdotto(
                         cursorColor = my_bordeaux,             // Colore del cursore
                         unfocusedBorderColor = Color.Black,       // Colore del bordo non selezionato
                         unfocusedLabelColor = Color.Black         // Colore della label non selezionata
-                    )
+                    ),
+                    singleLine = true,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
