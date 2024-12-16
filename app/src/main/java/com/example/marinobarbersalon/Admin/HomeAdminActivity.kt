@@ -7,15 +7,23 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentCut
+import androidx.compose.material.icons.outlined.Feedback
+import androidx.compose.material.icons.outlined.Grade
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.List
 
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
@@ -102,6 +110,12 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.VisualizzaProdotti.route,
                             selectedIcon = Icons.Filled.ShoppingCart,
                             unselectedIcon = Icons.Outlined.ShoppingCart
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Recensioni",
+                            route = Screen.Recensioni.route,
+                            selectedIcon = Icons.Filled.Grade,
+                            unselectedIcon = Icons.Outlined.Grade
                         )
 
                     )

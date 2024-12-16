@@ -1,9 +1,12 @@
 package com.example.marinobarbersalon.Admin
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -19,6 +22,8 @@ import com.example.marinobarbersalon.Admin.VisualizzaClienti.VisualizzaClienti
 import com.example.marinobarbersalon.Admin.VisualizzaProdotti.AggiungiProdotto
 import com.example.marinobarbersalon.Admin.VisualizzaProdotti.VisualizzaProdotti
 import com.example.marinobarbersalon.Admin.VisualizzaProdotti.VisualizzaProdottiDettaglio
+import com.example.marinobarbersalon.Cliente.Account.ListaRecensioniViewModel
+import com.example.marinobarbersalon.Cliente.Account.Recensioni
 import com.example.marinobarbersalon.Cliente.Screen
 
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
@@ -43,6 +48,8 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationAdmin(modifier: Modifier, navController : NavHostController, adminViewModel : AdminViewModel, logout : () -> Unit) {
+
+    val listaRecensioniViewModel : ListaRecensioniViewModel = viewModel()
 
     NavHost(navController, startDestination = "homeAdmin"){
 
@@ -152,6 +159,17 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             } else {
                 Text(text = "NESSUNA CATEGORIA PASSATA")
             }
+        }
+
+        composable(Screen.Recensioni.route) {
+            Recensioni(
+                modifier = Modifier.padding(top = 64.dp),
+                listaRecensioniViewModel = listaRecensioniViewModel,
+                isAdmin = true,
+                onNavigateToInserisciRecensione = {
+                    navController.navigate(Screen.InserisciRecensione.route)
+                }
+            )
         }
 
 

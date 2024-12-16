@@ -78,6 +78,7 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         Screen.VisualizzaProdotti.route -> "VISUALIZZA PRODOTTI"
         Screen.VisualizzaProdottiDettaglio.route -> "VISUALIZZA PRODOTTI"
         Screen.AggiungiProdotto.route -> "VISUALIZZA PRODOTTI"
+        Screen.Recensioni.route -> "VISUALIZZA RECENSIONI"
         else -> "Default"
     }
 

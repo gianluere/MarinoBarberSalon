@@ -345,6 +345,7 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                 Recensioni(
                     modifier = Modifier.padding(paddingValues),
                     listaRecensioniViewModel = listaRecensioniViewModel,
+                    isAdmin = false,
                     onNavigateToInserisciRecensione = {
                         navController.navigate(Screen.InserisciRecensione.route)
                     }
