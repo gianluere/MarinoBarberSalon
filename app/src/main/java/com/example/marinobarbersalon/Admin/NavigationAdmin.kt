@@ -51,9 +51,21 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
     val listaRecensioniViewModel : ListaRecensioniViewModel = viewModel()
 
+    /* I caratteri "\\ fungono da escape character
+       La Regexp va a sostituire nella stringa di partenza
+       l'argomento passato togliendo le graffe
+       (Prima barra (\): serve da escape per la seconda barra nella stringa
+        dato che (\) è anche esso un carattere speciale nelle stringhe di Kotlin.
+    */
+
+    fun String.withArg(arg: String): String {
+        return this.replace("\\{.*?\\}".toRegex(), arg)
+    }
+
+
     NavHost(navController, startDestination = "homeAdmin"){
 
-        composable(Screen.HomeAdmin.route){
+        composable(Screen.HomeAdmin.route) {
             HomeAdmin(
                 modifier = modifier,
                 adminViewModel = adminViewModel,
@@ -63,23 +75,23 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             )
         }
 
-        composable(Screen.Prova.route){
-            Prova(modifier = modifier,
+        composable(Screen.Prova.route) {
+            Prova(
+                modifier = modifier,
                 clicca = {
                     navController.navigate(Screen.Provadue.route)
-                })
+                }
+            )
         }
 
-        composable(Screen.Provadue.route){
-
+        composable(Screen.Provadue.route) {
             Provadue(modifier = modifier)
-
         }
 
         composable(Screen.VisualizzaAppuntamenti.route) {
             VisualizzaAppuntamenti(
                 onNavigateToNextPage = { date ->
-                    navController.navigate("visualizzaAppuntamenti1/$date")
+                    navController.navigate(Screen.VisualizzaAppuntamenti1.route.withArg(date))
                 }
             )
         }
@@ -96,7 +108,7 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
         composable(Screen.VisualizzaClienti.route) {
             VisualizzaClienti(
                 onNavigateToDetails = { clienteEmail ->
-                    navController.navigate("dettagliCliente/${clienteEmail}")
+                    navController.navigate(Screen.DettagliCliente.route.withArg(clienteEmail))
                 }
             )
         }
@@ -110,7 +122,7 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             }
         }
 
-        composable(Screen.VisualizzaServizi.route){
+        composable(Screen.VisualizzaServizi.route) {
             VisualizzaServizi(
                 onNavigateToAddServizio = {
                     navController.navigate(Screen.AggiungiServizio.route)
@@ -118,28 +130,28 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             )
         }
 
-        composable(Screen.AggiungiServizio.route){
+        composable(Screen.AggiungiServizio.route) {
             AggiungiServizio(
                 onAggiungiSuccess = { navController.popBackStack() },
                 onAnnullaClick = { navController.popBackStack() }
             )
         }
 
-        composable(Screen.VisualizzaProdotti.route){
+        composable(Screen.VisualizzaProdotti.route) {
             VisualizzaProdotti(
                 onNavigateToNextPage = { categoria ->
-                    navController.navigate("visualizzaProdottiDettaglio/$categoria")
+                    navController.navigate(Screen.VisualizzaProdottiDettaglio.route.withArg(categoria))
                 }
             )
         }
-        composable(Screen.VisualizzaProdottiDettaglio.route) {backStackEntry ->
-            val categoria = backStackEntry.arguments?.getString("categoria")
 
+        composable(Screen.VisualizzaProdottiDettaglio.route) { backStackEntry ->
+            val categoria = backStackEntry.arguments?.getString("categoria")
             if (categoria != null) {
                 VisualizzaProdottiDettaglio(
                     categoria = categoria,
                     onNavigateToAddProdotto = {
-                        navController.navigate("aggiungiProdotto/$categoria")
+                        navController.navigate(Screen.AggiungiProdotto.route.withArg(categoria))
                     }
                 )
             } else {
@@ -149,7 +161,6 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
         composable(Screen.AggiungiProdotto.route) { backStackEntry ->
             val categoria = backStackEntry.arguments?.getString("categoria")
-
             if (categoria != null) {
                 AggiungiProdotto(
                     categoria = categoria,
@@ -163,7 +174,7 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
         composable(Screen.Recensioni.route) {
             Recensioni(
-                modifier = Modifier.padding(top = 64.dp),
+                modifier = Modifier.padding(top = 100.dp),
                 listaRecensioniViewModel = listaRecensioniViewModel,
                 isAdmin = true,
                 onNavigateToInserisciRecensione = {
@@ -171,6 +182,9 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
                 }
             )
         }
+
+
+
 
 
 
