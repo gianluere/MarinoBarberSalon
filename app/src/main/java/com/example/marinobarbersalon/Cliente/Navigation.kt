@@ -506,6 +506,9 @@ sealed class Screen(val route:String ){
     object DettagliCliente : Screen("dettagliCliente/{clienteEmail}")
     object VisualizzaServizi : Screen("visualizzaServizi")
     object AggiungiServizio : Screen("aggiugniServizio")
+    object VisualizzaProdotti : Screen("visualizzaProdotti")
+    object VisualizzaProdottiDettaglio: Screen("visualizzaProdottiDettaglio/{categoria}")
+    object AggiungiProdotto : Screen("aggiungiProdotto/{categoria}")
 
 
 }

@@ -33,6 +33,15 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
+/*
+POSSIBILE BUG:
+    quando faccio indietro bisogna ridirigere bene alla pagina indietro ( non so se non va bene ma da
+    vedere meglio perche mi è successo che tornando indietro non andasse piu e rimanesse bloccato
+    sulla stessa pagina)
+*/
+
+
+
 
 //--------------------------------------------------------------------------------------------------
 //PRIMA PAGINA
@@ -149,11 +158,11 @@ fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Nome: ${servizio.nome ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Tipo: ${servizio.tipo ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Durata: ${servizio.durata ?: 0} min", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Prezzo: €${servizio.prezzo}", style = MaterialTheme.typography.bodyMedium, fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
+                Text(text = "Nome: ${servizio.nome ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp) , color = Color.Black)
+                Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
+                Text(text = "Tipo: ${servizio.tipo ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
+                Text(text = "Durata: ${servizio.durata ?: 0} min", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
+                Text(text = "Prezzo: €${servizio.prezzo}", style = MaterialTheme.typography.bodyMedium, fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
             }
 
             IconButton(
@@ -313,7 +322,8 @@ fun AggiungiServizio(
     ) {
         Text(
             text = "Aggiungi Servizio",
-            style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(bottom = 16.dp),
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(bottom = 16.dp).padding(top = 25.dp ),
             color = my_white,
             fontFamily = myFont
         )
@@ -371,6 +381,7 @@ fun AggiungiServizio(
                     text = "Seleziona tipo servizio:",
                     fontFamily = myFont,
                     fontSize = 25.sp,
+                    color = Color.Black
 //                    fontWeight = FontWeight.W500
 //                    color = Color.Black.copy(alpha = 1.5f)
                 )
@@ -390,7 +401,8 @@ fun AggiungiServizio(
                             .padding(start = 8.dp)
                             .align(Alignment.CenterVertically),
                         fontFamily = myFont,
-                        fontSize = 25.sp
+                        fontSize = 25.sp,
+                        color = Color.Black
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -409,7 +421,8 @@ fun AggiungiServizio(
                             .padding(start = 8.dp)
                             .align(Alignment.CenterVertically),
                         fontFamily = myFont,
-                        fontSize = 25.sp
+                        fontSize = 25.sp,
+                        color = Color.Black
 
                     )
                 }

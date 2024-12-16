@@ -16,6 +16,9 @@ import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppu
 import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti1
 import com.example.marinobarbersalon.Admin.VisualizzaClienti.DettagliCliente
 import com.example.marinobarbersalon.Admin.VisualizzaClienti.VisualizzaClienti
+import com.example.marinobarbersalon.Admin.VisualizzaProdotti.AggiungiProdotto
+import com.example.marinobarbersalon.Admin.VisualizzaProdotti.VisualizzaProdotti
+import com.example.marinobarbersalon.Admin.VisualizzaProdotti.VisualizzaProdottiDettaglio
 import com.example.marinobarbersalon.Cliente.Screen
 
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
@@ -114,6 +117,46 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
                 onAnnullaClick = { navController.popBackStack() }
             )
         }
+
+        composable(Screen.VisualizzaProdotti.route){
+            VisualizzaProdotti(
+                onNavigateToNextPage = { categoria ->
+                    navController.navigate("visualizzaProdottiDettaglio/$categoria")
+                }
+            )
+        }
+        composable(Screen.VisualizzaProdottiDettaglio.route) {backStackEntry ->
+            val categoria = backStackEntry.arguments?.getString("categoria")
+
+            if (categoria != null) {
+                VisualizzaProdottiDettaglio(
+                    categoria = categoria,
+                    onNavigateToAddProdotto = {
+                        navController.navigate("aggiungiProdotto/$categoria")
+                    }
+                )
+            } else {
+                Text(text = "NESSUNA CATEGORIA PASSATA")
+            }
+        }
+
+        composable(Screen.AggiungiProdotto.route) { backStackEntry ->
+            val categoria = backStackEntry.arguments?.getString("categoria")
+
+            if (categoria != null) {
+                AggiungiProdotto(
+                    categoria = categoria,
+                    onAggiungiSuccess = { navController.popBackStack() },
+                    onAnnullaClick = { navController.popBackStack() },
+                )
+            } else {
+                Text(text = "NESSUNA CATEGORIA PASSATA")
+            }
+        }
+
+
+
+
 
 
 

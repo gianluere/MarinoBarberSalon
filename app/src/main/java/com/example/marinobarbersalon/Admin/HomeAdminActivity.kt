@@ -12,11 +12,14 @@ import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Home
+
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -93,6 +96,12 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.VisualizzaServizi.route,
                             selectedIcon = Icons.Filled.ContentCut,
                             unselectedIcon = Icons.Outlined.ContentCut
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Prodotti",
+                            route = Screen.VisualizzaProdotti.route,
+                            selectedIcon = Icons.Filled.ShoppingCart,
+                            unselectedIcon = Icons.Outlined.ShoppingCart
                         )
 
                     )
