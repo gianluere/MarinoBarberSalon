@@ -40,6 +40,9 @@ import com.example.marinobarbersalon.Cliente.Home.SelezionaServiziobarba
 import com.example.marinobarbersalon.Cliente.Home.SelezioneServizioCapelli
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.Cliente.ScaffoldItems.TopBarMia
+import com.example.marinobarbersalon.Cliente.Shopping.ProdottoShop
+import com.example.marinobarbersalon.Cliente.Shopping.SelezionaShop
+import com.example.marinobarbersalon.Cliente.Shopping.Shop
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 
@@ -365,7 +368,107 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             ) { paddingValues ->
                 InserisciRecensione(
                     modifier = Modifier.padding(paddingValues),
-                    listaRecensioniViewModel = listaRecensioniViewModel
+                    listaRecensioniViewModel = listaRecensioniViewModel,
+                    userViewModel = userViewModel,
+                    onSuccess = {
+                        navController.popBackStack(route = Screen.Recensioni.route, inclusive = false)
+                    }
+                )
+            }
+        }
+
+
+        composable(Screen.SelezionaShop.route){
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "SHOP",
+                        showIcon = false,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                SelezionaShop(
+                    modifier = Modifier.padding(paddingValues),
+                    onNavigateToShopCapelli = {
+                        navController.navigate(Screen.Shop.route + "/Capelli")
+                    },
+                    onNavigateToShopBarba = {
+                        navController.navigate(Screen.Shop.route + "/Barba")
+                    },
+                    onNavigateToShopViso = {
+                        navController.navigate(Screen.Shop.route + "/Viso")
+                    }
+                )
+            }
+        }
+
+        composable(
+            Screen.Shop.route+ "/{categoria}",
+            arguments =  listOf(
+                navArgument(name = "categoria"){
+                    type = NavType.StringType
+                }
+            )
+        ){backStackEntry ->
+            val categoria = backStackEntry.arguments?.getString("categoria").toString()
+
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "SHOP",
+                        showIcon = true,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                Shop(
+                    modifier = Modifier.padding(paddingValues),
+                    title = categoria,
+                    onNavigateToProdottoShop = {nomeProdotto ->
+                        navController.navigate(Screen.ProdottoShop.route + "/$nomeProdotto")
+                    }
+                )
+            }
+        }
+
+        composable(
+            Screen.ProdottoShop.route+ "/{nomeProdotto}",
+            arguments =  listOf(
+                navArgument(name = "nomeProdotto"){
+                    type = NavType.StringType
+                }
+            )
+        ){backStackEntry ->
+            val nomeProdotto = backStackEntry.arguments?.getString("nomeProdotto").toString()
+
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "SHOP",
+                        showIcon = true,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                ProdottoShop(
+                    modifier = Modifier.padding(paddingValues),
+                    nomeProdotto = nomeProdotto,
+                    onSuccess = {
+                        navController.popBackStack(route = Screen.SelezionaShop.route, inclusive = false)
+                    }
                 )
             }
         }
@@ -388,7 +491,9 @@ sealed class Screen(val route:String ){
     object Prenotazioni : Screen("prenotazioni")
     object Recensioni : Screen("recensioni")
     object InserisciRecensione : Screen("inserisciRecensione")
+    object SelezionaShop : Screen("selezionaShop")
     object Shop : Screen("shop")
+    object ProdottoShop : Screen("prodottoShop")
     object Impostazioni : Screen("impostazioni")
 
     ///////////////////////////////////////////////////////
@@ -403,7 +508,7 @@ sealed class Screen(val route:String ){
     object AggiungiServizio : Screen("aggiugniServizio")
     object VisualizzaProdotti : Screen("visualizzaProdotti")
     object VisualizzaProdottiDettaglio: Screen("visualizzaProdottiDettaglio/{categoria}")
-    object AggiungiProdotto : Screen("aggiungiProdotto")
+    object AggiungiProdotto : Screen("aggiungiProdotto/{categoria}")
 
 
 }

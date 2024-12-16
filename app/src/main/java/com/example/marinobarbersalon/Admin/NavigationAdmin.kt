@@ -132,7 +132,7 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
                 VisualizzaProdottiDettaglio(
                     categoria = categoria,
                     onNavigateToAddProdotto = {
-                        navController.navigate(Screen.AggiungiProdotto.route)
+                        navController.navigate("aggiungiProdotto/$categoria")
                     }
                 )
             } else {
@@ -140,12 +140,21 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             }
         }
 
-        composable(Screen.AggiungiProdotto.route){
-            AggiungiProdotto(
-                onAggiungiSuccess = { navController.popBackStack() },
-                onAnnullaClick = { navController.popBackStack() }
-            )
+        composable(Screen.AggiungiProdotto.route) { backStackEntry ->
+            val categoria = backStackEntry.arguments?.getString("categoria")
+
+            if (categoria != null) {
+                AggiungiProdotto(
+                    categoria = categoria,
+                    onAggiungiSuccess = { navController.popBackStack() },
+                    onAnnullaClick = { navController.popBackStack() },
+                )
+            } else {
+                Text(text = "NESSUNA CATEGORIA PASSATA")
+            }
         }
+
+
 
 
 

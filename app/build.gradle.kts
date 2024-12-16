@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation ("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
     implementation("com.github.javafaker:javafaker:1.0.2")
     implementation("io.coil-kt:coil-compose:2.0.0")

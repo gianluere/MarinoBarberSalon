@@ -212,7 +212,7 @@ fun BarraNavigazione(navController : NavController, notificheClienteViewModel: N
     val navItemList = listOf(
         NavItem(Screen.Home.route, ImageVector.vectorResource(R.drawable.sharp_content_cut_24)),
         NavItem(Screen.Account.route, Icons.Outlined.AccountCircle),
-        NavItem(Screen.Shop.route, Icons.Outlined.ShoppingCart),
+        NavItem(Screen.SelezionaShop.route, Icons.Outlined.ShoppingCart),
         NavItem(Screen.Impostazioni.route, Icons.Default.Settings)
     )
     val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -225,6 +225,9 @@ fun BarraNavigazione(navController : NavController, notificheClienteViewModel: N
         Screen.DatiPersonali.route -> Screen.Account.route
         Screen.Prenotazioni.route -> Screen.Account.route
         Screen.Recensioni.route -> Screen.Account.route
+        Screen.InserisciRecensione.route -> Screen.Account.route
+        Screen.Shop.route + "/{categoria}" -> Screen.SelezionaShop.route
+        Screen.ProdottoShop.route+ "/{nomeProdotto}" -> Screen.SelezionaShop.route
         else -> rottaCorrente
     }
     Log.d("NAVBAR", rottaDaEvidenziare.toString())

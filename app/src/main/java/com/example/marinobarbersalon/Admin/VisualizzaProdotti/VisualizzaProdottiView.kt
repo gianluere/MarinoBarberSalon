@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon.Admin.VisualizzaProdotti
 
+import android.net.Uri
 import android.text.Layout
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -21,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -58,7 +62,14 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.toUpperCase
+import coil.compose.SubcomposeAsyncImage
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.text.style.TextOverflow
 
 
 /*
@@ -86,7 +97,7 @@ import androidx.compose.runtime.*
 /*
 *       TODO
 *        first page:
-*               mettere apposto la grafica delle card;
+*               mettere apposto la grafica delle card; OK
 *        second page:
 *               mettere apposto la grafica delle card;
 *               pulsante di "+" quantità (si sovrappone se nome lungo);
@@ -96,7 +107,7 @@ import androidx.compose.runtime.*
 *        third page:
 *           modificare tipo di img (chiedere a gianluca se è ok come voglio fare io);
 *           accettare in input la categoria e quindi impostarla automaticamente
-*                           (fatto gia in VisualizzaProdottiDettaglio);
+*                           (fatto gia in VisualizzaProdottiDettaglio); OK
 *
 **/
 
@@ -116,90 +127,123 @@ fun VisualizzaProdotti(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .padding(top = 64.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 10.dp, horizontal = 10.dp),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.Start
     ) {
+
         Text(
-            text = "Seleziona una categoria",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
+            text = "Seleziona una categoria:",
+            fontFamily = myFont,
+            fontSize = 27.sp,
+            color = my_white
         )
 
-        //Card per "Capelli"
-        CategoriaCard(
-            categoria = "capelli",
-            isSelected = categoriaSelezionata == "capelli",
-            onClick = {
-                prodottiViewModel.onCategoriaSelezionata("capelli")
-                onNavigateToNextPage("capelli")
-            },
-            idIcon = R.drawable.capelli_icona
-        )
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
 
-        //Card per "Barba"
-        CategoriaCard(
-            categoria = "barba",
-            isSelected = categoriaSelezionata == "barba",
-            onClick = {
-                prodottiViewModel.onCategoriaSelezionata("barba")
-                onNavigateToNextPage("barba")
-            },
-            idIcon = R.drawable.barba_icona
-        )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                            .background(color = my_white, shape = RoundedCornerShape(25.dp))
+                            .aspectRatio(1f)
+                            .clickable {
+                                prodottiViewModel.onCategoriaSelezionata("capelli")
+                                onNavigateToNextPage("capelli")
+                            }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.capelli_icona),
+                            contentDescription = "Icona capelli",
+                            modifier = Modifier.padding(30.dp)
+                        )
+                    }
 
-        //Card per "Viso"
-        CategoriaCard(
-            categoria = "viso",
-            isSelected = categoriaSelezionata == "viso",
-            onClick = {
-                prodottiViewModel.onCategoriaSelezionata("viso")
-                onNavigateToNextPage("viso")
-            },
-            idIcon = R.drawable.viso_icona
-        )
-    }
-}
+                    Text(
+                        text = "CAPELLI",
+                        fontSize = 25.sp,
+                        fontFamily = myFont,
+                        color = my_white
+                    )
+                }
 
-@Composable
-fun CategoriaCard(
-    categoria: String,
-    isSelected: Boolean,
-    idIcon: Int,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .border(2.dp, my_gold, RoundedCornerShape(17.dp))
-            .clickable { onClick() },
-        shape = RoundedCornerShape(17.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = my_yellow
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(id = idIcon),
-                contentDescription = categoria,
-                modifier = Modifier.size(48.dp),
-                tint = if (isSelected) Color.White else Color.Gray
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = categoria,
-                style = MaterialTheme.typography.headlineLarge,
-                color = if (isSelected) Color.White else Color.Black
-            )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                            .background(color = my_white, shape = RoundedCornerShape(25.dp))
+                            .aspectRatio(1f)
+                            .clickable {
+                                prodottiViewModel.onCategoriaSelezionata("barba")
+                                onNavigateToNextPage("barba")
+                            }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.barba_icona),
+                            contentDescription = "Icona barba",
+                            modifier = Modifier.padding(30.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "BARBA",
+                        fontSize = 25.sp,
+                        fontFamily = myFont,
+                        color = my_white
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                        .background(color = my_white, shape = RoundedCornerShape(25.dp))
+                        .fillMaxWidth(0.5f)
+                        .clickable {
+                            prodottiViewModel.onCategoriaSelezionata("viso")
+                            onNavigateToNextPage("viso")
+                        }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.viso),
+                        contentDescription = "Icona viso",
+                        modifier = Modifier.padding(top = 30.dp, bottom = 30.dp, start = 30.dp, end = 20.dp)
+                    )
+                }
+
+                Text(
+                    text = "VISO",
+                    fontSize = 25.sp,
+                    fontFamily = myFont,
+                    color = my_white
+                )
+            }
         }
     }
 }
+
+
 
 //--------------------------------------------------------------------------------------------------
 
@@ -209,51 +253,62 @@ fun CategoriaCard(
 
 @Composable
 fun VisualizzaProdottiDettaglio(
-    categoria: String, //Categoria passata dalla navigazione
+    categoria: String,
     prodottiViewModel: VisualizzaProdottiVM = viewModel(),
-    onNavigateToAddProdotto: () -> Unit
+    onNavigateToAddProdotto: (String) -> Unit
 ) {
     val categoriaSelezionata = categoria
     val prodotti = prodottiViewModel.prodottiState.collectAsState().value
-
-
-    Log.d("VisualizzaProdottiDettaglio", "Prodotti visualizzati: $prodotti")
 
     LaunchedEffect(Unit) {
         prodottiViewModel.fetchProdottiPerCategoria(categoriaSelezionata)
     }
 
-    Log.d("VisualizzaProdottiDettaglio", "Prodotti visualizzati dopo launched effect: $prodotti")
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .padding(top = 64.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(10.dp)
+            .padding(top = 64.dp)
     ) {
         Text(
             text = "Categoria: $categoriaSelezionata",
-            style = MaterialTheme.typography.headlineMedium
+            fontFamily = myFont,
+            fontSize = 23.sp,
+            color = my_white,
+            modifier = Modifier.padding(bottom = 10.dp)
         )
 
-        LazyColumn {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                top = 25.dp,
+                end = 12.dp,
+                bottom = 25.dp
+            ),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.weight(1f) //togliere sovrapposizione
+        ) {
             items(prodotti) { prodotto ->
-                ProdottoCard(prodotto = prodotto)
+                ProdottoCard(prodotto, prodottiViewModel)
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-
+        //Bottone "Aggiungi Prodotto"
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
         ) {
             Button(
-                onClick = {onNavigateToAddProdotto()},
-                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                onClick = { onNavigateToAddProdotto(categoria) },
+//                modifier = Modifier
+//                    .height(48.dp)
+//                    .fillMaxWidth(0.7f),
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+//                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = "Aggiungi Prodotto",
@@ -269,40 +324,88 @@ fun VisualizzaProdottiDettaglio(
 @Composable
 fun ProdottoCard(
     prodotto: Prodotto,
-    prodottiViewModel: VisualizzaProdottiVM = viewModel()
+    prodottiViewModel: VisualizzaProdottiVM
 ) {
-    Card(
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            val painter = rememberAsyncImagePainter(prodotto.immagine)
-            Image(
-                painter = painter,
-                contentDescription = prodotto.nome,
-                modifier = Modifier.size(64.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = prodotto.nome,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "Prezzo: ${prodotto.prezzo} €"
-                )
-                Text(
-                    text = "Quantità: ${prodotto.quantita}"
-                )
-
+        //Immagine del prodotto
+        SubcomposeAsyncImage(
+            model = Uri.parse(prodotto.immagine),
+            contentDescription = "Immagine prodotto",
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(10.dp))
+                .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+            loading = {
+                Box(
+                    Modifier.size(180.dp)
+                        .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                        .background(color = my_grey, shape = RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(10.dp),
+                        color = my_gold,
+                        strokeWidth = 5.dp
+                    )
+                }
+            },
+            contentScale = ContentScale.Crop,
+            colorFilter = if (prodotto.quantita == 0) {
+                ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+            } else {
+                null
             }
+        )
+
+        //Dettagli del prodotto
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            //Nome
+            Text(
+                text = prodotto.nome,
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 18.sp,
+                maxLines = 2,
+                lineHeight = 14.sp,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            //Prezzo
+            Text(
+                text = String.format("%.2f", prodotto.prezzo) + "€",
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 18.sp,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 6.dp, bottom = 4.dp)
+            )
+        }
+
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            //Quantita
+            Text(
+                text = "Quantità: ${prodotto.quantita}",
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 16.sp
+            )
+            //Aumenta quantita
             IconButton(
-                onClick = {prodottiViewModel.increaseStock(prodotto)},
-                modifier = Modifier.padding(start = 8.dp)
+                onClick = { prodottiViewModel.increaseStock(prodotto) }
             ) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
@@ -313,6 +416,9 @@ fun ProdottoCard(
         }
     }
 }
+
+
+
 //--------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------
@@ -320,15 +426,17 @@ fun ProdottoCard(
 @Composable
 fun AggiungiProdotto(
     aggiungiProdottoViewModel: VisualizzaProdottiVM = viewModel(),
+    categoria : String,
     onAggiungiSuccess: () -> Unit,
     onAnnullaClick: () -> Unit
 ) {
     val nome = aggiungiProdottoViewModel.nome.collectAsState().value
     val descrizione = aggiungiProdottoViewModel.descrizione.collectAsState().value
     val prezzo = aggiungiProdottoViewModel.prezzo.collectAsState().value
-    val categoria = aggiungiProdottoViewModel.categoria.collectAsState().value
+    val categoriaVM = aggiungiProdottoViewModel.categoria.collectAsState().value
     val quantita = aggiungiProdottoViewModel.quantita.collectAsState().value
     val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
+
 
     //Form validation
     val formErrors = aggiungiProdottoViewModel.formErrors.collectAsState().value
@@ -340,6 +448,8 @@ fun AggiungiProdotto(
         if (formErrors.isNotEmpty()) {
             showErrorDialog.value = true
         }
+        aggiungiProdottoViewModel.setCategoria(categoria)
+
     }
 
     if (showErrorDialog.value) {
@@ -419,7 +529,8 @@ fun AggiungiProdotto(
                         cursorColor = my_bordeaux,             // Colore del cursore
                         unfocusedBorderColor = Color.Black,       // Colore del bordo non selezionato
                         unfocusedLabelColor = Color.Black         // Colore della label non selezionata
-                    )
+                    ),
+                    singleLine = true,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -444,7 +555,7 @@ fun AggiungiProdotto(
 
                 // Categoria
                 OutlinedTextField(
-                    value = categoria,
+                    value = categoriaVM,
                     onValueChange = { aggiungiProdottoViewModel.onCategoriaChange(it) },
                     label = { Text("Categoria") },
                     modifier = Modifier.fillMaxWidth(),
@@ -455,7 +566,8 @@ fun AggiungiProdotto(
                         cursorColor = my_bordeaux,
                         unfocusedBorderColor = Color.Black,
                         unfocusedLabelColor = Color.Black
-                    )
+                    ),
+                    readOnly = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
