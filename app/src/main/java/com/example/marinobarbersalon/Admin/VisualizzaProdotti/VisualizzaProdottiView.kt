@@ -241,26 +241,29 @@ fun VisualizzaProdottiDettaglio(
             items(prodotti) { prodotto ->
                 ProdottoCard(prodotto = prodotto)
             }
+            item(){
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {onNavigateToAddProdotto()},
+                        colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                    ) {
+                        Text(
+                            text = "Aggiungi Prodotto",
+                            fontFamily = myFont,
+                            fontSize = 25.sp,
+                            color = my_gold
+                        )
+                    }
+                }
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(
-                onClick = {onNavigateToAddProdotto()},
-                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
-            ) {
-                Text(
-                    text = "Aggiungi Prodotto",
-                    fontFamily = myFont,
-                    fontSize = 25.sp,
-                    color = my_gold
-                )
-            }
-        }
+
     }
 }
 
