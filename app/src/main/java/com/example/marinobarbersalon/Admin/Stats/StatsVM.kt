@@ -15,24 +15,26 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 class StatsVM : ViewModel() {
 
     //----------------------------------------------------------------------------------------------
-    //PAGINA APPUNTAMENTI
-
-
-    private val visualizzaAppuntamentiVM = VisualizzaAppuntamentiVM()
+    // PER LA PAGINA APPUNTAMENTI
 
     private val _appuntamentiPerIntervallo = MutableStateFlow<List<Pair<String, Int>>>(emptyList())
     val appuntamentiPerIntervallo: StateFlow<List<Pair<String, Int>>> = _appuntamentiPerIntervallo
 
-    private val _isLoading = MutableStateFlow(false) // Stato di caricamento
+    // PER IL CARICAMENTO
+    private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
-
     private var isFetchingData = false
+    //----------------------------------------------------------------------------------------------
+
+    //----------------------------------------------------------------------------------------------
+    // FUNZIONI STATISTICHE APPUNTAMENTI
 
 //    fun getAppuntamentiPerIntervallo(interval: String) {
 //        if (isFetchingData) {
@@ -73,25 +75,67 @@ class StatsVM : ViewModel() {
 //        }
 //    }
 
+//    fun getAppuntamentiPerIntervallo(interval: String) {
+//        viewModelScope.launch {
+//            _isLoading.value = true // Imposta il caricamento su true
+//            try {
+//                val dateCountMap = fetchDateCountsFromFirestore()
+//                val appuntamentiPerData = when (interval) {
+//                    "giorno" -> dateCountMap.toList()
+//                    "mese" -> countAppuntamentiPerMeseFromMap(dateCountMap)
+//                    "anno" -> countAppuntamentiPerAnnoFromMap(dateCountMap)
+//                    else -> emptyList()
+//                }
+//                _appuntamentiPerIntervallo.value = appuntamentiPerData
+//            } catch (e: Exception) {
+//                Log.e("StatsVM", "Errore nel recupero dati", e)
+//            } finally {
+//                _isLoading.value = false // Imposta il caricamento su false
+//            }
+//        }
+//    }
+
     fun getAppuntamentiPerIntervallo(interval: String) {
         viewModelScope.launch {
+            if (isFetchingData) return@launch // Previene più fetch simultanei
             _isLoading.value = true // Imposta il caricamento su true
+            isFetchingData = true
+
             try {
-                val dateCountMap = fetchDateCountsFromFirestore()
-                val appuntamentiPerData = when (interval) {
-                    "giorno" -> dateCountMap.toList()
-                    "mese" -> countAppuntamentiPerMeseFromMap(dateCountMap)
-                    "anno" -> countAppuntamentiPerAnnoFromMap(dateCountMap)
+                // Recupera i dati da Firestore (mappa con date -> conteggio)
+                val rawCounts = fetchDateCountsFromFirestore()
+
+                // Elabora e ordina i dati in base all'intervallo selezionato
+                val sortedCounts = when (interval) {
+                    "giorno" -> rawCounts
+                        .map { it.key to it.value }
+                        .sortedBy { LocalDate.parse(it.first, DateTimeFormatter.ofPattern("dd-MM-yyyy")) }
+                    "mese" -> rawCounts
+                        .map { it.key.substring(3, 10) to it.value } // Estrae "MM-yyyy"
+                        .groupBy { it.first } // Raggruppa per mese
+                        .map { it.key to it.value.sumOf { pair -> pair.second } } // Somma i conteggi per mese
+                        .sortedBy { YearMonth.parse(it.first, DateTimeFormatter.ofPattern("MM-yyyy")) }
+                    "anno" -> rawCounts
+                        .map { it.key.substring(6, 10) to it.value } // Estrae "yyyy"
+                        .groupBy { it.first } // Raggruppa per anno
+                        .map { it.key to it.value.sumOf { pair -> pair.second } } // Somma i conteggi per anno
+                        .sortedBy { it.first.toInt() } // Ordina per anno
                     else -> emptyList()
                 }
-                _appuntamentiPerIntervallo.value = appuntamentiPerData
+
+                // Aggiorna il valore dello StateFlow
+                _appuntamentiPerIntervallo.value = sortedCounts
+
+                Log.d("StatsVM", "Dati ordinati per $interval: $sortedCounts")
             } catch (e: Exception) {
-                Log.e("StatsVM", "Errore nel recupero dati", e)
+                Log.e("StatsVM", "Errore nel raggruppamento appuntamenti", e)
             } finally {
-                _isLoading.value = false // Imposta il caricamento su false
+                _isLoading.value = false // Fine caricamento
+                isFetchingData = false
             }
         }
     }
+
 
 
 
@@ -129,33 +173,35 @@ class StatsVM : ViewModel() {
         val dateCountMap = mutableMapOf<String, Int>()
 
         try {
-            Log.d("StatsVM", "Inizio recupero appuntamenti da Firestore...")
+//            Log.d("StatsVM", "Inizio recupero appuntamenti da Firestore...")
 
-            // Recupera tutti i documenti nella collection "appuntamenti"
+            //Recupera tutti i documenti nella collection "appuntamenti"
             val querySnapshot = appuntamentiCollection.get().await()
-            Log.d("StatsVM", "Numero di documenti principali trovati: ${querySnapshot.documents.size}")
+//            Log.d("StatsVM", "Numero di documenti principali trovati: ${querySnapshot.documents.size}")
 
             for (document in querySnapshot.documents) {
-                val date = document.id // La data è l'ID del documento principale
+                val date = document.id //La data è l'ID del documento principale
 
                 // Recupera direttamente il valore della raccolta "totale"
-                val totaleSnapshot = document.reference.collection("totale").document("count").get().await()
+                val totaleSnapshot = document.reference.collection("totale")
+                                    .document("count").get().await()
+
                 val totaleCount = totaleSnapshot.getLong("count")?.toInt() ?: 0
 
-                Log.d("StatsVM", "Numero totale di appuntamenti per $date: $totaleCount")
+//                Log.d("StatsVM", "Numero totale di appuntamenti per $date: $totaleCount")
 
                 if (totaleCount > 0) {
                     dateCountMap[date] = totaleCount
                 }
             }
 
-            Log.d("StatsVM", "Conteggio finale per tutte le date: $dateCountMap")
+//            Log.d("StatsVM", "Conteggio finale per tutte le date: $dateCountMap")
 
         } catch (e: Exception) {
             Log.e("StatsVM", "Errore durante il recupero delle date da Firestore", e)
         }
 
-        Log.d("StatsVM", "Fine del recupero appuntamenti.")
+//        Log.d("StatsVM", "Fine del recupero appuntamenti.")
         return dateCountMap
     }
 
@@ -195,62 +241,24 @@ class StatsVM : ViewModel() {
 
         )
     }
-
-    private fun countAppuntamentiPerMeseFromMap(dateCountMap: Map<String, Int>): List<Pair<String, Int>> {
-        return dateCountMap.entries
-            .groupBy { it.key.substring(3, 10) } // Prende solo MM-YYYY dalla data "GG-MM-YYYY"
-            .map { it.key to it.value.sumOf { entry -> entry.value } } // Somma i conteggi per ogni mese
-            .sortedBy { it.first } // Ordina per mese
-    }
-
-    private fun countAppuntamentiPerAnnoFromMap(dateCountMap: Map<String, Int>): List<Pair<String, Int>> {
-        return dateCountMap.entries
-            .groupBy { it.key.substring(6, 10) } // Prende solo YYYY dalla data "GG-MM-YYYY"
-            .map { it.key to it.value.sumOf { entry -> entry.value } } // Somma i conteggi per ogni anno
-            .sortedBy { it.first } // Ordina per anno
-    }
-
-
-
-    private fun countAppuntamentiPerGiorno(appuntamenti: List<Appuntamento>): List<Pair<String, Int>> {
-        val result = appuntamenti.groupBy { it.data } // Raggruppa per data completa (GG-MM-AAAA)
-            .map { it.key to it.value.size } // Conta gli appuntamenti per ogni giorno
-            .sortedBy { it.first } // Ordina i risultati per data (GG-MM-AAAA)
-        return result
-    }
-
-
-    private fun countAppuntamentiPerMese(appuntamenti: List<Appuntamento>): List<Pair<String, Int>> {
-        val result = appuntamenti.groupBy {
-            // Estrae mese e anno (MM-YYYY)
-            val parts = it.data.split("-")
-            if (parts.size == 3) "${parts[1]}-${parts[2]}" else "Formato Errato"
-        }
-            .filter { it.key != "Formato Errato" } // Filtra eventuali errori
-            .map { it.key to it.value.size }
-            .sortedBy { it.first }
-        return result
-    }
-
-    private fun countAppuntamentiPerAnno(appuntamenti: List<Appuntamento>): List<Pair<String, Int>> {
-        val result = appuntamenti.groupBy {
-            val parts = it.data.split("-")
-            if (parts.size == 3) parts[2] else "Formato Errato"
-        }
-            .filter { it.key != "Formato Errato" }
-            .map { it.key to it.value.size }
-            .sortedBy { it.first }
-        return result
-    }
-}
-
-
-
-
-
-
+    //----------------------------------------------------------------------------------------------
 
     //----------------------------------------------------------------------------------------------
+    // FUNZIONI SECONDA PAGINA
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
 
 
 
