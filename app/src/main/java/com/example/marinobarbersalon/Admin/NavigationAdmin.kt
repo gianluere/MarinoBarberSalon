@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.marinobarbersalon.Admin.Servizi.AggiungiServizio
 import com.example.marinobarbersalon.Admin.Servizi.VisualizzaServizi
+import com.example.marinobarbersalon.Admin.Stats.VisualizzaStatistiche
 import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti
 import com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti.VisualizzaAppuntamenti1
 import com.example.marinobarbersalon.Admin.VisualizzaClienti.DettagliCliente
@@ -181,6 +182,16 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
                     navController.navigate(Screen.InserisciRecensione.route)
                 }
             )
+        }
+
+        composable(Screen.StatsBase.route){
+            VisualizzaStatistiche(
+                onNavigateToNextPage = { statistica ->
+                    navController.navigate(Screen.AggiungiProdotto.route.withArg(statistica))
+                }
+
+            )
+
         }
 
 

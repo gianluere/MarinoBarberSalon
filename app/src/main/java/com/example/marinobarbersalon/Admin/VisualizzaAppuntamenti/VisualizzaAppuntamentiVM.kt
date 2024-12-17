@@ -97,7 +97,7 @@ class VisualizzaAppuntamentiVM: ViewModel() {
         }
     }
 
-    private suspend fun fetchAppuntamentiFromFirestore(date: String): List<Appuntamento> {
+     suspend fun fetchAppuntamentiFromFirestore(date: String): List<Appuntamento> {
         val db = FirebaseFirestore.getInstance()
         val appuntamentiRef = db.collection("appuntamenti").document(date).collection("app")
         val querySnapshot = appuntamentiRef.get().await()

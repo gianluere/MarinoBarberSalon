@@ -510,6 +510,7 @@ sealed class Screen(val route:String ){
     object VisualizzaProdotti : Screen("visualizzaProdotti")
     object VisualizzaProdottiDettaglio: Screen("visualizzaProdottiDettaglio/{categoria}")
     object AggiungiProdotto : Screen("aggiungiProdotto/{categoria}")
+    object StatsBase : Screen("statsBase")
 
 
 }

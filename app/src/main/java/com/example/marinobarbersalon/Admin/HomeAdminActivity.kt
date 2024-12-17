@@ -119,6 +119,12 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.Recensioni.route,
                             selectedIcon = Icons.Filled.Grade,
                             unselectedIcon = Icons.Outlined.Grade
+                        ),
+                        NavDrawerItem(
+                            title = "Visualizza Statistiche",
+                            route = Screen.StatsBase.route,
+                            selectedIcon = Icons.Filled.Grade,
+                            unselectedIcon = Icons.Outlined.Grade
                         )
 
                     )
