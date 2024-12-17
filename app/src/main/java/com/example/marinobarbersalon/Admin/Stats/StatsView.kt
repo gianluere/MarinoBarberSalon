@@ -1,6 +1,8 @@
 package com.example.marinobarbersalon.Admin.Stats
 
+import android.graphics.Paint
 import android.util.Log
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +61,9 @@ import co.yml.charts.ui.linechart.model.ShadowUnderLine
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.style.TextAlign
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.example.marinobarbersalon.Cliente.Home.UserFirebase
@@ -324,152 +329,153 @@ fun VisualizzaStatistiche(
 //--------------------------------------------------------------------------------------------------
 //PAGINA 1: STATISTICHE APPUNTAMENTI
 //--------------------------------------------------------------------------------------------------
-
 @Composable
 fun VisualizzaStatisticheAppuntamenti(
-    statsViewModel: StatsVM = StatsVM()
+    statsViewModel: StatsVM = viewModel()
 ) {
-
-
-    val selectedInterval = remember { mutableStateOf("") }
-    fun onIntervalChange(newInterval: String) {
-        selectedInterval.value = newInterval
-    }
+    // Stato per l'intervallo selezionato (giorno, mese, anno)
+    val selectedInterval = remember { mutableStateOf("giorno") }
     val appuntamentiPerIntervallo = statsViewModel.appuntamentiPerIntervallo.collectAsState().value
 
-    // Carico i dati ogni volta che cambia l'intervallo
+    // Effettua il caricamento dei dati ogni volta che cambia l'intervallo selezionato
     LaunchedEffect(selectedInterval.value) {
         statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
+//        Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
+//        Log.d("StatsVM", "Effettuata chiamata al ViewModel, selectedInterval: " + "${selectedInterval.value}")
     }
-
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .padding(top = 100.dp),
+            .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Text(text = "${selectedInterval.value}")
+    ) {
+        // Titolo
+        Text(
+            text = "Statistiche Appuntamenti",
+            fontFamily = myFont,
+            fontSize = 28.sp,
+            color = my_white,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        Row {
+        // Pulsanti per selezionare l'intervallo
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             Button(
                 onClick = {
-                    onIntervalChange("giorno")
+                    selectedInterval.value = "giorno"
                     statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-                    Log.d("Stats", "$appuntamentiPerIntervallo" )
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-            ){
-                Text( text = "Giorno")
+                    Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
+                          },
+                colors = ButtonDefaults.buttonColors(containerColor = my_gold)
+            ) {
+                Text("Giorno", color = my_white)
             }
 
             Button(
                 onClick = {
-                   onIntervalChange("mese")
+                    selectedInterval.value = "mese"
                     statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-                    Log.d("Stats", "$appuntamentiPerIntervallo" )
+                    Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
 
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-            ){
-                Text( text = "MESE")
+                          },
+                colors = ButtonDefaults.buttonColors(containerColor = my_gold)
+            ) {
+                Text("Mese", color = my_white)
             }
 
             Button(
                 onClick = {
-                    onIntervalChange("anno")
+                    selectedInterval.value = "anno"
                     statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-                    Log.d("Stats", "$appuntamentiPerIntervallo" )
-
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-            ){
-                Text( text = "ANNO")
+                    Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
+                          },
+                colors = ButtonDefaults.buttonColors(containerColor = my_gold)
+            ) {
+                Text("Anno", color = my_white)
             }
         }
-    }
 
-
-//    Column {
-//        if (selectedInterval.value == "giorno") {
-//            Text(
-//                text = if (appuntamentiPerIntervallo.isNotEmpty()) {
-//                    "Numero appuntamenti per GIORNO: ${appuntamentiPerIntervallo.size}"
-//                } else {
-//                    "Nessun appuntamento per GIORNO"
-//                },
-//                color = Color.White
-//            )
-//            Log.d("Stats", "SONO NELL'IF giorno: $appuntamentiPerIntervallo")
-//        } else if (selectedInterval.value == "mese") {
-//            Text(
-//                text = if (appuntamentiPerIntervallo.isNotEmpty()) {
-//                    "Numero appuntamenti per MESE: ${appuntamentiPerIntervallo.size}"
-//                } else {
-//                    "Nessun appuntamento per MESE"
-//                },
-//                color = Color.White
-//            )
-//            Log.d("Stats", "SONO NELL'IF mese: $appuntamentiPerIntervallo")
-//        } else if (selectedInterval.value == "anno") {
-//            Text(
-//                text = if (appuntamentiPerIntervallo.isNotEmpty()) {
-//                    "Numero appuntamenti per ANNO: ${appuntamentiPerIntervallo.size}"
-//                } else {
-//                    "Nessun appuntamento per ANNO"
-//                },
-//                color = Color.White
-//            )
-//            Log.d("Stats", "SONO NELL'IF anno: $appuntamentiPerIntervallo")
-//        }
-//    }
-    Column(modifier = Modifier.fillMaxSize()) {
+        // Grafico a barre
         if (appuntamentiPerIntervallo.isNotEmpty()) {
-            val pointsData = appuntamentiPerIntervallo.mapIndexed { index, dataPoint ->
-                Point(index.toFloat(), dataPoint.second.toFloat())  // Mappa i dati correttamente
-            }
-
-            val xAxisData = AxisData.Builder()
-                .axisStepSize(50.dp)
-                .steps(pointsData.size - 1)
-                .labelData { index -> appuntamentiPerIntervallo[index].first }
-                .build()
-
-            val yAxisData = AxisData.Builder()
-                .steps(5)  // Adatta il numero di passi per l'asse Y
-                .labelAndAxisLinePadding(20.dp)
-                .build()
-
-            val lineChartData = LineChartData(
-                linePlotData = LinePlotData(
-                    lines = listOf(
-                        Line(
-                            dataPoints = pointsData,
-                            lineStyle = LineStyle(),
-                            selectionHighlightPoint = SelectionHighlightPoint(),
-                            selectionHighlightPopUp = SelectionHighlightPopUp()
-                        )
-                    )
-                ),
-                xAxisData = xAxisData,
-                yAxisData = yAxisData
-            )
-
-            // Visualizzazione del grafico
-            LineChart(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
-                lineChartData = lineChartData
-            )
+            BarChart(appuntamentiPerIntervallo = appuntamentiPerIntervallo)
         } else {
-            Text("Nessun dato disponibile per l'intervallo selezionato.")
+            Text(
+                text = "Nessun dato disponibile per l'intervallo selezionato.",
+                color = my_white,
+                fontFamily = myFont
+            )
         }
     }
-
 }
+
+@Composable
+fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
+    val maxValue = appuntamentiPerIntervallo.maxOfOrNull { it.second }?.toFloat() ?: 1f
+    val barWidth = 50f // Larghezza delle barre
+    val spaceBetweenBars = 30f // Spaziatura tra le barre
+
+    // Canvas per il grafico
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)
+    ) {
+        val height = size.height
+        val barHeightFactor = height / maxValue
+
+        appuntamentiPerIntervallo.forEachIndexed { index, pair ->
+            val barHeight = pair.second * barHeightFactor
+            val xPosition = index * (barWidth + spaceBetweenBars)
+            val yPosition = height - barHeight
+
+            // Disegna la barra
+            drawRect(
+                color = Color(0xFF6200EE), // Personalizza il colore
+                topLeft = Offset(x = xPosition, y = yPosition),
+                size = Size(barWidth, barHeight)
+            )
+
+            // Testo sopra le barre
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    pair.second.toString(),
+                    xPosition + barWidth / 2,
+                    yPosition - 10f,
+                    Paint().apply {
+                        color = android.graphics.Color.WHITE
+                        textAlign = Paint.Align.CENTER
+                        textSize = 40f
+                    }
+                )
+            }
+        }
+
+        // Etichette per l'asse X
+        appuntamentiPerIntervallo.forEachIndexed { index, pair ->
+            val xPosition = index * (barWidth + spaceBetweenBars) + barWidth / 2
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    pair.first,
+                    xPosition,
+                    height + 20f,
+                    Paint().apply {
+                        color = android.graphics.Color.WHITE
+                        textAlign = Paint.Align.CENTER
+                        textSize = 30f
+                    }
+                )
+            }
+        }
+    }
+}
+
 
 
 

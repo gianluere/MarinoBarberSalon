@@ -187,22 +187,18 @@ class UserViewModel : ViewModel() {
         orarioInizio: String,
         orarioFine: String,
         dataSel: String,
-        onSuccess : () -> Unit,
-        onFailed : () -> Unit
+        onSuccess: () -> Unit,
+        onFailed: () -> Unit
     ) {
         val data = dataSel.replace("/", "-")
         Log.d("Appuntamento", servizio)
-        var idServizio: String = ""
-        val results = db.collection("servizi").whereEqualTo("nome", servizio).limit(1)
-            .get().await()
 
-        //idServizio = results.documents[0].id
-        val servizio : String = results.documents[0].get("nome").toString()
-        val descrizione : String = results.documents[0].get("descrizione").toString()
-        val prezzo : Double = results.documents[0].get("prezzo").toString().toDouble()
+        val results = db.collection("servizi").whereEqualTo("nome", servizio).limit(1).get().await()
 
-        Log.d("Appuntamento", idServizio)
-        //val servizioRiferimento: DocumentReference = db.collection("servizi").document(idServizio)
+        val servizioNome: String = results.documents[0].get("nome").toString()
+        val descrizione: String = results.documents[0].get("descrizione").toString()
+        val prezzo: Double = results.documents[0].get("prezzo").toString().toDouble()
+
         val utenteRiferimento: DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
 
         val appuntamento = hashMapOf(
@@ -210,41 +206,48 @@ class UserViewModel : ViewModel() {
             "orarioInizio" to orarioInizio,
             "orarioFine" to orarioFine,
             "data" to data,
-            "servizio" to servizio,
+            "servizio" to servizioNome,
             "descrizione" to descrizione,
             "prezzo" to prezzo
         )
 
         val appuntamentoPath = db.collection("appuntamenti").document(data)
         val occupatiPath = db.collection("occupati").document(data)
+        val totalePath = appuntamentoPath.collection("totale").document("count")
 
         try {
             // Esegui una transazione per garantire che solo una scrittura avvenga alla volta
             db.runTransaction { transaction ->
                 val appuntamentoSnapshot = transaction.get(appuntamentoPath)
                 val occupatiSnapshot = transaction.get(occupatiPath)
-                val userSnapshot = transaction.get(utenteRiferimento)
+                val totaleSnapshot = transaction.get(totalePath)
                 val chiave = "$orarioInizio-$orarioFine"
 
+                // Aggiungi appuntamento
                 if (appuntamentoSnapshot.exists()) {
                     Log.d("Appuntamento", "Documento appuntamento già esistente")
-                    // Aggiorna il documento esistente nell'app collection
                     transaction.set(
-                        appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine"),
+                        appuntamentoPath.collection("app").document(chiave),
                         appuntamento
                     )
                 } else {
-                    // Crea il documento principale e aggiungi il sottodocumento
                     transaction.set(appuntamentoPath, emptyMap<String, Any>())
                     transaction.set(
-                        appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine"),
+                        appuntamentoPath.collection("app").document(chiave),
                         appuntamento
                     )
                 }
 
+                // Aggiorna la collezione "totale" incrementando il conteggio
+                if (totaleSnapshot.exists()) {
+                    val currentCount = totaleSnapshot.getLong("count") ?: 0
+                    transaction.update(totalePath, "count", currentCount + 1)
+                } else {
+                    transaction.set(totalePath, mapOf("count" to 1))
+                }
+
                 // Gestisci la collezione occupati
                 if (occupatiSnapshot.exists()) {
-                    // Verifica se lo slot è già occupato
                     val occupatiMap = occupatiSnapshot.data
                     if (occupatiMap?.containsKey(chiave) == true) {
                         throw FirebaseFirestoreException(
@@ -252,38 +255,28 @@ class UserViewModel : ViewModel() {
                             FirebaseFirestoreException.Code.ABORTED
                         )
                     } else {
-                        // Aggiorna lo slot come occupato
                         transaction.update(occupatiPath, chiave, "occupato")
                     }
                 } else {
-                    // Crea un nuovo documento per la data e segna lo slot come occupato
                     transaction.set(occupatiPath, hashMapOf(chiave to "occupato"))
                 }
 
-                if (userSnapshot.exists()){
-                    transaction.update(
-                        utenteRiferimento,
-                        "appuntamenti",
-                        FieldValue.arrayUnion(appuntamentoPath.collection("app").document("$orarioInizio-$orarioFine"))
-                    )
-                }
-
-                onSuccess()
+                // Aggiorna il riferimento utente
+                transaction.update(
+                    utenteRiferimento,
+                    "appuntamenti",
+                    FieldValue.arrayUnion(appuntamentoPath.collection("app").document(chiave))
+                )
             }.await()
 
-            Log.d("Riuscito", "finito")
-            Log.d("Appuntamento", "Prenotazione aggiunta con successo")
-
+            onSuccess()
+            Log.d("Appuntamento", "Prenotazione aggiunta con successo e totale aggiornato")
         } catch (e: FirebaseFirestoreException) {
             onFailed()
             Log.e("Appuntamento", "Errore durante l'aggiunta dell'appuntamento: ${e.message}", e)
-            // Gestisci il conflitto (es. mostra un messaggio all'utente)
-            if (e.code == FirebaseFirestoreException.Code.ABORTED) {
-                // Lo slot è già stato occupato
-                Log.e("Appuntamento", "Lo slot è già occupato!")
-            }
         }
     }
+
 
     fun updateDati(
         nome : String,
@@ -371,50 +364,68 @@ class UserViewModel : ViewModel() {
     }
 
 
-    fun annullaPrenotazione(appuntamento: Appuntamento, finito : () -> Unit, errore : () -> Unit){
+    fun annullaPrenotazione(appuntamento: Appuntamento, finito: () -> Unit, errore: () -> Unit) {
 
         val appuntamentoPath = db.collection("appuntamenti").document(appuntamento.data)
         val occupatiPath = db.collection("occupati").document(appuntamento.data)
-        val utenteRiferimento: DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
+        val utenteRiferimento: DocumentReference =
+            db.collection("utenti").document(_userState.value.email.toString())
+        val totalePath = appuntamentoPath.collection("totale").document("count") // Percorso al totale
 
-
-        db.runTransaction {transaction ->
+        db.runTransaction { transaction ->
             val appuntamentoSnapshot = transaction.get(appuntamentoPath)
             val occupatiSnapshot = transaction.get(occupatiPath)
+            val totaleSnapshot = transaction.get(totalePath)
             val userSnapshot = transaction.get(utenteRiferimento)
+
             val chiave = "${appuntamento.orarioInizio}-${appuntamento.orarioFine}"
-            val appuntamentoReference = db.collection("appuntamenti").document(appuntamento.data).collection("app").document(chiave)
+            val appuntamentoReference =
+                db.collection("appuntamenti").document(appuntamento.data).collection("app").document(chiave)
 
+            // Cancella l'appuntamento
             if (appuntamentoSnapshot.exists()) {
-                transaction.delete(
-                    appuntamentoPath.collection("app").document(chiave)
+                transaction.delete(appuntamentoPath.collection("app").document(chiave))
+            }
+
+            // Aggiorna il documento "occupati" rimuovendo la chiave
+            if (occupatiSnapshot.exists()) {
+                transaction.update(occupatiPath, chiave, FieldValue.delete())
+            }
+
+            // Rimuove il riferimento appuntamento dall'utente
+            if (userSnapshot.exists()) {
+                transaction.update(
+                    utenteRiferimento,
+                    "appuntamenti",
+                    FieldValue.arrayRemove(appuntamentoReference)
                 )
             }
 
-            if (occupatiSnapshot.exists()){
-                transaction.update(
-                    occupatiPath, chiave, FieldValue.delete()
-                )
-            }
-
-            if(userSnapshot.exists()){
-                transaction.update(
-                    utenteRiferimento, "appuntamenti", FieldValue.arrayRemove(appuntamentoReference)
-                )
+            // Aggiorna il conteggio nella collezione "totale"
+            if (totaleSnapshot.exists()) {
+                val currentCount = totaleSnapshot.getLong("count") ?: 0
+                if (currentCount > 0) {
+                    transaction.update(totalePath, "count", currentCount - 1) // Decrementa di 1
+                } else {
+                    transaction.update(totalePath, "count", 0) // Garantisce che il conteggio non vada sotto zero
+                }
+            } else {
+                // Se per qualche motivo il documento totale non esiste, lo crea con valore 0
+                transaction.set(totalePath, mapOf("count" to 0))
             }
 
         }.addOnSuccessListener {
             finito()
+            Log.d("AnnullaPrenotazione", "Prenotazione annullata con successo e totale aggiornato")
         }.addOnFailureListener {
-            finito()
             errore()
+            Log.e("AnnullaPrenotazione", "Errore durante l'annullamento della prenotazione")
         }.addOnCanceledListener {
-            finito()
             errore()
+            Log.e("AnnullaPrenotazione", "Annullamento della prenotazione annullato")
         }
-
-
     }
+
 
 
 

@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation("co.yml:ycharts:2.1.0")
     implementation(libs.core)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
