@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +15,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.collectAsState
@@ -43,8 +47,7 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 import co.yml.charts.common.model.Point
 import androidx.compose.foundation.lazy.items
-
-
+import androidx.compose.foundation.rememberScrollState
 
 
 import co.yml.charts.axis.AxisData
@@ -64,7 +67,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.example.marinobarbersalon.Cliente.Home.UserFirebase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -333,15 +338,12 @@ fun VisualizzaStatistiche(
 fun VisualizzaStatisticheAppuntamenti(
     statsViewModel: StatsVM = viewModel()
 ) {
-    // Stato per l'intervallo selezionato (giorno, mese, anno)
     val selectedInterval = remember { mutableStateOf("giorno") }
     val appuntamentiPerIntervallo = statsViewModel.appuntamentiPerIntervallo.collectAsState().value
+    val isLoading = statsViewModel.isLoading.collectAsState().value // Stato di caricamento
 
-    // Effettua il caricamento dei dati ogni volta che cambia l'intervallo selezionato
     LaunchedEffect(selectedInterval.value) {
         statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-//        Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
-//        Log.d("StatsVM", "Effettuata chiamata al ViewModel, selectedInterval: " + "${selectedInterval.value}")
     }
 
     Column(
@@ -351,7 +353,6 @@ fun VisualizzaStatisticheAppuntamenti(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titolo
         Text(
             text = "Statistiche Appuntamenti",
             fontFamily = myFont,
@@ -360,7 +361,6 @@ fun VisualizzaStatisticheAppuntamenti(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Pulsanti per selezionare l'intervallo
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -368,113 +368,117 @@ fun VisualizzaStatisticheAppuntamenti(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = {
-                    selectedInterval.value = "giorno"
-                    statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-                    Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
-                          },
+                onClick = { selectedInterval.value = "giorno" },
                 colors = ButtonDefaults.buttonColors(containerColor = my_gold)
             ) {
                 Text("Giorno", color = my_white)
             }
 
             Button(
-                onClick = {
-                    selectedInterval.value = "mese"
-                    statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-                    Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
-
-                          },
+                onClick = { selectedInterval.value = "mese" },
                 colors = ButtonDefaults.buttonColors(containerColor = my_gold)
             ) {
                 Text("Mese", color = my_white)
             }
 
             Button(
-                onClick = {
-                    selectedInterval.value = "anno"
-                    statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
-                    Log.d("StatsVM", "Effettuata chiamata al ViewModel, dati: " + "${appuntamentiPerIntervallo}")
-                          },
+                onClick = { selectedInterval.value = "anno" },
                 colors = ButtonDefaults.buttonColors(containerColor = my_gold)
             ) {
                 Text("Anno", color = my_white)
             }
         }
 
-        // Grafico a barre
-        if (appuntamentiPerIntervallo.isNotEmpty()) {
-            BarChart(appuntamentiPerIntervallo = appuntamentiPerIntervallo)
-        } else {
-            Text(
-                text = "Nessun dato disponibile per l'intervallo selezionato.",
-                color = my_white,
-                fontFamily = myFont
+        // Mostra il CircularProgressIndicator se i dati stanno caricando
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = my_gold,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .size(50.dp)
             )
+        } else {
+            // Mostra il grafico o il messaggio di nessun dato
+            if (appuntamentiPerIntervallo.isNotEmpty()) {
+                BarChart(appuntamentiPerIntervallo = appuntamentiPerIntervallo)
+            } else {
+                Text(
+                    text = "Nessun dato disponibile per l'intervallo selezionato.",
+                    color = my_white,
+                    fontFamily = myFont
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
     val maxValue = appuntamentiPerIntervallo.maxOfOrNull { it.second }?.toFloat() ?: 1f
-    val barWidth = 50f // Larghezza delle barre
-    val spaceBetweenBars = 30f // Spaziatura tra le barre
+    val barWidth = 90.dp // Larghezza fissa delle barre
+    val labelTextStyle = androidx.compose.ui.text.TextStyle(
+        color = Color.White,
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center
+    )
 
-    // Canvas per il grafico
-    Canvas(
+    // Contenitore principale con LazyRow per lo scroll orizzontale
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp)
+            .height(350.dp) // Altezza totale del grafico
+            .background(Color.Transparent)
     ) {
-        val height = size.height
-        val barHeightFactor = height / maxValue
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp), // Altezza specifica per le barre
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp)
+        ) {
+            items(appuntamentiPerIntervallo) { pair ->
+                val barHeightFactor = 200.dp / maxValue // Scala altezza dinamicamente
 
-        appuntamentiPerIntervallo.forEachIndexed { index, pair ->
-            val barHeight = pair.second * barHeightFactor
-            val xPosition = index * (barWidth + spaceBetweenBars)
-            val yPosition = height - barHeight
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom, // Barre partono dal basso
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    // Valore numerico sopra la barra
+                    Text(
+                        text = pair.second.toString(),
+                        style = labelTextStyle,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
 
-            // Disegna la barra
-            drawRect(
-                color = Color(0xFF6200EE), // Personalizza il colore
-                topLeft = Offset(x = xPosition, y = yPosition),
-                size = Size(barWidth, barHeight)
-            )
+                    // Barra verticale che cresce dal basso verso l'alto
+                    Box(
+                        modifier = Modifier
+                            .width(barWidth)
+                            .height((pair.second * barHeightFactor.value).dp)
+                            .background(my_gold, RoundedCornerShape(4.dp))
+                    )
 
-            // Testo sopra le barre
-            drawContext.canvas.nativeCanvas.apply {
-                drawText(
-                    pair.second.toString(),
-                    xPosition + barWidth / 2,
-                    yPosition - 10f,
-                    Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        textAlign = Paint.Align.CENTER
-                        textSize = 40f
-                    }
-                )
-            }
-        }
-
-        // Etichette per l'asse X
-        appuntamentiPerIntervallo.forEachIndexed { index, pair ->
-            val xPosition = index * (barWidth + spaceBetweenBars) + barWidth / 2
-            drawContext.canvas.nativeCanvas.apply {
-                drawText(
-                    pair.first,
-                    xPosition,
-                    height + 20f,
-                    Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        textAlign = Paint.Align.CENTER
-                        textSize = 30f
-                    }
-                )
+                    // Etichetta sotto la barra
+                    Text(
+                        text = pair.first,
+                        style = labelTextStyle,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .width(barWidth),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = my_white
+                    )
+                }
             }
         }
     }
 }
+
+
+
 
 
 
