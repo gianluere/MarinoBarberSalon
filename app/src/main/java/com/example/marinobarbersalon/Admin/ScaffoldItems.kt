@@ -80,6 +80,7 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         Screen.AggiungiProdotto.route -> "VISUALIZZA PRODOTTI"
         Screen.Recensioni.route -> "VISUALIZZA RECENSIONI"
         Screen.StatsBase.route -> "STATISTICHE"
+        Screen.VisualizzaStatisticheAppuntamenti.route -> "STATISTICHE"
         else -> "Default"
     }
 

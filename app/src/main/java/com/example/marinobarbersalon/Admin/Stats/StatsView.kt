@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon.Admin.Stats
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,10 +39,32 @@ import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
+import co.yml.charts.common.model.Point
+import androidx.compose.foundation.lazy.items
 
-import androidx.compose.ui.viewinterop.AndroidView
 
 
+
+import co.yml.charts.axis.AxisData
+import co.yml.charts.ui.linechart.LineChart
+import co.yml.charts.ui.linechart.model.GridLines
+import co.yml.charts.ui.linechart.model.IntersectionPoint
+import co.yml.charts.ui.linechart.model.Line
+import co.yml.charts.ui.linechart.model.LineChartData
+import co.yml.charts.ui.linechart.model.LinePlotData
+import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
+import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
+import co.yml.charts.ui.linechart.model.ShadowUnderLine
+
+import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.text.style.TextAlign
+import com.example.marinobarbersalon.Cliente.Account.Appuntamento
+import com.example.marinobarbersalon.Cliente.Home.UserFirebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.auth.User
+import kotlinx.coroutines.tasks.await
 
 
 /*
@@ -94,7 +117,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 //PAGINA SCELTA STATISTICHE
 @Composable
 fun VisualizzaStatistiche(
-    onNavigateToNextPage: (String) -> Unit
+    onNavigateToVisualizzaStatisticheAppuntamenti: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -139,7 +162,7 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToNextPage("appuntamenti")
+                                    onNavigateToVisualizzaStatisticheAppuntamenti()
                                 }
                         ) {
                             Image(
@@ -169,7 +192,7 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToNextPage("entrate")
+                                    onNavigateToVisualizzaStatisticheAppuntamenti()
                                 }
                         ) {
                             Image(
@@ -209,7 +232,7 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToNextPage("clienti_attivi")
+                                    onNavigateToVisualizzaStatisticheAppuntamenti()
                                 }
                         ) {
                             Image(
@@ -239,7 +262,7 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToNextPage("recensioni")
+                                    onNavigateToVisualizzaStatisticheAppuntamenti()
                                 }
                         ) {
                             Image(
@@ -275,7 +298,7 @@ fun VisualizzaStatistiche(
                             .background(color = my_white, shape = RoundedCornerShape(25.dp))
                             .fillMaxWidth(0.5f)
                             .clickable {
-                                onNavigateToNextPage("servizi_richiesti")
+                                onNavigateToVisualizzaStatisticheAppuntamenti()
                             }
                     ) {
                         Image(
@@ -300,7 +323,161 @@ fun VisualizzaStatistiche(
 
 //--------------------------------------------------------------------------------------------------
 //PAGINA 1: STATISTICHE APPUNTAMENTI
-//
+//--------------------------------------------------------------------------------------------------
+
+@Composable
+fun VisualizzaStatisticheAppuntamenti(
+    statsViewModel: StatsVM = StatsVM()
+) {
+
+
+    val selectedInterval = remember { mutableStateOf("") }
+    fun onIntervalChange(newInterval: String) {
+        selectedInterval.value = newInterval
+    }
+    val appuntamentiPerIntervallo = statsViewModel.appuntamentiPerIntervallo.collectAsState().value
+
+    // Carico i dati ogni volta che cambia l'intervallo
+    LaunchedEffect(selectedInterval.value) {
+        statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
+    }
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .padding(top = 100.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Text(text = "${selectedInterval.value}")
+
+        Row {
+            Button(
+                onClick = {
+                    onIntervalChange("giorno")
+                    statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
+                    Log.d("Stats", "$appuntamentiPerIntervallo" )
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ){
+                Text( text = "Giorno")
+            }
+
+            Button(
+                onClick = {
+                   onIntervalChange("mese")
+                    statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
+                    Log.d("Stats", "$appuntamentiPerIntervallo" )
+
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ){
+                Text( text = "MESE")
+            }
+
+            Button(
+                onClick = {
+                    onIntervalChange("anno")
+                    statsViewModel.getAppuntamentiPerIntervallo(selectedInterval.value)
+                    Log.d("Stats", "$appuntamentiPerIntervallo" )
+
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ){
+                Text( text = "ANNO")
+            }
+        }
+    }
+
+
+//    Column {
+//        if (selectedInterval.value == "giorno") {
+//            Text(
+//                text = if (appuntamentiPerIntervallo.isNotEmpty()) {
+//                    "Numero appuntamenti per GIORNO: ${appuntamentiPerIntervallo.size}"
+//                } else {
+//                    "Nessun appuntamento per GIORNO"
+//                },
+//                color = Color.White
+//            )
+//            Log.d("Stats", "SONO NELL'IF giorno: $appuntamentiPerIntervallo")
+//        } else if (selectedInterval.value == "mese") {
+//            Text(
+//                text = if (appuntamentiPerIntervallo.isNotEmpty()) {
+//                    "Numero appuntamenti per MESE: ${appuntamentiPerIntervallo.size}"
+//                } else {
+//                    "Nessun appuntamento per MESE"
+//                },
+//                color = Color.White
+//            )
+//            Log.d("Stats", "SONO NELL'IF mese: $appuntamentiPerIntervallo")
+//        } else if (selectedInterval.value == "anno") {
+//            Text(
+//                text = if (appuntamentiPerIntervallo.isNotEmpty()) {
+//                    "Numero appuntamenti per ANNO: ${appuntamentiPerIntervallo.size}"
+//                } else {
+//                    "Nessun appuntamento per ANNO"
+//                },
+//                color = Color.White
+//            )
+//            Log.d("Stats", "SONO NELL'IF anno: $appuntamentiPerIntervallo")
+//        }
+//    }
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (appuntamentiPerIntervallo.isNotEmpty()) {
+            val pointsData = appuntamentiPerIntervallo.mapIndexed { index, dataPoint ->
+                Point(index.toFloat(), dataPoint.second.toFloat())  // Mappa i dati correttamente
+            }
+
+            val xAxisData = AxisData.Builder()
+                .axisStepSize(50.dp)
+                .steps(pointsData.size - 1)
+                .labelData { index -> appuntamentiPerIntervallo[index].first }
+                .build()
+
+            val yAxisData = AxisData.Builder()
+                .steps(5)  // Adatta il numero di passi per l'asse Y
+                .labelAndAxisLinePadding(20.dp)
+                .build()
+
+            val lineChartData = LineChartData(
+                linePlotData = LinePlotData(
+                    lines = listOf(
+                        Line(
+                            dataPoints = pointsData,
+                            lineStyle = LineStyle(),
+                            selectionHighlightPoint = SelectionHighlightPoint(),
+                            selectionHighlightPopUp = SelectionHighlightPopUp()
+                        )
+                    )
+                ),
+                xAxisData = xAxisData,
+                yAxisData = yAxisData
+            )
+
+            // Visualizzazione del grafico
+            LineChart(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                lineChartData = lineChartData
+            )
+        } else {
+            Text("Nessun dato disponibile per l'intervallo selezionato.")
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
 
 
 
