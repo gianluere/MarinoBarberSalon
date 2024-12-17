@@ -72,9 +72,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.example.marinobarbersalon.Cliente.Home.UserFirebase
+import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 
 
 /*
@@ -349,7 +353,8 @@ fun VisualizzaStatisticheAppuntamenti(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .padding(top = 100.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -369,21 +374,33 @@ fun VisualizzaStatisticheAppuntamenti(
         ) {
             Button(
                 onClick = { selectedInterval.value = "giorno" },
-                colors = ButtonDefaults.buttonColors(containerColor = my_gold)
+                modifier = Modifier.align(Alignment.CenterVertically),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = my_bordeaux,
+                    disabledContainerColor = my_bordeaux
+                )
             ) {
                 Text("Giorno", color = my_white)
             }
 
             Button(
                 onClick = { selectedInterval.value = "mese" },
-                colors = ButtonDefaults.buttonColors(containerColor = my_gold)
+                modifier = Modifier.align(Alignment.CenterVertically),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = my_bordeaux,
+                    disabledContainerColor = my_bordeaux
+                )
             ) {
                 Text("Mese", color = my_white)
             }
 
             Button(
                 onClick = { selectedInterval.value = "anno" },
-                colors = ButtonDefaults.buttonColors(containerColor = my_gold)
+                modifier = Modifier.align(Alignment.CenterVertically),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = my_bordeaux,
+                    disabledContainerColor = my_bordeaux
+                )
             ) {
                 Text("Anno", color = my_white)
             }
@@ -457,7 +474,7 @@ fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
                         modifier = Modifier
                             .width(barWidth)
                             .height((pair.second * barHeightFactor.value).dp)
-                            .background(my_gold, RoundedCornerShape(4.dp))
+                            .background(my_bordeaux, RoundedCornerShape(4.dp))
                     )
 
                     // Etichetta sotto la barra
@@ -476,6 +493,7 @@ fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
         }
     }
 }
+
 
 
 
