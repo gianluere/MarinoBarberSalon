@@ -77,11 +77,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.example.marinobarbersalon.Cliente.Home.UserFirebase
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
+import com.example.marinobarbersalon.ui.theme.my_yellow
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.tasks.await
@@ -97,7 +99,7 @@ import java.time.format.DateTimeFormatter
 
     Tipo di Grafico: Line Chart o Bar Chart.
 
-    Dati: Numero di appuntamenti per ciascun giorno, settimana o mese.
+    Dati: Numero di appuntamenti per ciascun giorno, settimana o mese. OK!!!!!
 
 
 2. Numero di clienti attivi vs inattivi;
@@ -106,7 +108,7 @@ import java.time.format.DateTimeFormatter
 
     Tipo di Grafico: Pie Chart.
 
-    Dati: Numero di clienti con appuntamenti negli ultimi 30 giorni vs clienti con appuntamenti passati.
+    Dati: Numero di clienti con appuntamenti negli ultimi 30 giorni vs clienti con appuntamenti passati. OK!!!!!
 
 
 
@@ -115,7 +117,7 @@ import java.time.format.DateTimeFormatter
 
     Tipo di Grafico: Bar Chart o Pie Chart.
 
-    Dati: Numero di volte che ogni servizio è stato prenotato in un dato periodo.
+    Dati: Numero di volte che ogni servizio è stato prenotato in un dato periodo. OK!!!!!
 
 
 5. Entrate mensili:
@@ -133,7 +135,8 @@ import java.time.format.DateTimeFormatter
 fun VisualizzaStatistiche(
     onNavigateToVisualizzaStatisticheAppuntamenti: () -> Unit,
     onNavigateToVisualizzaStatisticheClienti: () -> Unit,
-    onNavigateToVisualizzaServiziPiuRichiesti: () -> Unit
+    onNavigateToVisualizzaServiziPiuRichiesti: () -> Unit,
+    onNavigateToVisualizzaEntrateMensili: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -211,7 +214,7 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToVisualizzaStatisticheAppuntamenti()
+                                    onNavigateToVisualizzaEntrateMensili()
                                 }
                         ) {
                             Icon(
@@ -850,6 +853,130 @@ fun BarChartServizi(serviziStats: Map<String, Int>) {
         }
     }
 }
+//--------------------------------------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------------------------------------
+//QUARTA PAGINA: ENTRATE MENSILI
+//--------------------------------------------------------------------------------------------------
+@Composable
+fun VisualizzaEntrateMensili(statsViewModel: StatsVM = viewModel()) {
+    val entrateMensili = statsViewModel.entrateMensili.collectAsState().value
+    val isLoadingEntrate = statsViewModel.isLoadingEntrate.collectAsState().value
+
+    LaunchedEffect(Unit) {
+        statsViewModel.calcolaEntrateMensili()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .padding(top = 64.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Titolo
+        Text(
+            text = "Entrate Mensili",
+            fontFamily = myFont,
+            fontSize = 28.sp,
+            color = my_white,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        if (isLoadingEntrate) {
+            // Circular Progress Indicator per il caricamento
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = my_gold,
+                    modifier = Modifier.size(100.dp)
+                )
+            }
+        } else {
+            if (entrateMensili.isEmpty()) {
+                // Messaggio quando non ci sono dati
+                Text(
+                    text = "Nessun dato disponibile.",
+                    color = my_white,
+                    fontFamily = myFont,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            } else {
+                // LazyColumn con card per ogni mese
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(entrateMensili) { (mese, entrata) ->
+                        EntrateMensiliCard(
+                            mese = mese,
+                            entrata = entrata
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun EntrateMensiliCard(mese: String, entrata: Double) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+        shape = RoundedCornerShape(17.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = my_yellow
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                // Nome del mese
+                Text(
+                    text = mese,
+                    fontFamily = myFont,
+                    fontSize = 22.sp,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = Color.Black
+                )
+
+                // Entrata mensile
+                Text(
+                    text = "Entrate: €${"%.2f".format(entrata)}",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
+//--------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
 
 

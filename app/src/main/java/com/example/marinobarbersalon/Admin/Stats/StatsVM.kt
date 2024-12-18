@@ -363,6 +363,7 @@ class StatsVM : ViewModel() {
 
     //----------------------------------------------------------------------------------------------
     //TERZA PAGINA PAGINA: STATS SERVIZI
+    //----------------------------------------------------------------------------------------------
 
     // Stato per i servizi più richiesti
     private val _serviziStats = MutableStateFlow<Map<String, Int>>(emptyMap()) // Mappa Servizio -> Occorrenze
@@ -418,6 +419,115 @@ class StatsVM : ViewModel() {
     }
 
     //----------------------------------------------------------------------------------------------
+
+    //----------------------------------------------------------------------------------------------
+    //QUARTA PAGINA: ENTRATE
+    //----------------------------------------------------------------------------------------------
+    private val _entrateMensili = MutableStateFlow<List<Pair<String, Double>>>(emptyList())
+    val entrateMensili: StateFlow<List<Pair<String, Double>>> = _entrateMensili.asStateFlow()
+
+    private val _isLoadingEntrate = MutableStateFlow(false)
+    val isLoadingEntrate: StateFlow<Boolean> = _isLoadingEntrate.asStateFlow()
+
+    private var isFetchingEntrate = false
+
+    fun calcolaEntrateMensili() {
+        if (_isLoadingEntrate.value) return
+
+        viewModelScope.launch {
+            _isLoadingEntrate.value = true
+            try {
+                val appuntamenti = fetchAllAppuntamentiFromFirestore()
+                Log.d("EntrateMensili", "Numero totale di appuntamenti: ${appuntamenti.size}")
+
+                val entratePerMese = appuntamenti.groupBy { appuntamento ->
+                    val meseAnno = appuntamento.data.substring(3, 10) // Es. "03-2024"
+                    val mese = meseAnno.substring(0, 2).toInt() // Converte il mese in intero
+                    val anno = meseAnno.substring(3).toInt() // Converte l'anno in intero
+                    mese to anno // Usa un Pair come chiave
+                }.map { (meseAnno, appuntamentiMese) ->
+                    val (mese, anno) = meseAnno
+                    Log.d("EntrateMensili", "Mese: $mese, Anno: $anno, Numero appuntamenti: ${appuntamentiMese.size}")
+                    Pair(
+                        mese to anno, // Usa il Pair come chiave
+                        appuntamentiMese.sumOf { it.prezzo } // Somma le entrate
+                    )
+                }.sortedWith(compareBy({ it.first.second }, { it.first.first })) // Ordina prima per anno, poi per mese
+                    .map { (meseAnno, entrata) ->
+                        val (mese, anno) = meseAnno
+                        "${getNomeMese(mese.toString().padStart(2, '0'))} $anno" to entrata // Converte in stringa leggibile
+                    }
+
+                entratePerMese.forEach { (mese, entrata) ->
+                    Log.d("EntrateMensili", "Mese: $mese, Entrata totale: €${"%.2f".format(entrata)}")
+                }
+
+                _entrateMensili.value = entratePerMese
+            } catch (e: Exception) {
+                Log.e("EntrateMensili", "Errore nel calcolo delle entrate mensili", e)
+                _entrateMensili.value = emptyList()
+            } finally {
+                _isLoadingEntrate.value = false
+            }
+        }
+    }
+
+
+
+    suspend fun fetchAllAppuntamentiFromFirestore(): List<Appuntamento> {
+        val db = FirebaseFirestore.getInstance()
+        val appuntamentiCollection = db.collection("appuntamenti")
+
+        val allAppuntamenti = mutableListOf<Appuntamento>()
+
+        try {
+            val querySnapshot = appuntamentiCollection.get().await()
+            Log.d("Firestore", "Numero di documenti principali: ${querySnapshot.documents.size}")
+
+            for (document in querySnapshot.documents) {
+                val subCollection = document.reference.collection("app").get().await()
+                Log.d("Firestore", "Numero di appuntamenti nella data ${document.id}: ${subCollection.documents.size}")
+
+                for (subDocument in subCollection.documents) {
+                    val prezzo = subDocument.getDouble("prezzo") ?: 0.0
+
+                    val data = document.id
+                    allAppuntamenti.add(
+                        Appuntamento(
+                            prezzo = prezzo,
+                            data = data
+                        )
+                    )
+                    Log.d("Firestore", "Aggiunto appuntamento con data: $data, prezzo: $prezzo")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("Firestore", "Errore nel recupero degli appuntamenti", e)
+        }
+
+        Log.d("Firestore", "Totale appuntamenti recuperati: ${allAppuntamenti.size}")
+        return allAppuntamenti
+    }
+
+
+    fun getNomeMese(mese: String): String {
+        val mapping = mapOf(
+            "01" to "Gennaio",
+            "02" to "Febbraio",
+            "03" to "Marzo",
+            "04" to "Aprile",
+            "05" to "Maggio",
+            "06" to "Giugno",
+            "07" to "Luglio",
+            "08" to "Agosto",
+            "09" to "Settembre",
+            "10" to "Ottobre",
+            "11" to "Novembre",
+            "12" to "Dicembre"
+        )
+        return mapping[mese] ?: mese
+    }
+
 
 
 

@@ -514,6 +514,7 @@ sealed class Screen(val route:String ){
     object VisualizzaStatisticheAppuntamenti : Screen("visualizzaStatisticheAppuntamenti")
     object VisualizzaStatisticheClienti : Screen("visualizzaStatisticheClienti")
     object VisualizzaServiziPiuRichiesti : Screen("visualizzaServiziPiuRichiesti")
+    object VisualizzaEntrateMensili : Screen("visualizzaEntrateMensili")
 
 
 }

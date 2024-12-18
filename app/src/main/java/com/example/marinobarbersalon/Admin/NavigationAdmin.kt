@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.marinobarbersalon.Admin.Servizi.AggiungiServizio
 import com.example.marinobarbersalon.Admin.Servizi.VisualizzaServizi
+import com.example.marinobarbersalon.Admin.Stats.VisualizzaEntrateMensili
 import com.example.marinobarbersalon.Admin.Stats.VisualizzaServiziPiuRichiesti
 import com.example.marinobarbersalon.Admin.Stats.VisualizzaStatistiche
 import com.example.marinobarbersalon.Admin.Stats.VisualizzaStatisticheAppuntamenti
@@ -197,6 +198,9 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
                 },
                 onNavigateToVisualizzaServiziPiuRichiesti = {
                     navController.navigate(Screen.VisualizzaServiziPiuRichiesti.route)
+                },
+                onNavigateToVisualizzaEntrateMensili = {
+                    navController.navigate(Screen.VisualizzaEntrateMensili.route)
                 }
             )
         }
@@ -212,6 +216,11 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
         composable(Screen.VisualizzaServiziPiuRichiesti.route){
             VisualizzaServiziPiuRichiesti()
         }
+
+        composable(Screen.VisualizzaEntrateMensili.route){
+            VisualizzaEntrateMensili()
+        }
+
 
 
 
