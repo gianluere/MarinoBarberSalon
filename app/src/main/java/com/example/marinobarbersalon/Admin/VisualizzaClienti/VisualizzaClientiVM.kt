@@ -39,6 +39,12 @@ class VisualizzaClientiVM : ViewModel() {
     private val _clientiState = MutableStateFlow<List<UserFirebase>>(emptyList())
     val clientiState = _clientiState.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _isLoadingCliente = MutableStateFlow(false)
+    val isLoadingCliente: StateFlow<Boolean> = _isLoadingCliente.asStateFlow()
+
 //    val filteredClients = searchText
 //        .debounce(1000L)
 //        .combine(_clientiState) { text, clienti ->
@@ -60,15 +66,19 @@ class VisualizzaClientiVM : ViewModel() {
 
     fun fetchUsers() {
         viewModelScope.launch {
+            _isLoading.value = true // Inizia il caricamento
             try {
                 val users = getUsersFromFirestore()
                 _usersState.value = users
             } catch (e: Exception) {
                 Log.e("VisualizzaClientiVM", "Errore nel recupero degli utenti", e)
                 _usersState.value = emptyList()
+            } finally {
+                _isLoading.value = false // Termina il caricamento
             }
         }
     }
+
 
     private suspend fun getUsersFromFirestore(): List<UserFirebase> {
         val db = firestore.collection("utenti")
@@ -81,12 +91,15 @@ class VisualizzaClientiVM : ViewModel() {
 
     fun getClienteByEmail(clienteEmail: String) {
         viewModelScope.launch {
+            _isLoadingCliente.value = true // Inizia il caricamento
             try {
                 val cliente = getUserByEmailFromFirestore(clienteEmail)
                 _selectedClienteState.value = cliente
             } catch (e: Exception) {
-                Log.e("HI", "Errore  recupero cliente $clienteEmail", e)
+                Log.e("DettagliCliente", "Errore nel recupero del cliente $clienteEmail", e)
                 _selectedClienteState.value = null
+            } finally {
+                _isLoadingCliente.value = false // Termina il caricamento
             }
         }
     }
