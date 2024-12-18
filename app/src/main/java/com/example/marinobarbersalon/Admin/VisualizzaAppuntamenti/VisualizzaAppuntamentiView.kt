@@ -28,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
 fun VisualizzaAppuntamenti(
@@ -46,7 +48,9 @@ fun VisualizzaAppuntamenti(
         Text(
             text = "Seleziona una data",
             fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
+            fontFamily = myFont,
+            color = my_white
         )
         Calendar(onDateSelected = { date ->
             calendarViewModel.selectDate(date)
@@ -56,9 +60,10 @@ fun VisualizzaAppuntamenti(
 
         Text(
             text = "Data selezionata: ${calendarState.selectedDate ?: "Nessuna"}",
-            fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 16.dp),
-            fontFamily = myFont
+            fontFamily = myFont,
+            color = my_white,
+            fontSize = 30.sp
         )
 
         Button(
@@ -79,9 +84,9 @@ fun VisualizzaAppuntamenti(
 }
 
 @Composable
-fun VisualizzaAppuntamenti1(date: String) {
-    val viewModel: VisualizzaAppuntamentiVM = viewModel()
+fun VisualizzaAppuntamenti1(date: String, viewModel: VisualizzaAppuntamentiVM = viewModel()) {
     val appuntamenti by viewModel.appuntamentiState.collectAsState()
+    val isLoading = viewModel.isLoading.collectAsState().value
 
     LaunchedEffect(date) {
         viewModel.getAppuntamentiByDate(date)
@@ -90,59 +95,54 @@ fun VisualizzaAppuntamenti1(date: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Appuntamenti per la data: $date",
             fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .padding(top = 85.dp),
+            fontFamily = myFont,
+            color = my_white
         )
 
-        if (appuntamenti.isEmpty()) {
-            Text(text = "Nessun appuntamento disponibile per questa data.", fontSize = 18.sp)
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
+        if (isLoading) {
+            // Mostra il CircularProgressIndicator durante il caricamento
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp, top = 8.dp)
-                    ) {
-                        Text(
-                            text = "Orario",
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "Nome",
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "Prezzo",
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "Servizio",
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
+                CircularProgressIndicator(
+                    color = my_gold,
+                    modifier = Modifier.size(100.dp)
+                )
+            }
+        } else {
+            if (appuntamenti.isEmpty()) {
+                // Mostra il messaggio quando non ci sono appuntamenti
+                Text(
+                    text = "Nessun appuntamento disponibile per questa data.",
+                    fontSize = 18.sp,
+                    fontFamily = myFont,
+                    color = my_white
+                )
+            } else {
+                // Mostra la lista degli appuntamenti
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(appuntamenti) { appuntamento ->
+                        AppointmentItem(appuntamento)
                     }
-                }
-                items(appuntamenti) { appuntamento ->
-                    AppointmentItem(appuntamento)
                 }
             }
         }
     }
 }
+
 
 
 

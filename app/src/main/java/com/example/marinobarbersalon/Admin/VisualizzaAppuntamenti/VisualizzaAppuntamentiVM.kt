@@ -1,6 +1,5 @@
 package com.example.marinobarbersalon.Admin.VisualizzaAppuntamenti
 
-import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -34,6 +33,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,14 +48,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColor
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.example.marinobarbersalon.Cliente.Home.User
 import com.example.marinobarbersalon.ui.theme.myFont
+import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
+import com.example.marinobarbersalon.ui.theme.my_yellow
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 
 import java.time.Month
 import java.time.YearMonth
@@ -74,6 +80,9 @@ class VisualizzaAppuntamentiVM: ViewModel() {
     private val _appuntamentiState = MutableStateFlow<List<Appuntamento>>(emptyList())
     val appuntamentiState: StateFlow<List<Appuntamento>> = _appuntamentiState
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     fun selectDate(date: String) {
         _calendarState.value = CalendarState(selectedDate = date)
     }
@@ -85,15 +94,14 @@ class VisualizzaAppuntamentiVM: ViewModel() {
     }
 
     suspend fun getAppuntamentiByDate(date: String) {
+        _isLoading.value = true
         try {
             val appuntamenti = fetchAppuntamentiFromFirestore(date)
-            Log.d("Ciao", "eccomi")
-            Log.d("Ciao", "$date")
             _appuntamentiState.value = appuntamenti
-
-            Log.d("Ciao", "${_appuntamentiState.value}")
         } catch (e: Exception) {
             _appuntamentiState.value = emptyList()
+        } finally {
+            _isLoading.value = false
         }
     }
 
@@ -171,14 +179,16 @@ fun Calendar(
                     selectedMonth = selectedMonth.minus(1)
                 }
             }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Mese Precedente")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Mese Precedente", tint = my_white)
             }
 
             Text(
                 text = "${italianMonthNames[selectedMonth.value - 1]} $selectedYear",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 8.dp),
-                fontFamily = myFont
+                fontFamily = myFont,
+                color = my_white,
+                fontSize = 20.sp
             )
 
             IconButton(onClick = {
@@ -189,7 +199,7 @@ fun Calendar(
                     selectedMonth = selectedMonth.plus(1)
                 }
             }) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Mese prossimo")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Mese prossimo", tint = my_white)
             }
         }
 
@@ -205,7 +215,9 @@ fun Calendar(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    fontFamily = myFont
+                    fontFamily = myFont,
+                    color = my_white,
+                    fontSize = 20.sp
                 )
             }
         }
@@ -244,7 +256,8 @@ fun Calendar(
                         text = day?.toString() ?: "",
                         //style = MaterialTheme.typography.bodySmall,
                         color = my_white,
-                        fontFamily = myFont
+                        fontFamily = myFont,
+                        fontSize = 20.sp
                     )
                 }
             }
@@ -272,33 +285,56 @@ fun AppointmentItem(appuntamento: Appuntamento) {
         }
     }
 
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .border(1.dp, androidx.compose.ui.graphics.Color.Gray)
-            .padding(8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+        shape = RoundedCornerShape(17.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = my_yellow
+        )
     ) {
-
-        Text(
-            text = "${appuntamento.orarioInizio} - ${appuntamento.orarioFine}",
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = nomeCliente,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "€${"%.2f".format(appuntamento.prezzo)}",
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = appuntamento.servizio,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Orario: ${appuntamento.orarioInizio} - ${appuntamento.orarioFine}",
+                fontFamily = myFont,
+                fontSize = 18.sp,
+                color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = "Cliente: $nomeCliente",
+                fontFamily = myFont,
+                fontSize = 18.sp,
+                color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = "Servizio: ${appuntamento.servizio}",
+                fontFamily = myFont,
+                fontSize = 18.sp,
+                color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = "Prezzo: €${"%.2f".format(appuntamento.prezzo)}",
+                fontFamily = myFont,
+                fontSize = 18.sp,
+                color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
+
