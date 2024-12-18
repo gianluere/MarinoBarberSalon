@@ -1,19 +1,14 @@
 package com.example.marinobarbersalon.Admin.Stats
 
-import android.graphics.Paint
-import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,12 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,36 +33,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.marinobarbersalon.Admin.VisualizzaProdotti.VisualizzaProdottiVM
-import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
-import co.yml.charts.common.model.Point
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.QueryStats
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Group
-
-
-import co.yml.charts.axis.AxisData
-import co.yml.charts.ui.linechart.LineChart
-import co.yml.charts.ui.linechart.model.GridLines
-import co.yml.charts.ui.linechart.model.IntersectionPoint
-import co.yml.charts.ui.linechart.model.Line
-import co.yml.charts.ui.linechart.model.LineChartData
-import co.yml.charts.ui.linechart.model.LinePlotData
-import co.yml.charts.ui.linechart.model.LineStyle
-import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
-import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
-import co.yml.charts.ui.linechart.model.ShadowUnderLine
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.geometry.Offset
@@ -80,57 +52,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.marinobarbersalon.Cliente.Account.Appuntamento
-import com.example.marinobarbersalon.Cliente.Home.UserFirebase
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_yellow
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
-import kotlinx.coroutines.tasks.await
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-
-
-/*
-1. Numero di appuntamenti per giorno/settimana/mese:
-    Descrizione: Una statistica che mostra quanti appuntamenti sono stati prenotati in un dato intervallo
-     di tempo (giorno, settimana o mese).
-
-    Tipo di Grafico: Line Chart o Bar Chart.
-
-    Dati: Numero di appuntamenti per ciascun giorno, settimana o mese. OK!!!!!
-
-
-2. Numero di clienti attivi vs inattivi;
-    Descrizione: Percentuale di clienti che hanno prenotato appuntamenti recenti rispetto a quelli
-     che non hanno effettuato prenotazioni da un certo periodo di tempo.
-
-    Tipo di Grafico: Pie Chart.
-
-    Dati: Numero di clienti con appuntamenti negli ultimi 30 giorni vs clienti con appuntamenti passati. OK!!!!!
-
-
-
-3. Servizi più richiesti:
-    Descrizione: Un grafico che mostra quali servizi sono stati prenotati di più in un determinato periodo.
-
-    Tipo di Grafico: Bar Chart o Pie Chart.
-
-    Dati: Numero di volte che ogni servizio è stato prenotato in un dato periodo. OK!!!!!
-
-
-5. Entrate mensili:
-    Descrizione: Le entrate generate dal salone, divise per mese, per avere un'idea chiara delle performance finanziarie.
-
-    Tipo di Grafico: Line Chart o Bar Chart.
-
-    Dati: Somma delle entrate per ogni mese.
-
-*/
 
 //--------------------------------------------------------------------------------------------------
 //PAGINA SCELTA STATISTICHE
+//--------------------------------------------------------------------------------------------------
 @Composable
 fun VisualizzaStatistiche(
     onNavigateToVisualizzaStatisticheAppuntamenti: () -> Unit,
@@ -387,7 +315,6 @@ fun VisualizzaStatisticheAppuntamenti(
             }
         }
 
-        // Mostra il CircularProgressIndicator se i dati stanno caricando
         if (isLoading) {
             CircularProgressIndicator(
                 color = my_gold,
@@ -413,43 +340,42 @@ fun VisualizzaStatisticheAppuntamenti(
 @Composable
 fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
     val maxValue = appuntamentiPerIntervallo.maxOfOrNull { it.second }?.toFloat() ?: 1f
-    val barWidth = 90.dp // Larghezza fissa delle barre
+    val barWidth = 90.dp //Larghezza fissa delle barre
     val labelTextStyle = androidx.compose.ui.text.TextStyle(
         color = Color.White,
         fontSize = 16.sp,
         textAlign = TextAlign.Center
     )
 
-    // Contenitore principale con LazyRow per lo scroll orizzontale
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(350.dp) // Altezza totale del grafico
+            .height(350.dp) //Altezza totale del grafico
             .background(Color.Transparent)
     ) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp), // Altezza specifica per le barre
+                .height(300.dp), //Altezza specifica per le barre
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
             items(appuntamentiPerIntervallo) { pair ->
-                val barHeightFactor = 200.dp / maxValue // Scala altezza dinamicamente
+                val barHeightFactor = 200.dp / maxValue //Scala altezza dinamicamente
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom, // Barre partono dal basso
+                    verticalArrangement = Arrangement.Bottom,
                     modifier = Modifier.fillMaxHeight()
                 ) {
-                    // Valore numerico sopra la barra
+                    //Valore numerico sopra la barra
                     Text(
                         text = pair.second.toString(),
                         style = labelTextStyle,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
 
-                    // Barra verticale che cresce dal basso verso l'alto
                     Box(
                         modifier = Modifier
                             .width(barWidth)
@@ -457,7 +383,7 @@ fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
                             .background(my_bordeaux, RoundedCornerShape(4.dp))
                     )
 
-                    // Etichetta sotto la barra
+                    //Etichetta sotto la barra
                     Text(
                         text = pair.first,
                         style = labelTextStyle,
@@ -496,10 +422,10 @@ fun VisualizzaStatisticheClienti(
             .fillMaxSize()
             .padding(16.dp)
             .padding(top = 100.dp),
-        verticalArrangement = Arrangement.Top, // Il titolo rimane in alto
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titolo
+        //Titolo
         Text(
             text = "Statistiche Clienti",
             fontFamily = myFont,
@@ -508,12 +434,12 @@ fun VisualizzaStatisticheClienti(
             modifier = Modifier.padding(bottom = 0.dp)
         )
 
-        // Contenitore per centrare il grafico
+        //Contenitore per centrare il grafico
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f), // Occupa lo spazio disponibile
-            contentAlignment = Alignment.Center // Centra solo il grafico nella parte rimanente
+                .weight(1f),
+            contentAlignment = Alignment.Center
         ) {
             if (isLoadingClienti) {
                 CircularProgressIndicator(
@@ -538,19 +464,21 @@ fun VisualizzaStatisticheClienti(
     }
 }
 
-
+/**
+ * E' posibile utilizzare sia BarChart sia il grafico a torta
+ * (basta chiamare una o l'altra funzione CON GLI STESSI PARAMETRI!!)
+ * */
 @Composable
 fun BarChartClienti(attivi: Int, inattivi: Int) {
     val clientiData = listOf("Attivi" to attivi, "Inattivi" to inattivi)
     val maxValue = clientiData.maxOfOrNull { it.second }?.toFloat() ?: 1f
-    val barWidth = 90.dp // Larghezza fissa delle barre
+    val barWidth = 90.dp //Larghezza fissa delle barre
     val labelTextStyle = androidx.compose.ui.text.TextStyle(
         color = my_white,
         fontSize = 20.sp,
         textAlign = TextAlign.Center
     )
 
-    //Contenitore principale con LazyRow per lo scroll orizzontale
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -580,7 +508,6 @@ fun BarChartClienti(attivi: Int, inattivi: Int) {
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
 
-                    //Barra verticale che cresce dal basso verso l'alto
                     Box(
                         modifier = Modifier
                             .width(barWidth)
@@ -607,7 +534,6 @@ fun BarChartClienti(attivi: Int, inattivi: Int) {
         }
     }
 }
-//da fare: mettere centrato il grafico
 
 @Composable
 fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
@@ -615,24 +541,24 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
     val percentualeAttivi = if (totale > 0) attivi.toFloat() / totale else 0f
     val sweepAngleAttivi = percentualeAttivi * 360f
 
-    // Converti dp in pixel usando LocalDensity
+
     val density = LocalDensity.current
-    val radius = with(density) { 155.dp.toPx() } // Raggio del cerchio per posizionare le etichette
+    val radius = with(density) { 155.dp.toPx() } //Raggio del cerchio per posizionare le etichette
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(350.dp), // Altezza totale del contenitore
+            .height(350.dp), //Altezza totale del contenitore
         contentAlignment = Alignment.Center
     ) {
         Canvas(
             modifier = Modifier
-                .size(250.dp) // Dimensione del grafico
+                .size(250.dp) //Dimensione del grafico
         ) {
             val circleSize = Size(size.minDimension, size.minDimension)
             val center = Offset(size.width / 2, size.height / 2)
 
-            // Disegna la fetta per i clienti attivi
+            //Fetta per i clienti attivi
             drawArc(
                 color = my_gold,
                 startAngle = 0f,
@@ -645,7 +571,7 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
                 )
             )
 
-            // Disegna la fetta per i clienti inattivi
+            //Fetta per i clienti inattivi
             drawArc(
                 color = my_bordeaux,
                 startAngle = sweepAngleAttivi,
@@ -658,8 +584,8 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
                 )
             )
 
-            // Posizionamento dinamico dell'etichetta per i clienti attivi
-            val angleAttivi = sweepAngleAttivi / 2 // Angolo medio della fetta
+            //Posizionamento dinamico dell'etichetta per i clienti attivi
+            val angleAttivi = sweepAngleAttivi / 2
             val attiviX =
                 center.x + radius * kotlin.math.cos(Math.toRadians(angleAttivi.toDouble()))
                     .toFloat()
@@ -670,7 +596,7 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
                 drawText(
                     "Attivi",
                     attiviX,
-                    attiviY - 20f, // Posizione sopra la percentuale
+                    attiviY - 20f, //Posizione sopra la percentuale
                     android.graphics.Paint().apply {
                         color = my_gold.toArgb()
                         textAlign = android.graphics.Paint.Align.CENTER
@@ -680,7 +606,7 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
                 drawText(
                     "${((percentualeAttivi) * 100).toInt()}%",
                     attiviX,
-                    attiviY + 50f, // Posizione sotto "Attivi"
+                    attiviY + 50f, //Posizione sotto "Attivi"
                     android.graphics.Paint().apply {
                         color = my_gold.toArgb()
                         textAlign = android.graphics.Paint.Align.CENTER
@@ -710,7 +636,7 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
                 drawText(
                     "Inattivi",
                     inattiviX,
-                    inattiviY - 20f, // Posizione sopra la percentuale
+                    inattiviY - 20f, //Posizione sopra la percentuale
                     android.graphics.Paint().apply {
                         color = my_bordeaux.toArgb()
                         textAlign = android.graphics.Paint.Align.CENTER
@@ -720,7 +646,7 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
                 drawText(
                     "${((1 - percentualeAttivi) * 100).toInt()}%",
                     inattiviX,
-                    inattiviY + 50f, // Posizione sotto "Inattivi"
+                    inattiviY + 50f, //Posizione sotto "Inattivi"
                     android.graphics.Paint().apply {
                         color = my_bordeaux.toArgb()
                         textAlign = android.graphics.Paint.Align.CENTER
@@ -746,7 +672,6 @@ fun VisualizzaServiziPiuRichiesti(
     val serviziStats = statsViewModel.serviziStats.collectAsState().value
     val isLoadingServizi = statsViewModel.isLoadingServizi.collectAsState().value
 
-    // Effettua il calcolo quando la pagina viene caricata
     LaunchedEffect(Unit) {
         statsViewModel.calcolaServiziPiuRichiesti()
     }
@@ -767,7 +692,6 @@ fun VisualizzaServiziPiuRichiesti(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Mostra il loader se i dati stanno caricando
         if (isLoadingServizi) {
             CircularProgressIndicator(
                 color = my_gold,
@@ -777,7 +701,6 @@ fun VisualizzaServiziPiuRichiesti(
             )
         } else {
             if (serviziStats.isNotEmpty()) {
-                // Visualizza il grafico a barre
                 BarChartServizi(serviziStats)
             } else {
                 Text(
@@ -793,43 +716,42 @@ fun VisualizzaServiziPiuRichiesti(
 @Composable
 fun BarChartServizi(serviziStats: Map<String, Int>) {
     val maxValue = serviziStats.values.maxOrNull()?.toFloat() ?: 1f
-    val barWidth = 90.dp // Larghezza fissa delle barre
+    val barWidth = 90.dp //Larghezza fissa delle barre
     val labelTextStyle = androidx.compose.ui.text.TextStyle(
         color = Color.White,
         fontSize = 16.sp,
         textAlign = TextAlign.Center
     )
 
-    // Contenitore principale con LazyRow per lo scroll orizzontale
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(350.dp) // Altezza totale del grafico
+            .height(350.dp) //Altezza totale del grafico
             .background(Color.Transparent)
     ) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp), // Altezza specifica per le barre
+                .height(300.dp), //Altezza specifica per le barre
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(horizontal = 8.dp)
         ) {
             items(serviziStats.entries.toList()) { servizio ->
-                val barHeightFactor = 200.dp / maxValue // Scala altezza dinamicamente
+                val barHeightFactor = 200.dp / maxValue //Scala altezza dinamicamente
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom, // Barre partono dal basso
+                    verticalArrangement = Arrangement.Bottom,
                     modifier = Modifier.fillMaxHeight()
                 ) {
-                    // Valore numerico sopra la barra
+                    //Valore numerico sopra la barra
                     Text(
                         text = servizio.value.toString(),
                         style = labelTextStyle,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
 
-                    // Barra verticale che cresce dal basso verso l'alto
+
                     Box(
                         modifier = Modifier
                             .width(barWidth)
@@ -837,7 +759,7 @@ fun BarChartServizi(serviziStats: Map<String, Int>) {
                             .background(my_bordeaux, RoundedCornerShape(4.dp))
                     )
 
-                    // Etichetta sotto la barra
+                    //Etichetta sotto la barra
                     Text(
                         text = servizio.key,
                         style = labelTextStyle,
@@ -886,7 +808,6 @@ fun VisualizzaEntrateMensili(statsViewModel: StatsVM = viewModel()) {
         )
 
         if (isLoadingEntrate) {
-            // Circular Progress Indicator per il caricamento
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -899,7 +820,6 @@ fun VisualizzaEntrateMensili(statsViewModel: StatsVM = viewModel()) {
             }
         } else {
             if (entrateMensili.isEmpty()) {
-                // Messaggio quando non ci sono dati
                 Text(
                     text = "Nessun dato disponibile.",
                     color = my_white,
@@ -907,7 +827,6 @@ fun VisualizzaEntrateMensili(statsViewModel: StatsVM = viewModel()) {
                     modifier = Modifier.padding(top = 16.dp)
                 )
             } else {
-                // LazyColumn con card per ogni mese
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -945,7 +864,7 @@ fun EntrateMensiliCard(mese: String, entrata: Double) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                // Nome del mese
+                //Nome mese
                 Text(
                     text = mese,
                     fontFamily = myFont,
@@ -954,7 +873,7 @@ fun EntrateMensiliCard(mese: String, entrata: Double) {
                     color = Color.Black
                 )
 
-                // Entrata mensile
+                //Entrata mensile
                 Text(
                     text = "Entrate: €${"%.2f".format(entrata)}",
                     fontFamily = myFont,
