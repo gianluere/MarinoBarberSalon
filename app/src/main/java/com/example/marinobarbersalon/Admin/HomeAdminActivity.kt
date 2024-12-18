@@ -136,9 +136,18 @@ class HomeAdminActivity: ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
 
+                    /**
+                     * INSERIRE QUI LE PAGINE CHE DEVONO AVERE IL DRAWER
+                     * */
                     val pagineConDrawer = listOf(
                         Screen.HomeAdmin.route,
-                        Screen.Prova.route
+                        Screen.Prova.route,
+                        Screen.VisualizzaAppuntamenti.route,
+                        Screen.VisualizzaClienti.route,
+                        Screen.VisualizzaServizi.route,
+                        Screen.VisualizzaProdotti.route,
+                        Screen.Recensioni.route,
+                        Screen.StatsBase.route
                     )
 
                     val showDraweIcon = currentRoute in pagineConDrawer
