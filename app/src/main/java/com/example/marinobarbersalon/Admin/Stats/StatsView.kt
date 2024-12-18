@@ -131,7 +131,8 @@ import java.time.format.DateTimeFormatter
 //PAGINA SCELTA STATISTICHE
 @Composable
 fun VisualizzaStatistiche(
-    onNavigateToVisualizzaStatisticheAppuntamenti: () -> Unit
+    onNavigateToVisualizzaStatisticheAppuntamenti: () -> Unit,
+    onNavigateToVisualizzaStatisticheClienti: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -246,7 +247,7 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToVisualizzaStatisticheAppuntamenti()
+                                    onNavigateToVisualizzaStatisticheClienti()
                                 }
                         ) {
                             Image(
@@ -496,8 +497,164 @@ fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
 //--------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------
-//PAGINA 2: STATISTICHE
+//PAGINA 2: STATISTICHE APPUNTAMENTI RECENTI VS APPUNTAMENTI VECCHI
 //--------------------------------------------------------------------------------------------------
+@Composable
+fun VisualizzaStatisticheClienti(
+    statsViewModel: StatsVM = viewModel()
+) {
+    val isLoadingClienti = statsViewModel.isLoadingClienti.collectAsState().value
+    val clientiStats = statsViewModel.clientiStats.collectAsState().value
+
+    LaunchedEffect(Unit) {
+        statsViewModel.calcolaClientiAttiviInattivi()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .padding(top = 100.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Statistiche Clienti",
+            fontFamily = myFont,
+            fontSize = 28.sp,
+            color = my_white,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        if (isLoadingClienti) {
+            CircularProgressIndicator(
+                color = my_gold,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .size(100.dp)
+            )
+        } else {
+            if (clientiStats.first + clientiStats.second > 0) {
+                BarChartClienti(attivi = clientiStats.first, inattivi = clientiStats.second)
+            } else {
+                Text(
+                    text = "Nessun dato disponibile.",
+                    color = my_white,
+                    fontFamily = myFont
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun BarChartClienti(attivi: Int, inattivi: Int) {
+    val clientiData = listOf("Attivi" to attivi, "Inattivi" to inattivi)
+    val maxValue = clientiData.maxOfOrNull { it.second }?.toFloat() ?: 1f
+    val barWidth = 90.dp // Larghezza fissa delle barre
+    val labelTextStyle = androidx.compose.ui.text.TextStyle(
+        color = my_white,
+        fontSize = 20.sp,
+        textAlign = TextAlign.Center
+    )
+
+    //Contenitore principale con LazyRow per lo scroll orizzontale
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp) //Altezza tot grafico
+            .background(Color.Transparent),
+        contentAlignment = Alignment.Center
+    ) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp), //Altezza barre
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp)
+        ) {
+            items(clientiData) { pair ->
+                val barHeightFactor = 200.dp / maxValue //Scala altezza dinamicamente
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    //Valore numerico sopra la barra
+                    Text(
+                        text = pair.second.toString(),
+                        style = labelTextStyle,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+
+                    //Barra verticale che cresce dal basso verso l'alto
+                    Box(
+                        modifier = Modifier
+                            .width(barWidth)
+                            .height((pair.second * barHeightFactor.value).dp)
+                            .background(
+                                color = if (pair.first == "Attivi") my_gold else my_bordeaux,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                    )
+
+                    //Etichetta sotto la barra
+                    Text(
+                        text = pair.first,
+                        style = labelTextStyle,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .width(barWidth),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = my_white
+                    )
+                }
+            }
+        }
+    }
+}
+//da fare: mettere centrato il grafico
+
+@Composable
+fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
+    val totale = attivi + inattivi
+    val percentualeAttivi = if (totale > 0) attivi.toFloat() / totale else 0f
+    val sweepAngleAttivi = percentualeAttivi * 360f
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)
+    ) {
+        val size = minOf(size.width, size.height)
+
+        // Disegna la fetta per i clienti attivi
+        drawArc(
+            color = Color.Green,
+            startAngle = 0f,
+            sweepAngle = sweepAngleAttivi,
+            useCenter = true,
+            size = Size(size, size),
+            //topLeft = Offset((size.width - size) / 2f, (size.height - size) / 2f)
+
+        )
+
+        // Disegna la fetta per i clienti inattivi
+        drawArc(
+            color = Color.Red,
+            startAngle = sweepAngleAttivi,
+            sweepAngle = 360f - sweepAngleAttivi,
+            useCenter = true,
+            size = Size(size, size),
+            //topLeft = Offset((size.width - size) / 2f, (size.height - size) / 2f)
+        )
+    }
+}
+
+
+
 
 
 
