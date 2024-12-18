@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -73,9 +74,11 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.toUpperCase
 import coil.compose.SubcomposeAsyncImage
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.marinobarbersalon.Admin.Servizi.DialogGenerico
 
 
 /*
@@ -160,7 +163,11 @@ fun VisualizzaProdotti(
                 ) {
                     Box(
                         modifier = Modifier
-                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                            .border(
+                                width = 2.dp,
+                                color = my_gold,
+                                shape = RoundedCornerShape(25.dp)
+                            )
                             .background(color = my_white, shape = RoundedCornerShape(25.dp))
                             .aspectRatio(1f)
                             .clickable {
@@ -190,7 +197,11 @@ fun VisualizzaProdotti(
                 ) {
                     Box(
                         modifier = Modifier
-                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
+                            .border(
+                                width = 2.dp,
+                                color = my_gold,
+                                shape = RoundedCornerShape(25.dp)
+                            )
                             .background(color = my_white, shape = RoundedCornerShape(25.dp))
                             .aspectRatio(1f)
                             .clickable {
@@ -350,7 +361,8 @@ fun ProdottoCard(
                 .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
             loading = {
                 Box(
-                    Modifier.size(180.dp)
+                    Modifier
+                        .size(180.dp)
                         .border(2.dp, my_gold, RoundedCornerShape(10.dp))
                         .background(color = my_grey, shape = RoundedCornerShape(10.dp)),
                     contentAlignment = Alignment.Center
@@ -450,12 +462,39 @@ fun AggiungiProdotto(
     val showErrorDialog = remember { mutableStateOf(false) }
     val isFormSubmitted = remember { mutableStateOf(false) }
 
+    //dialog succ o fail
+    val showDialogSuccess = remember { mutableStateOf(false) }
+    val showDialogError = remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         aggiungiProdottoViewModel.validateForm()
         if (formErrors.isNotEmpty()) {
             showErrorDialog.value = true
         }
         aggiungiProdottoViewModel.setCategoria(categoria)
+    }
+
+    // Visualizza dialog di successo
+    if (showDialogSuccess.value) {
+        DialogGenerico(
+            titolo = "Successo",
+            messaggio = "Prodotto aggiunto con successo!",
+            icona = painterResource(id = R.drawable.select_check_box_24dp_faf9f6_fill0_wght100_grad0_opsz24),
+            onDismiss = {
+                showDialogSuccess.value = false
+                onAggiungiSuccess() // Naviga o esegui azione al completamento
+            }
+        )
+    }
+
+    // Visualizza dialog di errore
+    if (showDialogError.value) {
+        DialogGenerico(
+            titolo = "Errore",
+            messaggio = "Errore durante l'aggiunta del prodotto.",
+            icona = rememberVectorPainter(Icons.Filled.Error),
+            onDismiss = { showDialogError.value = false }
+        )
     }
 
     if (showErrorDialog.value) {
@@ -686,8 +725,8 @@ fun AggiungiProdotto(
                     aggiungiProdottoViewModel.validateForm()
                     if (formErrors.isEmpty()) {
                         aggiungiProdottoViewModel.aggiungiProdotto(
-                            onSuccess = onAggiungiSuccess,
-                            onError = { /* Mostra errore */ }
+                            onSuccess = { showDialogSuccess.value = true },
+                            onError = { showDialogError.value = true }
                         )
                     } else {
                         showErrorDialog.value = true
