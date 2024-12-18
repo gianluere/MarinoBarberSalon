@@ -48,6 +48,14 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import co.yml.charts.common.model.Point
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.QueryStats
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.outlined.ContentCut
+import androidx.compose.material.icons.outlined.Group
 
 
 import co.yml.charts.axis.AxisData
@@ -68,6 +76,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
@@ -109,15 +118,6 @@ import java.time.format.DateTimeFormatter
     Dati: Numero di volte che ogni servizio è stato prenotato in un dato periodo.
 
 
-4. Recensioni dei clienti:
-    Descrizione: Un'analisi delle recensioni ricevute dai clienti, mostrando la distribuzione delle
-     recensioni per rating (ad esempio, da 1 a 5 stelle).
-
-    Tipo di Grafico: Bar Chart (o Pie Chart).
-
-    Dati: Numero di recensioni per ciascun punteggio (1 stella, 2 stelle, ecc.).
-
-
 5. Entrate mensili:
     Descrizione: Le entrate generate dal salone, divise per mese, per avere un'idea chiara delle performance finanziarie.
 
@@ -132,7 +132,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun VisualizzaStatistiche(
     onNavigateToVisualizzaStatisticheAppuntamenti: () -> Unit,
-    onNavigateToVisualizzaStatisticheClienti: () -> Unit
+    onNavigateToVisualizzaStatisticheClienti: () -> Unit,
+    onNavigateToVisualizzaServiziPiuRichiesti: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -151,21 +152,21 @@ fun VisualizzaStatistiche(
                 .padding(bottom = 32.dp)
         )
 
-        // Avvolgiamo il contenuto delle card in un LazyColumn per renderle scrollabili
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(20.dp), // Spaziatura tra le card
-            contentPadding = PaddingValues(top = 10.dp) // Aggiungiamo un po' di spazio in alto
+            verticalArrangement = Arrangement.spacedBy(20.dp), //Spaziatura tra le card
+            contentPadding = PaddingValues(top = 25.dp)
         ) {
             item {
-                // Riga per le prime due statistiche
+                //Riga per le prime due statistiche
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Statistica 1: Appuntamenti
+                    //Statistica 1: Appuntamenti
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -180,10 +181,12 @@ fun VisualizzaStatistiche(
                                     onNavigateToVisualizzaStatisticheAppuntamenti()
                                 }
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.barba_icona),
+                            Icon(
+                                imageVector = Icons.Filled.CalendarMonth,
                                 contentDescription = "Icona Appuntamenti",
-                                modifier = Modifier.padding(30.dp)
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(10.dp)
                             )
                         }
 
@@ -193,9 +196,10 @@ fun VisualizzaStatistiche(
                             fontFamily = myFont,
                             color = my_white
                         )
+
                     }
 
-                    // Statistica 2: Entrate
+                    //Statistica 2: Entrate
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -210,10 +214,12 @@ fun VisualizzaStatistiche(
                                     onNavigateToVisualizzaStatisticheAppuntamenti()
                                 }
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.barba_icona),
-                                contentDescription = "Icona Entrate",
-                                modifier = Modifier.padding(30.dp)
+                            Icon(
+                                imageVector = Icons.Filled.QueryStats, //oppure Icons.Filled.TrendingUp chiedere quale è meglio
+                                contentDescription = "Icona Entrare",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(10.dp)
                             )
                         }
 
@@ -228,14 +234,14 @@ fun VisualizzaStatistiche(
             }
 
             item {
-                // Riga per le statistiche restanti
+                //Riga per le statistiche restanti
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Statistica 4: Clienti attivi/inattivi
+                    //Statistica 4: Clienti attivi/inattivi
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -250,10 +256,12 @@ fun VisualizzaStatistiche(
                                     onNavigateToVisualizzaStatisticheClienti()
                                 }
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.barba_icona),
-                                contentDescription = "Icona Clienti",
-                                modifier = Modifier.padding(30.dp)
+                            Icon(
+                                imageVector = Icons.Outlined.Group,
+                                contentDescription = "Icona clienti",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(10.dp)
                             )
                         }
 
@@ -265,7 +273,7 @@ fun VisualizzaStatistiche(
                         )
                     }
 
-                    // Statistica 5: Recensioni
+                    //Statistica 5: Servizi
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -277,18 +285,20 @@ fun VisualizzaStatistiche(
                                 .background(color = my_white, shape = RoundedCornerShape(25.dp))
                                 .aspectRatio(1f)
                                 .clickable {
-                                    onNavigateToVisualizzaStatisticheAppuntamenti()
+                                    onNavigateToVisualizzaServiziPiuRichiesti()
                                 }
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.barba_icona),
-                                contentDescription = "Icona Recensioni",
-                                modifier = Modifier.padding(30.dp)
+                            Icon(
+                                imageVector = Icons.Outlined.ContentCut,
+                                contentDescription = "Icona servizi",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(20.dp)
                             )
                         }
 
                         Text(
-                            text = "RECENSIONI",
+                            text = "SERVIZI",
                             fontSize = 20.sp,
                             fontFamily = myFont,
                             color = my_white
@@ -296,45 +306,12 @@ fun VisualizzaStatistiche(
                     }
                 }
             }
-
-            item {
-                // Riga per le altre statistiche
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
-                ) {
-                    // Statistica 3: Servizi più richiesti
-                    Box(
-                        modifier = Modifier
-                            .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(25.dp))
-                            .background(color = my_white, shape = RoundedCornerShape(25.dp))
-                            .fillMaxWidth(0.5f)
-                            .clickable {
-                                onNavigateToVisualizzaStatisticheAppuntamenti()
-                            }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.barba_icona),
-                            contentDescription = "Icona Servizi",
-                            modifier = Modifier.padding(top = 30.dp, bottom = 30.dp, start = 30.dp, end = 20.dp)
-                        )
-                    }
-
-                    Text(
-                        text = "SERVIZI",
-                        fontSize = 20.sp,
-                        fontFamily = myFont,
-                        color = my_white
-                    )
-                }
-            }
         }
     }
 }
 //--------------------------------------------------------------------------------------------------
+
+
 
 //--------------------------------------------------------------------------------------------------
 //PAGINA 1: STATISTICHE APPUNTAMENTI
@@ -430,7 +407,6 @@ fun VisualizzaStatisticheAppuntamenti(
     }
 }
 
-
 @Composable
 fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
     val maxValue = appuntamentiPerIntervallo.maxOfOrNull { it.second }?.toFloat() ?: 1f
@@ -496,6 +472,8 @@ fun BarChart(appuntamentiPerIntervallo: List<Pair<String, Int>>) {
 }
 //--------------------------------------------------------------------------------------------------
 
+
+
 //--------------------------------------------------------------------------------------------------
 //PAGINA 2: STATISTICHE APPUNTAMENTI RECENTI VS APPUNTAMENTI VECCHI
 //--------------------------------------------------------------------------------------------------
@@ -515,37 +493,48 @@ fun VisualizzaStatisticheClienti(
             .fillMaxSize()
             .padding(16.dp)
             .padding(top = 100.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Top, // Il titolo rimane in alto
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Titolo
         Text(
             text = "Statistiche Clienti",
             fontFamily = myFont,
             fontSize = 28.sp,
             color = my_white,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 0.dp)
         )
 
-        if (isLoadingClienti) {
-            CircularProgressIndicator(
-                color = my_gold,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .size(100.dp)
-            )
-        } else {
-            if (clientiStats.first + clientiStats.second > 0) {
-                BarChartClienti(attivi = clientiStats.first, inattivi = clientiStats.second)
-            } else {
-                Text(
-                    text = "Nessun dato disponibile.",
-                    color = my_white,
-                    fontFamily = myFont
+        // Contenitore per centrare il grafico
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f), // Occupa lo spazio disponibile
+            contentAlignment = Alignment.Center // Centra solo il grafico nella parte rimanente
+        ) {
+            if (isLoadingClienti) {
+                CircularProgressIndicator(
+                    color = my_gold,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(100.dp)
                 )
+            } else {
+                if (clientiStats.first + clientiStats.second > 0) {
+                    GraficoTortaClienti(attivi = clientiStats.first, inattivi = clientiStats.second)
+                } else {
+                    Text(
+                        text = "Nessun dato disponibile.",
+                        color = my_white,
+                        fontFamily = myFont,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun BarChartClienti(attivi: Int, inattivi: Int) {
@@ -623,33 +612,242 @@ fun GraficoTortaClienti(attivi: Int, inattivi: Int) {
     val percentualeAttivi = if (totale > 0) attivi.toFloat() / totale else 0f
     val sweepAngleAttivi = percentualeAttivi * 360f
 
-    Canvas(
+    // Converti dp in pixel usando LocalDensity
+    val density = LocalDensity.current
+    val radius = with(density) { 155.dp.toPx() } // Raggio del cerchio per posizionare le etichette
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp)
+            .height(350.dp), // Altezza totale del contenitore
+        contentAlignment = Alignment.Center
     ) {
-        val size = minOf(size.width, size.height)
+        Canvas(
+            modifier = Modifier
+                .size(250.dp) // Dimensione del grafico
+        ) {
+            val circleSize = Size(size.minDimension, size.minDimension)
+            val center = Offset(size.width / 2, size.height / 2)
 
-        // Disegna la fetta per i clienti attivi
-        drawArc(
-            color = Color.Green,
-            startAngle = 0f,
-            sweepAngle = sweepAngleAttivi,
-            useCenter = true,
-            size = Size(size, size),
-            //topLeft = Offset((size.width - size) / 2f, (size.height - size) / 2f)
+            // Disegna la fetta per i clienti attivi
+            drawArc(
+                color = my_gold,
+                startAngle = 0f,
+                sweepAngle = sweepAngleAttivi,
+                useCenter = true,
+                size = circleSize,
+                topLeft = Offset(
+                    (size.width - circleSize.width) / 2f,
+                    (size.height - circleSize.height) / 2f
+                )
+            )
 
+            // Disegna la fetta per i clienti inattivi
+            drawArc(
+                color = my_bordeaux,
+                startAngle = sweepAngleAttivi,
+                sweepAngle = 360f - sweepAngleAttivi,
+                useCenter = true,
+                size = circleSize,
+                topLeft = Offset(
+                    (size.width - circleSize.width) / 2f,
+                    (size.height - circleSize.height) / 2f
+                )
+            )
+
+            // Posizionamento dinamico dell'etichetta per i clienti attivi
+            val angleAttivi = sweepAngleAttivi / 2 // Angolo medio della fetta
+            val attiviX =
+                center.x + radius * kotlin.math.cos(Math.toRadians(angleAttivi.toDouble()))
+                    .toFloat()
+            val attiviY =
+                center.y + radius * kotlin.math.sin(Math.toRadians(angleAttivi.toDouble()))
+                    .toFloat()
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    "Attivi",
+                    attiviX,
+                    attiviY - 20f, // Posizione sopra la percentuale
+                    android.graphics.Paint().apply {
+                        color = my_gold.toArgb()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        textSize = 20.dp.toPx()
+                    }
+                )
+                drawText(
+                    "${((percentualeAttivi) * 100).toInt()}%",
+                    attiviX,
+                    attiviY + 50f, // Posizione sotto "Attivi"
+                    android.graphics.Paint().apply {
+                        color = my_gold.toArgb()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        textSize = 20.dp.toPx()
+                    }
+                )
+            }
+
+            //Posizionamento dinamico dell'etichetta per i clienti inattivi
+            val angleInattivi =
+                sweepAngleAttivi + (360f - sweepAngleAttivi) / 2 //Angolo medio della fetta
+            /**
+            * una volta che sto a metà angolo della getta inattivi allora:
+             *
+             * cos: Calcola l'offset orizzontale (X) relativo all'angolo dato.
+             * sin: Calcola l'offset verticale (Y) relativo all'angolo dato.
+            * */
+
+
+            val inattiviX =
+                center.x + radius * kotlin.math.cos(Math.toRadians(angleInattivi.toDouble()))
+                    .toFloat()
+            val inattiviY =
+                center.y + radius * kotlin.math.sin(Math.toRadians(angleInattivi.toDouble()))
+                    .toFloat()
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    "Inattivi",
+                    inattiviX,
+                    inattiviY - 20f, // Posizione sopra la percentuale
+                    android.graphics.Paint().apply {
+                        color = my_bordeaux.toArgb()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        textSize = 20.dp.toPx()
+                    }
+                )
+                drawText(
+                    "${((1 - percentualeAttivi) * 100).toInt()}%",
+                    inattiviX,
+                    inattiviY + 50f, // Posizione sotto "Inattivi"
+                    android.graphics.Paint().apply {
+                        color = my_bordeaux.toArgb()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        textSize = 20.dp.toPx()
+                    }
+                )
+            }
+        }
+    }
+}
+//--------------------------------------------------------------------------------------------------
+
+
+
+
+//--------------------------------------------------------------------------------------------------
+//TERZA PAGINA: STATS SERVIZI
+//--------------------------------------------------------------------------------------------------
+@Composable
+fun VisualizzaServiziPiuRichiesti(
+    statsViewModel: StatsVM = viewModel()
+) {
+    val serviziStats = statsViewModel.serviziStats.collectAsState().value
+    val isLoadingServizi = statsViewModel.isLoadingServizi.collectAsState().value
+
+    // Effettua il calcolo quando la pagina viene caricata
+    LaunchedEffect(Unit) {
+        statsViewModel.calcolaServiziPiuRichiesti()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .padding(top = 100.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Servizi più richiesti",
+            fontFamily = myFont,
+            fontSize = 28.sp,
+            color = my_white,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Disegna la fetta per i clienti inattivi
-        drawArc(
-            color = Color.Red,
-            startAngle = sweepAngleAttivi,
-            sweepAngle = 360f - sweepAngleAttivi,
-            useCenter = true,
-            size = Size(size, size),
-            //topLeft = Offset((size.width - size) / 2f, (size.height - size) / 2f)
-        )
+        // Mostra il loader se i dati stanno caricando
+        if (isLoadingServizi) {
+            CircularProgressIndicator(
+                color = my_gold,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .size(50.dp)
+            )
+        } else {
+            if (serviziStats.isNotEmpty()) {
+                // Visualizza il grafico a barre
+                BarChartServizi(serviziStats)
+            } else {
+                Text(
+                    text = "Nessun dato disponibile.",
+                    color = my_white,
+                    fontFamily = myFont
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun BarChartServizi(serviziStats: Map<String, Int>) {
+    val maxValue = serviziStats.values.maxOrNull()?.toFloat() ?: 1f
+    val barWidth = 90.dp // Larghezza fissa delle barre
+    val labelTextStyle = androidx.compose.ui.text.TextStyle(
+        color = Color.White,
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center
+    )
+
+    // Contenitore principale con LazyRow per lo scroll orizzontale
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp) // Altezza totale del grafico
+            .background(Color.Transparent)
+    ) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp), // Altezza specifica per le barre
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp)
+        ) {
+            items(serviziStats.entries.toList()) { servizio ->
+                val barHeightFactor = 200.dp / maxValue // Scala altezza dinamicamente
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom, // Barre partono dal basso
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    // Valore numerico sopra la barra
+                    Text(
+                        text = servizio.value.toString(),
+                        style = labelTextStyle,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+
+                    // Barra verticale che cresce dal basso verso l'alto
+                    Box(
+                        modifier = Modifier
+                            .width(barWidth)
+                            .height((servizio.value * barHeightFactor.value).dp)
+                            .background(my_bordeaux, RoundedCornerShape(4.dp))
+                    )
+
+                    // Etichetta sotto la barra
+                    Text(
+                        text = servizio.key,
+                        style = labelTextStyle,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .width(barWidth),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = my_white
+                    )
+                }
+            }
+        }
     }
 }
 

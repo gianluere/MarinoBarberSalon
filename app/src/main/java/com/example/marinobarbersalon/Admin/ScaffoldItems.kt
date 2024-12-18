@@ -82,6 +82,7 @@ fun TopBarDrawer(showDrawer : Boolean, navController: NavController, onClickDraw
         Screen.StatsBase.route -> "STATISTICHE"
         Screen.VisualizzaStatisticheAppuntamenti.route -> "STATISTICHE"
         Screen.VisualizzaStatisticheClienti.route -> "STATISTICHE"
+        Screen.VisualizzaServiziPiuRichiesti.route -> "STATISTICHE"
         else -> "Default"
     }
 

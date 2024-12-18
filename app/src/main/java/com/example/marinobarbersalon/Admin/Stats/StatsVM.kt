@@ -241,7 +241,7 @@ class StatsVM : ViewModel() {
     //----------------------------------------------------------------------------------------------
 
     //----------------------------------------------------------------------------------------------
-    //SECONDA PAGINA
+    //SECONDA PAGINA: STATS CLIENTE
 
 
     private val _clientiStats = MutableStateFlow<Pair<Int, Int>>(0 to 0) //Attivi, Inattivi
@@ -357,6 +357,69 @@ class StatsVM : ViewModel() {
         Log.d("StatsVM", "Appuntamenti recuperati: $appuntamenti")
         return appuntamenti
     }
+
+    //----------------------------------------------------------------------------------------------
+
+
+    //----------------------------------------------------------------------------------------------
+    //TERZA PAGINA PAGINA: STATS SERVIZI
+
+    // Stato per i servizi più richiesti
+    private val _serviziStats = MutableStateFlow<Map<String, Int>>(emptyMap()) // Mappa Servizio -> Occorrenze
+    val serviziStats: StateFlow<Map<String, Int>> = _serviziStats
+
+    // Stato di caricamento per i servizi
+    private val _isLoadingServizi = MutableStateFlow(false)
+    val isLoadingServizi: StateFlow<Boolean> = _isLoadingServizi
+
+    /**
+     * Funzione per calcolare i servizi più richiesti
+     */
+    fun calcolaServiziPiuRichiesti() {
+        viewModelScope.launch {
+            try {
+                _isLoadingServizi.value = true // Inizio caricamento
+                val appuntamenti = fetchAllAppuntamenti() // Recupera tutti gli appuntamenti
+                val serviziCount = contaServizi(appuntamenti)
+                _serviziStats.value = serviziCount
+            } catch (e: Exception) {
+                Log.e("StatsVM", "Errore durante il calcolo dei servizi più richiesti", e)
+                _serviziStats.value = emptyMap()
+            } finally {
+                _isLoadingServizi.value = false // Fine caricamento
+            }
+        }
+    }
+
+    /**
+     * Recupera tutti gli appuntamenti dalla collezione principale
+     */
+    private suspend fun fetchAllAppuntamenti(): List<Appuntamento> {
+        val appuntamentiCollection = firestore.collection("appuntamenti")
+        val appuntamentiSnapshot = appuntamentiCollection.get().await()
+        val allAppuntamenti = mutableListOf<Appuntamento>()
+
+        for (document in appuntamentiSnapshot.documents) {
+            val subCollection = document.reference.collection("app").get().await()
+            for (subDocument in subCollection.documents) {
+                subDocument.toObject(Appuntamento::class.java)?.let { allAppuntamenti.add(it) }
+            }
+        }
+
+        Log.d("StatsVM", "Totale appuntamenti trovati: ${allAppuntamenti.size}")
+        return allAppuntamenti
+    }
+
+    /**
+     * Conta le occorrenze di ogni servizio
+     */
+    private fun contaServizi(appuntamenti: List<Appuntamento>): Map<String, Int> {
+        return appuntamenti.groupingBy { it.servizio }.eachCount().toSortedMap()
+    }
+
+    //----------------------------------------------------------------------------------------------
+
+
 
 
 
