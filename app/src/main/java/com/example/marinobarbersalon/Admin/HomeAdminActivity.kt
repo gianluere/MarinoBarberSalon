@@ -4,13 +4,20 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Home
@@ -45,14 +52,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.marinobarbersalon.MainActivity
 import com.example.marinobarbersalon.ui.theme.MarinoBarberSalonTheme
 import com.example.marinobarbersalon.Cliente.Screen
+import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_drawer
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
@@ -78,18 +89,18 @@ class HomeAdminActivity: ComponentActivity() {
 
 
                     val items = listOf(
-                        NavDrawerItem(
-                            title = "Visualizza appuntamenti",
-                            route = Screen.HomeAdmin.route,
-                            selectedIcon = Icons.Filled.Home,
-                            unselectedIcon = Icons.Outlined.Home,
-                        ),
-                        NavDrawerItem(
-                            title = "Prova",
-                            route = Screen.Prova.route,
-                            selectedIcon = Icons.Filled.Person,
-                            unselectedIcon = Icons.Outlined.Person,
-                        ),
+//                        NavDrawerItem(
+//                            title = "Visualizza appuntamenti",
+//                            route = Screen.HomeAdmin.route,
+//                            selectedIcon = Icons.Filled.Home,
+//                            unselectedIcon = Icons.Outlined.Home,
+//                        ),
+//                        NavDrawerItem(
+//                            title = "Prova",
+//                            route = Screen.Prova.route,
+//                            selectedIcon = Icons.Filled.Person,
+//                            unselectedIcon = Icons.Outlined.Person,
+//                        ),
                         NavDrawerItem(
                             title = "Visualizza Appuntamenti",
                             route = Screen.VisualizzaAppuntamenti.route,
@@ -125,7 +136,8 @@ class HomeAdminActivity: ComponentActivity() {
                             route = Screen.StatsBase.route,
                             selectedIcon = Icons.Filled.Grade,
                             unselectedIcon = Icons.Outlined.Grade
-                        )
+                        ),
+
 
                     )
 
@@ -188,6 +200,36 @@ class HomeAdminActivity: ComponentActivity() {
                                     scope.launch {
                                         drawerState.close()
                                     }
+                                }
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                // Aggiungi l'elemento Logout centrato
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp)
+                                        .clickable {
+                                            adminViewModel.logout()
+                                            Intent(context, MainActivity::class.java).also {
+                                                context.startActivity(it)
+                                                (context as? ComponentActivity)?.finish()
+                                            }
+                                        },
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ExitToApp, // Cambia l'icona se necessario
+                                        contentDescription = "Logout",
+                                        tint = my_white
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Logout",
+                                        fontSize = 25.sp,
+                                        color = my_white,
+                                        fontFamily = myFont,
+                                    )
                                 }
                             }
                         },

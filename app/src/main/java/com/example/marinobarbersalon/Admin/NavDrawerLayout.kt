@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.R
+import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_drawer
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
@@ -62,7 +64,10 @@ fun NavDrawerBody(
             label = {
                 Text(
                     text = navDrawerItem.title,
-                    color =  my_white
+                    color =  my_white,
+                    fontFamily = myFont,
+                    fontSize = 20.sp
+
                 )
             }, selected = currentRoute == navDrawerItem.route, onClick = {
                 onClick(navDrawerItem)
