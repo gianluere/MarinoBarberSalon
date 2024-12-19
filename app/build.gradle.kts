@@ -76,6 +76,12 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation("co.yml:ycharts:2.1.0")
     implementation(libs.core)
+    //PER IMG CARICAMENTO APP
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    //PER BARRA NAV E DI STATO
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
+
+
 
 
     testImplementation(libs.junit)
