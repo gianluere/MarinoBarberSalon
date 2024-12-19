@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentCut
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.outlined.List
 
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerValue
@@ -134,8 +136,8 @@ class HomeAdminActivity: ComponentActivity() {
                         NavDrawerItem(
                             title = "Visualizza Statistiche",
                             route = Screen.StatsBase.route,
-                            selectedIcon = Icons.Filled.Grade,
-                            unselectedIcon = Icons.Outlined.Grade
+                            selectedIcon = Icons.Filled.QueryStats,
+                            unselectedIcon = Icons.Outlined.QueryStats
                         ),
 
 
