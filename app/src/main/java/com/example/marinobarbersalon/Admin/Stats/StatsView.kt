@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
+import com.example.marinobarbersalon.ui.theme.my_icon
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
@@ -117,7 +118,8 @@ fun VisualizzaStatistiche(
                                 contentDescription = "Icona Appuntamenti",
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(10.dp)
+                                    .padding(10.dp),
+                                tint = my_icon
                             )
                         }
 
@@ -150,7 +152,8 @@ fun VisualizzaStatistiche(
                                 contentDescription = "Icona Entrare",
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(10.dp)
+                                    .padding(10.dp),
+                                tint = my_icon
                             )
                         }
 
@@ -165,14 +168,14 @@ fun VisualizzaStatistiche(
             }
 
             item {
-                //Riga per le statistiche restanti
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    //Statistica 4: Clienti attivi/inattivi
+                    //Statistica 3: Clienti attivi/inattivi
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -192,7 +195,8 @@ fun VisualizzaStatistiche(
                                 contentDescription = "Icona clienti",
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(10.dp)
+                                    .padding(10.dp),
+                                tint = my_icon
                             )
                         }
 
@@ -204,7 +208,7 @@ fun VisualizzaStatistiche(
                         )
                     }
 
-                    //Statistica 5: Servizi
+                    //Statistica 4: Servizi
                     Column(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -224,7 +228,9 @@ fun VisualizzaStatistiche(
                                 contentDescription = "Icona servizi",
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(20.dp)
+                                    .padding(20.dp),
+                                tint = my_icon
+
                             )
                         }
 
