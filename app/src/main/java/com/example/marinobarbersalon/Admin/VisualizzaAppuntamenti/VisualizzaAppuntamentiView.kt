@@ -29,14 +29,26 @@ import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import com.example.marinobarbersalon.Admin.AdminViewModel
+import com.example.marinobarbersalon.Cliente.Home.AuthState
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
 fun VisualizzaAppuntamenti(
     calendarViewModel: VisualizzaAppuntamentiVM = viewModel(),
-    onNavigateToNextPage: (String) -> Unit
+    onNavigateToNextPage: (String) -> Unit,
+    onNavigateToLogin : () -> Unit,
+    adminViewModel: AdminViewModel = viewModel()
 ) {
     val calendarState by calendarViewModel.calendarState.collectAsState()
+    val adminState by adminViewModel.adminState.collectAsState()
+
+    LaunchedEffect(adminState.state){
+        when(adminState.state){
+            is AuthState.Unauthenticated -> onNavigateToLogin()
+            else -> Unit
+        }
+    }
 
     Column(
         modifier = Modifier

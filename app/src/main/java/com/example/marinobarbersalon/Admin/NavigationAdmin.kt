@@ -31,14 +31,30 @@ import com.example.marinobarbersalon.Cliente.Account.ListaRecensioniViewModel
 import com.example.marinobarbersalon.Cliente.Account.Recensioni
 import com.example.marinobarbersalon.Cliente.Screen
 
+
+
+
+/** I caratteri "\\ fungono da escape character
+       La Regexp va a sostituire nella stringa di partenza
+       l'argomento passato togliendo le graffe
+       (Prima barra (\): serve da escape per la seconda barra nella stringa
+        dato che (\) è anche esso un carattere speciale nelle stringhe di Kotlin.
+    */
+
+fun String.withArg(arg: String): String {
+    return this.replace("\\{.*?\\}".toRegex(), arg)
+}
+
 fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: AdminViewModel) {
     navigation(
         route = "adminGraph",
-        startDestination = Screen.HomeAdmin.route
+        startDestination = Screen.VisualizzaAppuntamenti.route
     ) {
-        composable(Screen.HomeAdmin.route){
-            HomeAdmin(
-                adminViewModel = adminViewModel,
+        composable(Screen.VisualizzaAppuntamenti.route) {
+            VisualizzaAppuntamenti(
+                onNavigateToNextPage = { date ->
+                    navController.navigate(Screen.VisualizzaAppuntamenti1.route.withArg(date))
+                },
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo("adminGraph") { inclusive = true }
@@ -47,8 +63,20 @@ fun NavGraphBuilder.adminNavGraph(navController: NavController, adminViewModel: 
                 }
             )
         }
+//        composable(Screen.HomeAdmin.route){
+//            HomeAdmin(
+//                adminViewModel = adminViewModel,
+//                onNavigateToLogin = {
+//                    navController.navigate(Screen.Login.route) {
+//                        popUpTo("adminGraph") { inclusive = true }
+//                        popUpTo("clientGraph") { inclusive = true }
+//                    }
+//                }
+//            )
+//        }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,19 +84,7 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
 
     val listaRecensioniViewModel : ListaRecensioniViewModel = viewModel()
 
-    /* I caratteri "\\ fungono da escape character
-       La Regexp va a sostituire nella stringa di partenza
-       l'argomento passato togliendo le graffe
-       (Prima barra (\): serve da escape per la seconda barra nella stringa
-        dato che (\) è anche esso un carattere speciale nelle stringhe di Kotlin.
-    */
-
-    fun String.withArg(arg: String): String {
-        return this.replace("\\{.*?\\}".toRegex(), arg)
-    }
-
-
-    NavHost(navController, startDestination = "homeAdmin"){
+    NavHost(navController, startDestination = "visualizzaAppuntamenti"){
 
         composable(Screen.HomeAdmin.route) {
             HomeAdmin(
@@ -97,6 +113,9 @@ fun NavigationAdmin(modifier: Modifier, navController : NavHostController, admin
             VisualizzaAppuntamenti(
                 onNavigateToNextPage = { date ->
                     navController.navigate(Screen.VisualizzaAppuntamenti1.route.withArg(date))
+                },
+                onNavigateToLogin = {
+                    logout()
                 }
             )
         }
