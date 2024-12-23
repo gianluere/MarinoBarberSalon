@@ -436,6 +436,7 @@ class UserViewModel : ViewModel() {
         // Recupera i prodotti prenotati
         db.collection("prodottiPrenotati")
             .whereEqualTo("utente", userReference)
+            .whereEqualTo("stato", "attesa")
             .get()
             .addOnSuccessListener { result ->
                 val taskList = mutableListOf<Task<DocumentSnapshot>>()
