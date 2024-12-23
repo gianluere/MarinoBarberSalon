@@ -31,6 +31,7 @@ import com.example.marinobarbersalon.Cliente.Account.InserisciRecensione
 import com.example.marinobarbersalon.Cliente.Account.ListaRecensioniViewModel
 import com.example.marinobarbersalon.Cliente.Account.NotificheClienteViewModel
 import com.example.marinobarbersalon.Cliente.Account.Prenotazioni
+import com.example.marinobarbersalon.Cliente.Account.ProdottiPrenotati
 import com.example.marinobarbersalon.Cliente.Account.Recensioni
 import com.example.marinobarbersalon.Cliente.Home.HomeScreen
 import com.example.marinobarbersalon.Cliente.Home.ListaServiziViewModel
@@ -67,7 +68,9 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             if (userState.nome.isNullOrEmpty() ) {
                 // Mostra una schermata di caricamento o uno stato intermedio
                 Box(
-                    modifier = modifier.fillMaxSize().background(my_grey),
+                    modifier = modifier
+                        .fillMaxSize()
+                        .background(my_grey),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = my_gold) // Indicatore di caricamento
@@ -277,6 +280,9 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     onNavigaPrenotazioni = {
                         navController.navigate(Screen.Prenotazioni.route)
                     },
+                    onNavigaProdottiPrenotati = {
+                        navController.navigate(Screen.ProdottiPrenotati.route)
+                    },
                     onNavigaRecensioni = {
                         navController.navigate(Screen.Recensioni.route)
                     }
@@ -473,6 +479,24 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
             }
         }
 
+        composable(Screen.ProdottiPrenotati.route){
+            Scaffold(
+                modifier = modifier,
+                containerColor = my_grey,
+                topBar = {
+                    TopBarMia(
+                        titolo = "PRODOTTI PRENOTATI",
+                        showIcon = true,
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            ) { paddingValues ->
+                ProdottiPrenotati(modifier = Modifier.padding(paddingValues), userViewModel = userViewModel)
+            }
+        }
+
 
     }
 
@@ -494,6 +518,7 @@ sealed class Screen(val route:String ){
     object SelezionaShop : Screen("selezionaShop")
     object Shop : Screen("shop")
     object ProdottoShop : Screen("prodottoShop")
+    object ProdottiPrenotati : Screen("prodottiPrenotati")
     object Impostazioni : Screen("impostazioni")
 
     ///////////////////////////////////////////////////////

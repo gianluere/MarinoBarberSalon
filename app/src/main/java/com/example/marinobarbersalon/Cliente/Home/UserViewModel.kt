@@ -4,12 +4,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
+import com.example.marinobarbersalon.Cliente.Shopping.Prodotto
+import com.example.marinobarbersalon.Cliente.Shopping.ProdottoPrenotato
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +35,9 @@ class UserViewModel : ViewModel() {
 
     private val _listaAppuntamenti = MutableStateFlow(listOf<Appuntamento>())
     val listaAppuntamenti : StateFlow<List<Appuntamento>> = _listaAppuntamenti.asStateFlow()
+
+    private val _listaProdottiPrenotati = MutableStateFlow<List<Pair<ProdottoPrenotato, Prodotto>>>(emptyList())
+    val listaProdottiPrenotati : StateFlow<List<Pair<ProdottoPrenotato, Prodotto>>> = _listaProdottiPrenotati.asStateFlow()
 
     init {
         checkAuthState()
@@ -416,6 +425,100 @@ class UserViewModel : ViewModel() {
 
     }
 
+
+    fun caricaProdottiPrenotati(){
+
+        val listaProdPren = mutableListOf<ProdottoPrenotato>()
+        val listaProdottiAssociati = mutableListOf<Pair<ProdottoPrenotato, Prodotto>>()
+
+        val userReference = auth.currentUser?.email?.let { db.collection("utenti").document(it) }
+
+        // Recupera i prodotti prenotati
+        db.collection("prodottiPrenotati")
+            .whereEqualTo("utente", userReference)
+            .get()
+            .addOnSuccessListener { result ->
+                val taskList = mutableListOf<Task<DocumentSnapshot>>()
+
+                // Aggiungi i prodotti prenotati alla lista
+                for (document in result) {
+                    val prodottoPrenotato = document.toObject<ProdottoPrenotato>()
+                    Log.d("Prenotato", prodottoPrenotato.quantita.toString())
+                    listaProdPren.add(prodottoPrenotato)
+
+                    // Recupera il prodotto associato
+                    val prodottoTask = prodottoPrenotato.prodotto?.get()
+                    if (prodottoTask != null) {
+                        taskList.add(prodottoTask)
+                    }
+
+                    prodottoTask?.addOnSuccessListener { prodottoDoc ->
+                        val prodotto = prodottoDoc.toObject<Prodotto>()
+                        if (prodotto != null) {
+                            Log.d("Prenotato", prodotto.nome)
+                            listaProdottiAssociati.add(Pair(prodottoPrenotato, prodotto))
+                        }
+                    }
+                }
+
+                // Attendi il completamento di tutti i task
+                Tasks.whenAllComplete(taskList).addOnCompleteListener {
+                    _listaProdottiPrenotati.value = listaProdottiAssociati
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore", "Errore nel caricamento dei prodotti prenotati", exception)
+            }
+
+
+
+    }
+
+    fun annullaPrenotazioneProdotto(prodotto : ProdottoPrenotato){
+
+        db.collection("prodottiPrenotati")
+            .whereEqualTo("prodotto", prodotto.prodotto)
+            .whereEqualTo("quantita", prodotto.quantita)
+            .whereEqualTo("utente", prodotto.utente)
+            .whereEqualTo("data", prodotto.data)
+            .whereEqualTo("stato", prodotto.stato).get()
+            .addOnSuccessListener { result ->
+                if (!result.isEmpty) {
+                    for (document in result) {
+                        document.reference.delete()
+                            .addOnSuccessListener {
+                            }
+                            .addOnFailureListener { e ->
+                                println("Errore durante la cancellazione: ${e.message}")
+                            }
+                    }
+                }
+
+                prodotto.prodotto?.let { prodottoReference ->
+                    db.runTransaction { transaction ->
+                        val snapshot = transaction.get(prodottoReference)
+
+                        if (snapshot.exists()) {
+                            val quantitaAttuale = snapshot.getLong("quantita") ?: 0L
+                            val nuovaQuantita = quantitaAttuale + prodotto.quantita
+
+
+                            transaction.update(prodottoReference, "quantita", nuovaQuantita)
+                        }
+                    }.addOnSuccessListener {
+                        caricaProdottiPrenotati()
+                        println("Transazione completata con successo.")
+                    }.addOnFailureListener { e ->
+                        println("Errore durante la transazione: ${e.message}")
+                    }
+                } ?: run {
+                    println("Riferimento al prodotto nullo.")
+                }
+            }
+            .addOnFailureListener { e ->
+                println("Errore durante il recupero dei documenti: ${e.message}")
+            }
+    }
 
 
 }
