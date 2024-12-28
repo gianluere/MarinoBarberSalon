@@ -42,6 +42,7 @@ fun Account(
     notificheClienteViewModel : NotificheClienteViewModel,
     onNavigaDatiPersonali : () -> Unit,
     onNavigaPrenotazioni : () -> Unit,
+    onNavigaProdottiPrenotati : () -> Unit,
     onNavigaRecensioni : () -> Unit
 ) {
 
@@ -97,7 +98,7 @@ fun Account(
                 color = my_gold
             )
 
-            Riga(testo = "Acquisti in app",modifier = Modifier)
+            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() })
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),

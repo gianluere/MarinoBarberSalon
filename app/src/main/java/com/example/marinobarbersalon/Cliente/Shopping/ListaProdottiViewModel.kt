@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class ListaProdottiViewModel : ViewModel() {
@@ -78,11 +80,14 @@ class ListaProdottiViewModel : ViewModel() {
         val prod_ref = db.collection("prodotti").document(prod.documents[0].id)
         val user_ref = db.collection("utenti").document(auth.currentUser?.email.toString())
 
+        val data = SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN).format(Date())
+
         val prenotazioneProd = hashMapOf(
             "prodotto" to prod_ref,
             "utente" to user_ref,
             "quantita" to quantita,
-            "stato" to "attesa"
+            "stato" to "attesa",
+             "data" to data
         )
 
         try{
