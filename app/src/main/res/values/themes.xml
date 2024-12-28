@@ -22,7 +22,7 @@
         <!-- Colore di sfondo dello Splash Screen -->
         <item name="windowSplashScreenBackground">@color/splash_background</item>
         <!-- Icona animata (il logo) -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/logo3</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
         <!-- Tema che sarà applicato dopo lo Splash Screen -->
         <item name="postSplashScreenTheme">@style/Theme.MarinoBarberSalon</item>
     </style>
