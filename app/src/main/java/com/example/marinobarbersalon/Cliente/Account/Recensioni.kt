@@ -52,7 +52,8 @@ import com.example.marinobarbersalon.ui.theme.my_yellow
 fun Recensioni(
     modifier: Modifier,
     listaRecensioniViewModel : ListaRecensioniViewModel,
-    onNavigateToInserisciRecensione : () -> Unit
+    onNavigateToInserisciRecensione : () -> Unit,
+    isAdmin : Boolean
 ) {
 
     listaRecensioniViewModel.caricaListaRecensioni()
@@ -65,28 +66,35 @@ fun Recensioni(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.Top
     ) {
-        Box(
-            modifier = Modifier.padding(top = 20.dp, end = 15.dp)
-        ){
-            Row(
-                modifier = Modifier
-                    .background(color = my_yellow, shape = RoundedCornerShape(10.dp))
-                    .height(45.dp)
-                    .padding(horizontal = 5.dp)
-                    .clickable {
-                        onNavigateToInserisciRecensione()
-                    },
-                //horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        if(!isAdmin) {
+            Box(
+                modifier = Modifier.padding(top = 20.dp, end = 15.dp)
             ) {
-                Icon(Icons.Outlined.Add, contentDescription = null, tint = my_grey, modifier = Modifier.size(20.dp))
+                Row(
+                    modifier = Modifier
+                        .background(color = my_yellow, shape = RoundedCornerShape(10.dp))
+                        .height(45.dp)
+                        .padding(horizontal = 5.dp)
+                        .clickable {
+                            onNavigateToInserisciRecensione()
+                        },
+                    //horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Outlined.Add,
+                        contentDescription = null,
+                        tint = my_grey,
+                        modifier = Modifier.size(20.dp)
+                    )
 
-                Text(
-                    text = "Inserisci recensione",
-                    fontFamily = myFont,
-                    color = my_grey,
-                    fontSize = 20.sp
-                )
+                    Text(
+                        text = "Inserisci recensione",
+                        fontFamily = myFont,
+                        color = my_grey,
+                        fontSize = 20.sp
+                    )
+                }
             }
         }
 

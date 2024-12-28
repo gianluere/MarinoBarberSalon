@@ -351,6 +351,7 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                 Recensioni(
                     modifier = Modifier.padding(paddingValues),
                     listaRecensioniViewModel = listaRecensioniViewModel,
+                    isAdmin = false,
                     onNavigateToInserisciRecensione = {
                         navController.navigate(Screen.InserisciRecensione.route)
                     }
@@ -534,6 +535,11 @@ sealed class Screen(val route:String ){
     object VisualizzaProdotti : Screen("visualizzaProdotti")
     object VisualizzaProdottiDettaglio: Screen("visualizzaProdottiDettaglio/{categoria}")
     object AggiungiProdotto : Screen("aggiungiProdotto/{categoria}")
+    object StatsBase : Screen("statsBase")
+    object VisualizzaStatisticheAppuntamenti : Screen("visualizzaStatisticheAppuntamenti")
+    object VisualizzaStatisticheClienti : Screen("visualizzaStatisticheClienti")
+    object VisualizzaServiziPiuRichiesti : Screen("visualizzaServiziPiuRichiesti")
+    object VisualizzaEntrateMensili : Screen("visualizzaEntrateMensili")
 
 
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,15 +18,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.marinobarbersalon.Cliente.Home.Servizio
+import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
@@ -45,19 +54,18 @@ POSSIBILE BUG:
 
 //--------------------------------------------------------------------------------------------------
 //PRIMA PAGINA
+//--------------------------------------------------------------------------------------------------
 @Composable
 fun VisualizzaServizi(
     serviziViewModel: VisualizzaServiziVM = viewModel(),
     onNavigateToAddServizio: () -> Unit
 ) {
     val serviziState = serviziViewModel.serviziState.collectAsState().value
+    val isLoading = serviziViewModel.isLoadingServizi.collectAsState().value // Stato di caricamento
     val (servizioDaEliminare, setServizioDaEliminare) = remember { mutableStateOf<Servizio?>(null) }
 
     LaunchedEffect(Unit) {
         serviziViewModel.fetchServizi()
-//        if (serviziState.isEmpty()) {
-//            serviziViewModel.fetchServizi()
-//        }
     }
 
     Column(
@@ -69,7 +77,7 @@ fun VisualizzaServizi(
         verticalArrangement = Arrangement.Center
     ) {
 
-        if(serviziState.isNotEmpty()) {
+        if (serviziState.isNotEmpty()) {
             Text(
                 text = "Servizi disponibili",
                 fontSize = 24.sp,
@@ -81,62 +89,70 @@ fun VisualizzaServizi(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            if (serviziState.isEmpty()) {
-                Text(
-                    text = "Nessun servizio disponibile.",
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    color = my_white
-                )
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(serviziState) { servizio ->
-                        ServizioCard(
-                            servizio = servizio,
-                            onEliminaClick = { setServizioDaEliminare(servizio) }
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        color = my_gold,
+                        modifier = Modifier.align(Alignment.Center).size(100.dp)
+                    )
+                }
+
+                serviziState.isEmpty() -> {
+                    Text(
+                        text = "Nessun servizio disponibile.",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        color = my_white
+                    )
+                }
+
+                else -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(serviziState) { servizio ->
+                            ServizioCard(
+                                servizio = servizio,
+                                onEliminaClick = { setServizioDaEliminare(servizio) }
+                            )
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(100.dp)) // da chiedere se va bene o se diminuire
+                        }
+                    }
+
+                    FloatingActionButton(
+                        onClick = onNavigateToAddServizio,
+                        containerColor = my_bordeaux,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            "+",
+                            color = my_gold,
+                            fontSize = 30.sp,
                         )
                     }
-
-                    item {
-                        Spacer(modifier = Modifier.height(100.dp)) //da chiedere se va bene o se diminuire
-                    }
                 }
             }
 
-
-
-            FloatingActionButton(
-                onClick = onNavigateToAddServizio,
-                containerColor = my_bordeaux,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            ) {
-                Text(
-                    "+",
-                    color = my_gold,
-                    fontSize = 30.sp,
-                    //fontFamily = myFont
+            // Dialog eliminazione servizio
+            servizioDaEliminare?.let { servizio ->
+                ConfermaEliminazioneDialog(
+                    servizio = servizio,
+                    onConferma = {
+                        serviziViewModel.deleteServizio(servizio)
+                        setServizioDaEliminare(null)
+                    },
+                    onAnnulla = {
+                        setServizioDaEliminare(null)
+                    }
                 )
             }
         }
-
-        //Dialog eliminaz servizio
-        servizioDaEliminare?.let { servizio ->
-            ConfermaEliminazioneDialog(
-                servizio = servizio,
-                onConferma = {
-                    serviziViewModel.deleteServizio(servizio)
-                    setServizioDaEliminare(null)
-                },
-                onAnnulla = {
-                    setServizioDaEliminare(null)
-                }
-            )
-        }
     }
-
 }
+
 
 @Composable
 fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
@@ -158,8 +174,8 @@ fun ServizioCard(servizio: Servizio, onEliminaClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Nome: ${servizio.nome ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp) , color = Color.Black)
-                Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
+                Text(text = "Nome: ${servizio.nome ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp) , color = Color.Black, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                Text(text = "Descrizione: ${servizio.descrizione ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black, maxLines = 3, overflow = TextOverflow.Ellipsis )
                 Text(text = "Tipo: ${servizio.tipo ?: "N/A"}", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
                 Text(text = "Durata: ${servizio.durata ?: 0} min", fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
                 Text(text = "Prezzo: €${servizio.prezzo}", style = MaterialTheme.typography.bodyMedium, fontFamily = myFont, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp), color = Color.Black)
@@ -250,6 +266,7 @@ fun ConfermaEliminazioneDialog(
 
 //--------------------------------------------------------------------------------------------------
 //SECONDA PAGINA
+//--------------------------------------------------------------------------------------------------
 @Composable
 fun AggiungiServizio(
     aggiungiServizioViewModel: VisualizzaServiziVM = viewModel(),
@@ -267,11 +284,38 @@ fun AggiungiServizio(
     val showErrorDialog = remember { mutableStateOf(false) }
     val isFormSubmitted = remember { mutableStateOf(false) }
 
+    //PER DIALOG SUCCESSO O FALLIMENTO INSERIMENTO
+    val showDialogSuccess = remember { mutableStateOf(false) }
+    val showDialogError = remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         aggiungiServizioViewModel.validateForm()
         if (formErrors.isNotEmpty()) {
             showErrorDialog.value = true
         }
+    }
+
+    // Visualizza il DialogGenerico per il successo
+    if (showDialogSuccess.value) {
+        DialogGenerico(
+            titolo = "Successo",
+            messaggio = "Servizio aggiunto con successo!",
+            icona = painterResource(id = R.drawable.select_check_box_24dp_faf9f6_fill0_wght100_grad0_opsz24),
+            onDismiss = {
+                showDialogSuccess.value = false
+                onAggiungiSuccess() // Naviga o esegui azione al completamento
+            }
+        )
+    }
+
+    // Visualizza il DialogGenerico per l'errore
+    if (showDialogError.value) {
+        DialogGenerico(
+            titolo = "Errore",
+            messaggio = "Errore durante l'aggiunta del servizio.",
+            icona = rememberVectorPainter(Icons.Filled.Error), // Sostituisci con l'icona appropriata
+            onDismiss = { showDialogError.value = false }
+        )
     }
 
 
@@ -323,7 +367,9 @@ fun AggiungiServizio(
         Text(
             text = "Aggiungi Servizio",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp).padding(top = 25.dp ),
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .padding(top = 25.dp),
             color = my_white,
             fontFamily = myFont
         )
@@ -352,7 +398,8 @@ fun AggiungiServizio(
                         cursorColor = my_bordeaux,            // Colore del cursore
                         unfocusedBorderColor = Color.Black,     // Colore del bordo non selezionato
                         unfocusedLabelColor = Color.Black         // Colore della label non selezionata
-                    )
+                    ),
+                    maxLines = 2
 
                 )
 
@@ -371,7 +418,8 @@ fun AggiungiServizio(
                         cursorColor = my_bordeaux,
                         unfocusedBorderColor = Color.Black,
                         unfocusedLabelColor = Color.Black
-                    )
+                    ),
+                    maxLines = 3
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -491,8 +539,8 @@ fun AggiungiServizio(
                     aggiungiServizioViewModel.validateForm()
                     if (formErrors.isEmpty()) {
                         aggiungiServizioViewModel.aggiungiServizio(
-                            onSuccess = onAggiungiSuccess,
-                            onError = { /* Mostra errore */ }
+                            onSuccess = { showDialogSuccess.value = true },
+                            onError = { showDialogError.value = true }
                         )
                     } else {
                         showErrorDialog.value = true
@@ -528,6 +576,54 @@ fun AggiungiServizio(
         }
     }
 }
+
+
+/**
+ * IMPORTANTE FUNZIONE PER I DIALOG DI SUCCESSO O ERRORE
+ * (la metto qui perché qui l'ho creato e non sapevo dove metterlo
+ *  ma serve anche in altri punti)
+ * */
+@Composable
+fun DialogGenerico(
+    titolo: String,
+    messaggio: String,
+    icona: Painter,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .size(width = 300.dp, height = 230.dp)
+                .background(color = Color.White, RoundedCornerShape(15.dp))
+                .border(3.dp, my_bordeaux, RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(15.dp)),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                painter = icona,
+                contentDescription = titolo,
+                modifier = Modifier.size(80.dp),
+                tint = Color.Black
+            )
+
+            Text(
+                text = messaggio,
+                fontFamily = myFont,
+                fontSize = 20.sp,
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
 //--------------------------------------------------------------------------------------------------
 
 

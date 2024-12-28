@@ -1,9 +1,11 @@
 package com.example.marinobarbersalon.Admin.VisualizzaProdotti
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +26,8 @@ class VisualizzaProdottiVM : ViewModel(){
     // PER LA SECONDA PAGINA
     private val _prodottiState = MutableStateFlow<List<Prodotto>>(emptyList())
     val prodottiState: StateFlow<List<Prodotto>> = _prodottiState.asStateFlow()
+    //per l'img
+    private val storageReference = FirebaseStorage.getInstance().reference
     //----------------------------------------------------------------------------------------------
 
 
@@ -116,6 +120,18 @@ class VisualizzaProdottiVM : ViewModel(){
                 Log.e("VisualizzaProdottiVM", "Errore nell'aggiornamento stock: ${e.message}")
             }
         }
+    }
+
+    fun saveImageUrl(context: Context, imageUrl: String) {
+        val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("image_url", imageUrl)
+        editor.apply() // Salva l'URL
+    }
+
+    fun getImageUrl(context: Context): String? {
+        val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("image_url", null) // Recupera l'URL salvato
     }
     //----------------------------------------------------------------------------------------------
 

@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MarinoBarberSalon" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Tema principale dell'app -->
+    <style name="Theme.MarinoBarberSalon" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Colore di sfondo predefinito all'avvio -->
+        <item name="android:windowBackground">@color/splash_background</item>
+        <!-- Imposta il colore della barra di navigazione -->
+        <item name="android:navigationBarColor">@color/splash_background</item>
+        <!-- Imposta il colore della barra di stato -->
+        <item name="android:statusBarColor">@color/splash_background</item>
+        <!-- Contenuto dietro le barre di sistema (facoltativo) -->
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowTranslucentStatus">false</item>
+    </style>
+
+
+
+
+    <!-- Tema dello Splash Screen -->
+    <style name="Theme.MarinoBarberSalon.Splash" parent="Theme.SplashScreen">
+        <!-- Colore di sfondo dello Splash Screen -->
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <!-- Icona animata (il logo) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo3</item>
+        <!-- Tema che sarà applicato dopo lo Splash Screen -->
+        <item name="postSplashScreenTheme">@style/Theme.MarinoBarberSalon</item>
+    </style>
+
 </resources>

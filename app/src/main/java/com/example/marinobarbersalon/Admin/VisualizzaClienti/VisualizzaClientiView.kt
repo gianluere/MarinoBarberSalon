@@ -26,6 +26,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
@@ -34,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
+import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
@@ -47,6 +49,8 @@ fun VisualizzaClienti(
     //per la ricera
     val searchText = clientiViewModel.searchText.collectAsState().value
     //val isSearching = clientiViewModel.isSearching.collectAsState().value
+
+    val isLoading = clientiViewModel.isLoading.collectAsState().value
 
     LaunchedEffect(Unit) {
         if (utentiState.isEmpty()) {
@@ -94,7 +98,18 @@ fun VisualizzaClienti(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (utentiState.isEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = my_gold,
+                    modifier = Modifier.align(Alignment.Center).size(100.dp)
+                )
+
+            }
+        } else if (utentiState.isEmpty()) {
             Text(
                 text = "Nessun cliente disponibile.",
                 style = MaterialTheme.typography.bodyLarge,
@@ -112,7 +127,10 @@ fun VisualizzaClienti(
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
                                 .padding(top = 8.dp),
-                            textAlign = TextAlign.Start
+                            textAlign = TextAlign.Start,
+                            color = my_white,
+                            fontFamily = myFont,
+                            fontSize = 25.sp
                         )
                     }
 
@@ -149,13 +167,19 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
             text = cliente.nome,
             modifier = Modifier.weight(1f),
             //style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Start
+            textAlign = TextAlign.Start,
+            fontFamily = myFont,
+            fontSize = 20.sp,
+            color = my_white
         )
         Text(
             text = cliente.cognome,
             modifier = Modifier.weight(1f),
             //style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Start
+            textAlign = TextAlign.Start,
+            fontFamily = myFont,
+            fontSize = 20.sp,
+            color = my_white
         )
     }
 }
@@ -166,6 +190,7 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
 fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM = viewModel()) {
     val cliente = clientiViewModel.selectedClienteState.collectAsState().value
     val context = LocalContext.current
+    val isLoadingCliente = clientiViewModel.isLoadingCliente.collectAsState().value
 
     Log.d("DettagliCliente", "Caricamento dettagli per: $clienteEmail")
 
@@ -180,7 +205,14 @@ fun DettagliCliente(clienteEmail: String, clientiViewModel: VisualizzaClientiVM 
             .padding(16.dp)
             .padding(top = 128.dp)
     ) {
-        if (cliente != null) {
+        if (isLoadingCliente) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = my_gold)
+            }
+        } else if (cliente != null) {
             Log.d("DettagliCliente", "Cliente trovato: ${cliente.nome}")
 
             Card(

@@ -19,6 +19,10 @@ class VisualizzaServiziVM: ViewModel(){
     private val firestore = FirebaseFirestore.getInstance()
     private val _serviziState = MutableStateFlow<List<Servizio>>(emptyList())
     val serviziState: StateFlow<List<Servizio>> = _serviziState.asStateFlow()
+
+    private val _isLoadingServizi = MutableStateFlow(false)
+    val isLoadingServizi: StateFlow<Boolean> = _isLoadingServizi.asStateFlow()
+
     //----------------------------------------------------------------------------------------------
 
 
@@ -52,11 +56,14 @@ class VisualizzaServiziVM: ViewModel(){
     // FUNZIONI PER LA PRIMA PAGINA
     fun fetchServizi() {
         viewModelScope.launch {
+            _isLoadingServizi.value = true // Inizia il caricamento
             try {
                 val servizi = getServiziFromFirestore()
                 _serviziState.value = servizi
             } catch (e: Exception) {
                 Log.e("VisualizzaServiziVM", e.toString())
+            } finally {
+                _isLoadingServizi.value = false // Termina il caricamento
             }
         }
     }

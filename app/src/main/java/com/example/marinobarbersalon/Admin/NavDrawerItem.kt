@@ -6,5 +6,5 @@ data class NavDrawerItem(
     val title : String,
     val selectedIcon: ImageVector,
     val unselectedIcon : ImageVector,
-    val route : String
+    val route : String,
 )

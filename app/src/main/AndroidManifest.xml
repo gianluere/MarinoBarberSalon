@@ -12,6 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MarinoBarberSalon"
         tools:targetApi="31">
+
+        <!-- SplashActivity -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".Cliente.Home.HomeClienteActivity"
             android:launchMode="singleTask"
@@ -27,13 +39,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MarinoBarberSalon">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.MarinoBarberSalon" />
     </application>
 
 </manifest>
