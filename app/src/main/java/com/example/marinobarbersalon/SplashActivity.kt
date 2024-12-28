@@ -1,8 +1,11 @@
 package com.example.marinobarbersalon
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -15,19 +18,42 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 
 class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Avvia direttamente la MainActivity senza delay
-        startActivity(Intent(this, MainActivity::class.java))
-        finish() // Chiude la SplashActivity
+
+        setContent {
+            val bool = Build.VERSION.SDK_INT < 31
+            Log.d("Splash",  "AA " +  Build.VERSION.SDK_INT.toString())
+
+            if(bool) {
+                Log.d("Splash", bool.toString())
+                SplashScreen {
+                    // Avvia direttamente la MainActivity senza delay
+                    startActivity(Intent(this, MainActivity::class.java))
+
+                    finish() // Chiude la SplashActivity
+                }
+            } else {
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+
+
+
+        }
     }
 }
 
@@ -35,11 +61,10 @@ class SplashActivity : ComponentActivity() {
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
     // Mostra lo Splash Screen per 3 secondi
-//    LaunchedEffect(Unit) {
-//        //delay(1000) // Durata dello Splash Screen
-//        onTimeout()
-//    }
-
+    LaunchedEffect(Unit) {
+        delay(2000) // Ritarda di 3 secondi
+        onTimeout() // Chiama l'operazione dopo il ritardo
+    }
     // Layout dello Splash Screen
     Box(
         modifier = Modifier
