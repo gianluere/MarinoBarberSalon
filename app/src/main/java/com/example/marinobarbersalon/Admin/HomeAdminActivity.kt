@@ -139,6 +139,12 @@ class HomeAdminActivity: ComponentActivity() {
                             selectedIcon = Icons.Filled.QueryStats,
                             unselectedIcon = Icons.Outlined.QueryStats
                         ),
+                        NavDrawerItem(
+                            title = "Visualizza Prodotti Prenotati",
+                            route = Screen.VisualizzaProdottiPrenotati.route,
+                            selectedIcon = Icons.Filled.QueryStats,
+                            unselectedIcon = Icons.Outlined.QueryStats
+                        )
 
 
                     )

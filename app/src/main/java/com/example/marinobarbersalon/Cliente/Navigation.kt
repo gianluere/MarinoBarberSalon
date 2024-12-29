@@ -540,6 +540,7 @@ sealed class Screen(val route:String ){
     object VisualizzaStatisticheClienti : Screen("visualizzaStatisticheClienti")
     object VisualizzaServiziPiuRichiesti : Screen("visualizzaServiziPiuRichiesti")
     object VisualizzaEntrateMensili : Screen("visualizzaEntrateMensili")
+    object VisualizzaProdottiPrenotati : Screen("visualizzaProdottiPrenotati")
 
 
 }
