@@ -5,8 +5,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Error
@@ -211,11 +213,20 @@ fun ConfermaEliminazioneDialog(
             )
         },
         text = {
-            Text(
-                text = "Sei sicuro di voler eliminare il servizio \"${servizio.nome}\"?", // \" è l'escape
-                fontFamily = myFont,
-                fontSize = 20.sp,
-            )
+            // Rendi il testo scrollabile
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth() // Occupa tutta la larghezza del dialogo
+                    .heightIn(min = 50.dp, max = 200.dp) // Limita l'altezza del testo per abilitare lo scrolling
+                    .verticalScroll(rememberScrollState()) // Abilita lo scrolling verticale
+            ) {
+                Text(
+                    text = "Sei sicuro di voler eliminare il servizio \"${servizio.nome}\"?",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    maxLines = Int.MAX_VALUE, // Permette il rendering di tutto il contenuto
+                )
+            }
         },
         confirmButton = {
             TextButton(
