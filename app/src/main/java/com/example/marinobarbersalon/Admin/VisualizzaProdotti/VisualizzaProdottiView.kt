@@ -327,6 +327,7 @@ fun VisualizzaProdottiDettaglio(
 //                    .fillMaxWidth(0.7f),
                 colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
 //                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = "Aggiungi Prodotto",
@@ -568,7 +569,8 @@ fun AggiungiProdotto(
                 .fillMaxWidth(), // Mantieni il titolo fisso
             color = my_white,
             fontFamily = myFont,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+
         )
 
         Card(
@@ -641,7 +643,7 @@ fun AggiungiProdotto(
 
                 // Prezzo
                 OutlinedTextField(
-                    value = if (prezzo == 0.0) "" else prezzo.toString(),
+                    value = if (prezzo == 0.0) ""  else String.format("%.2f", prezzo),
                     onValueChange = { newValue ->
                         val cleanedValue = newValue.replace(',', '.') // Sostituisci virgola con punto
                         val validValue = cleanedValue.toDoubleOrNull()
@@ -703,7 +705,8 @@ fun AggiungiProdotto(
                 Button(
                     onClick = { launcher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+//                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
                         text = "Seleziona Immagine",
@@ -747,7 +750,8 @@ fun AggiungiProdotto(
                         showErrorDialog.value = true
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = "Aggiungi",
@@ -762,7 +766,8 @@ fun AggiungiProdotto(
                     aggiungiProdottoViewModel.resetFields()
                     isFormSubmitted.value = false
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = "Annulla",

@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import com.example.marinobarbersalon.Admin.AdminViewModel
 import com.example.marinobarbersalon.Cliente.Home.AuthState
@@ -59,7 +60,7 @@ fun VisualizzaAppuntamenti(
     ) {
         Text(
             text = "Seleziona una data",
-            fontSize = 24.sp,
+            fontSize = 25.sp,
             modifier = Modifier.padding(bottom = 16.dp),
             fontFamily = myFont,
             color = my_white
@@ -88,7 +89,11 @@ fun VisualizzaAppuntamenti(
             colors = ButtonDefaults.buttonColors(
                 containerColor = my_bordeaux,
                 disabledContainerColor = my_bordeaux
-            )
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 18.dp, start = 14.dp, end = 14.dp),
+            shape = RoundedCornerShape(10.dp)
         ) {
             Text(text = "Conferma", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
         }
@@ -113,7 +118,7 @@ fun VisualizzaAppuntamenti1(date: String, viewModel: VisualizzaAppuntamentiVM = 
     ) {
         Text(
             text = "Appuntamenti per la data: $date",
-            fontSize = 24.sp,
+            fontSize = 25.sp,
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .padding(top = 85.dp),
@@ -134,13 +139,21 @@ fun VisualizzaAppuntamenti1(date: String, viewModel: VisualizzaAppuntamentiVM = 
             }
         } else {
             if (appuntamenti.isEmpty()) {
-                // Mostra il messaggio quando non ci sono appuntamenti
-                Text(
-                    text = "Nessun appuntamento disponibile per questa data.",
-                    fontSize = 18.sp,
-                    fontFamily = myFont,
-                    color = my_white
-                )
+                // Centra il messaggio quando non ci sono appuntamenti
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(), // Occupa l'intera dimensione dello schermo
+                    contentAlignment = Alignment.Center // Centra il contenuto
+                ) {
+                    Text(
+                        text = "Nessun appuntamento disponibile per questa data.",
+                        fontSize = 30.sp,
+                        fontFamily = myFont,
+                        color = my_white,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.offset(y = (-150).dp)
+                    )
+                }
             } else {
                 // Mostra la lista degli appuntamenti
                 LazyColumn(

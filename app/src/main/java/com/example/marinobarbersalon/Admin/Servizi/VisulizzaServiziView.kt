@@ -564,7 +564,9 @@ fun AggiungiServizio(
 //                modifier = Modifier
 //                    .padding(8.dp),
 ////                    .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                shape = RoundedCornerShape(10.dp),
+
             ) {
                 Text(
                     text ="Aggiungi",
@@ -579,7 +581,8 @@ fun AggiungiServizio(
                     aggiungiServizioViewModel.resetFields()
                     isFormSubmitted.value = false
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = "Annulla",

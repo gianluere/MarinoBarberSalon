@@ -32,6 +32,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
@@ -110,19 +111,27 @@ fun VisualizzaClienti(
 
             }
         } else if (utentiState.isEmpty()) {
-            Text(
-                text = "Nessun cliente disponibile.",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp),
-                textAlign = TextAlign.Center
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(), // Occupa l'intera dimensione dello schermo
+                contentAlignment = Alignment.Center // Centra il contenuto
+            ) {
+                Text(
+                    text = "Nessun cliente disponibile.",
+                    fontSize = 30.sp,
+                    fontFamily = myFont,
+                    color = my_white,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.offset(y = (-150).dp)
+                )
+            }
         } else {
             LazyColumn {
                 clientiFiltrati.forEach() { (lettera, clienti) ->
                     item {
                         Text(
                             text = lettera.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
+//                            style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
@@ -130,7 +139,9 @@ fun VisualizzaClienti(
                             textAlign = TextAlign.Start,
                             color = my_white,
                             fontFamily = myFont,
-                            fontSize = 25.sp
+                            fontSize = 25.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -170,7 +181,9 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
             textAlign = TextAlign.Start,
             fontFamily = myFont,
             fontSize = 20.sp,
-            color = my_white
+            color = my_white,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Text(
             text = cliente.cognome,
@@ -179,7 +192,9 @@ fun ClienteItem(cliente: UserFirebase, onNavigateToDetails: (String) -> Unit) {
             textAlign = TextAlign.Start,
             fontFamily = myFont,
             fontSize = 20.sp,
-            color = my_white
+            color = my_white,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
