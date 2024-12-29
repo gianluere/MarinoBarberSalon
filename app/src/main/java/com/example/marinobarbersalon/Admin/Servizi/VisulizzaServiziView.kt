@@ -343,10 +343,25 @@ fun AggiungiServizio(
                     },
                     modifier = Modifier
                         .padding(8.dp)
-                        .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
-                    colors = ButtonDefaults.buttonColors(containerColor = my_yellow)
+                        .border(
+                            width = 2.dp,
+                            color = my_gold,
+                            shape = RoundedCornerShape(17.dp)
+                        )
+                        .background(my_bordeaux, shape = RoundedCornerShape(17.dp)) //Sfondo!!!
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = my_white
+                    ),
+                    shape = RoundedCornerShape(17.dp)
                 ) {
-                    Text("OK", fontFamily = myFont, fontSize = 18.sp, color = my_grey)
+                    Text(
+                        text = "OK",
+                        fontFamily = myFont,
+                        fontSize = 20.sp,
+                        color = my_white
+                    )
                 }
             },
             shape = RoundedCornerShape(17.dp),
