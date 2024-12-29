@@ -261,7 +261,8 @@ fun CardPrenotazione(appuntamento: Appuntamento, annulla: () -> Unit) {
             onDismissSheet = { contextMenuAnnulla = null },
             annulla = {
                 annulla()
-            }
+            },
+             textSheet = "Vuoi annullare la tua prenotazione?"
         )
     }
 
@@ -273,14 +274,14 @@ fun CardPrenotazione(appuntamento: Appuntamento, annulla: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnnullaActionsSheet(onDismissSheet: () -> Unit, annulla: () -> Unit) {
+fun AnnullaActionsSheet(onDismissSheet: () -> Unit, annulla: () -> Unit, textSheet : String) {
     ModalBottomSheet(
         onDismissRequest = {onDismissSheet()},
         containerColor = my_grey
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Vuoi annullare la tua prenotazione?",
+            text = textSheet,
             textAlign = TextAlign.Center,
             color = my_white,
             fontFamily = myFont,
