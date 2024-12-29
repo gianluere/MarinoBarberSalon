@@ -33,10 +33,10 @@ class SplashActivity : ComponentActivity() {
             if(bool) {
                 Log.d("Splash", bool.toString())
                 SplashScreen {
-                    // Avvia direttamente la MainActivity senza delay
+                    //Avvia direttamente la MainActivity senza delay
                     startActivity(Intent(this, MainActivity::class.java))
 
-                    finish() // Chiude la SplashActivity
+                    finish() //Chiude la SplashActivity
                 }
             } else {
                 startActivity(Intent(this, MainActivity::class.java))
@@ -49,23 +49,23 @@ class SplashActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
-    // Mostra lo Splash Screen per 3 secondi
+
     LaunchedEffect(Unit) {
-        delay(2000) // Ritarda di 3 secondi
-        onTimeout() // Chiama l'operazione dopo il ritardo
+        delay(2000)
+        onTimeout()
     }
-    // Layout dello Splash Screen
+    //Layout dello Splash Screen
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF333333)), // Sfondo grigio
+            .background(Color(0xFF333333)), //Sfondo grigio
         contentAlignment = Alignment.Center
     ) {
-        // Logo al centro
+        //Logo al centro
         Image(
-            painter = painterResource(id = R.drawable.logo3), // Assicurati che il logo sia in res/drawable
+            painter = painterResource(id = R.drawable.logo3),
             contentDescription = "Splash Screen Logo",
-            modifier = Modifier.size(200.dp) // Dimensione del logo
+            modifier = Modifier.size(200.dp) //Dim del logo
         )
     }
 }
