@@ -7,6 +7,7 @@ val my_white = Color(0xFFF5F5DC)
 val my_bordeaux = Color(0xFF7B2B31)
 val my_gold = Color(0xFFD4AF37)
 val my_yellow = Color(0xFFF5F5DC)
+val my_green = Color(0xFF0C5D25)
 val my_drawer = Color(0xFF3E3E3E)
 val my_icon = Color(0xFF1A1B21)
 

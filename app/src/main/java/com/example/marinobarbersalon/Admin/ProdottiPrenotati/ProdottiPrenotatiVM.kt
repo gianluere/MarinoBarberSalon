@@ -1,8 +1,10 @@
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.marinobarbersalon.Cliente.Home.User
 import com.example.marinobarbersalon.Cliente.Shopping.Prodotto
 import com.example.marinobarbersalon.Cliente.Shopping.ProdottoPrenotato
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,26 +14,26 @@ import kotlinx.coroutines.tasks.await
 
 class ProdottiPrenotatiVM : ViewModel() {
 
+
     private val firestore = FirebaseFirestore.getInstance()
 
-    // Lista di prodotti prenotati con dettagli
     private val _listaProdottiPrenotati = MutableStateFlow<List<Pair<ProdottoPrenotato, Prodotto>>>(emptyList())
     val listaProdottiPrenotati: StateFlow<List<Pair<ProdottoPrenotato, Prodotto>>> = _listaProdottiPrenotati.asStateFlow()
 
     private val _isLoadingProdotti = MutableStateFlow(false)
     val isLoadingProdotti: StateFlow<Boolean> = _isLoadingProdotti.asStateFlow()
 
-    // Carica i prodotti prenotati con stato "attesa"
+
     fun fetchProdottiPrenotatiAttesa() {
         viewModelScope.launch {
-            _isLoadingProdotti.value = true // Inizia il caricamento
+            _isLoadingProdotti.value = true
             try {
                 val prodottiPrenotati = getProdottiPrenotatiFromFirestore()
                 _listaProdottiPrenotati.value = prodottiPrenotati
             } catch (e: Exception) {
                 Log.e("ProdottiPrenotatiVM", e.toString())
             } finally {
-                _isLoadingProdotti.value = false // Termina il caricamento
+                _isLoadingProdotti.value = false
             }
         }
     }
@@ -57,7 +59,7 @@ class ProdottiPrenotatiVM : ViewModel() {
         return prodottiPrenotati
     }
 
-    // Conferma un prodotto aggiornando il suo stato a "confermato"
+    //Cambia stato a "prodotto prenotato" da "attesa" a "confermato"
     fun confermaProdotto(prodottoPrenotato: ProdottoPrenotato) {
         viewModelScope.launch {
             try {
@@ -76,8 +78,9 @@ class ProdottiPrenotatiVM : ViewModel() {
                         .update("stato", "confermato")
                         .await()
                 }
+//                Log.d("ProdottiPrenotatiVM", "Prodotto confermato: ${prodottoPrenotato.prodotto}")
 
-                // Rimuovi il prodotto dalla lista locale
+                //Tolgo dalla lista presa prima
                 _listaProdottiPrenotati.value = _listaProdottiPrenotati.value.filterNot { it.first == prodottoPrenotato }
 
             } catch (e: Exception) {
@@ -85,4 +88,35 @@ class ProdottiPrenotatiVM : ViewModel() {
             }
         }
     }
+
+    //Per prendere i dettagli del cliente che ha prenotato il prodotto
+    fun fetchClienteDetails(
+        utenteReference: DocumentReference,
+        onSuccess: (String, String) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val utenteSnapshot = utenteReference.get().await()
+                val utente = utenteSnapshot.toObject(User::class.java)
+
+                if (utente != null) {
+                    val nome = utente.nome ?: "Nome non disponibile"
+                    val cognome = utente.cognome ?: "Cognome non disponibile"
+//                    Log.d("ProdottiPrenotatiVM", "Nome: $nome, Cognome: $cognome")
+                    onSuccess(nome, cognome)
+                } else {
+                    onError(Exception("Utente non trovato"))
+                }
+            } catch (e: Exception) {
+                onError(e)
+            }
+        }
+    }
+
+
+
+
+
+
 }
