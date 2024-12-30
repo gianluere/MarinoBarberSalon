@@ -29,7 +29,7 @@ class UserViewModel : ViewModel() {
 
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
 
-    private val _userState = MutableStateFlow(User())
+    private val _userState = MutableStateFlow(User(state = AuthState.None))
     val userState : StateFlow<User> = _userState.asStateFlow()
     private val db = Firebase.firestore
 
@@ -44,17 +44,17 @@ class UserViewModel : ViewModel() {
 
     }
 
-    private fun checkAuthState(){
-        if (auth.currentUser == null){
+    private fun checkAuthState() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
             _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
-        }else{
-            checkIfCliente(auth.currentUser?.email ?: "") { isCliente ->
+        } else {
+            checkIfCliente(currentUser.email ?: "") { isCliente ->
                 if (isCliente) {
                     _userState.value = _userState.value.copy(state = AuthState.Authenticated)
                     caricaDati()
                     sincronizzaPrenotazioni()
                 } else {
-                    // Se non è un admin, non lo autentichiamo
                     _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
                 }
             }
@@ -63,35 +63,60 @@ class UserViewModel : ViewModel() {
 
     private fun checkIfCliente(email: String, callback: (Boolean) -> Unit) {
         // Funzione per verificare se l'email è associata a un amministratore
+        if (email.isBlank()) {
+            callback(false)
+            return
+        }
+
         db.collection("utenti").document(email).get()
             .addOnSuccessListener { document ->
                 callback(document.exists())
             }
             .addOnFailureListener {
+                Log.e("UserViewModel", "Errore nel verificare se è cliente: ${it.message}")
                 callback(false)
             }
     }
 
-    fun login(email : String, password : String){
+    fun login(email: String, password: String) {
+        Log.d("LoginDebug", "Tentativo di login con email: $email")
 
-        if (email.isEmpty() || password.isEmpty()){
-            _userState.value= _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
+        if (email.isBlank() || password.isBlank()) {
+            Log.e("LoginDebug", "Email o password vuoti")
+            _userState.value = _userState.value.copy(
+                state = AuthState.Error("Email e password non possono essere vuoti")
+            )
             return
         }
+
         _userState.value = _userState.value.copy(state = AuthState.Loading)
+
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener{ task ->
-                if (task.isSuccessful){
-                    _userState.value = _userState.value.copy(state = AuthState.Authenticated)
-                    caricaDati()
-                }else{
-                    _userState.value = _userState.value.copy(state = AuthState.Error(
-                        task.exception?.message ?: "Errore"
-                    )
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("LoginDebug", "Login riuscito")
+                    checkIfCliente(email) { isCliente ->
+                        if (isCliente) {
+                            _userState.value = _userState.value.copy(state = AuthState.Authenticated)
+                            caricaDati()
+                            sincronizzaPrenotazioni()
+                        } else {
+                            _userState.value = _userState.value.copy(
+                                state = AuthState.Error("Non sei autorizzato ad accedere come cliente")
+                            )
+                        }
+                    }
+                } else {
+                    val errorMessage = task.exception?.message ?: "Errore generico"
+                    Log.e("LoginDebug", "Errore di login: $errorMessage")
+                    _userState.value = _userState.value.copy(
+                        state = AuthState.Error(errorMessage)
                     )
                 }
             }
     }
+
+
 
     fun signup(email : String, password : String, nome: String, cognome : String, eta: Int, telefono : String){
 

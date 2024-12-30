@@ -13,29 +13,41 @@ class AdminViewModel : ViewModel() {
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
 
-    private val _adminState = MutableStateFlow(Admin())
+    private val _adminState = MutableStateFlow(Admin(state = AuthState.None))
     val adminState : StateFlow<Admin> = _adminState.asStateFlow()
 
     init {
         checkAuthState()
     }
 
-    fun checkAuthState(){
-        if (auth.currentUser == null){
+    fun checkAuthState() {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
             _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)
-        }else{
-            isAdmin(auth.currentUser?.email ?: "") { isAdmin ->
+        } else {
+            val email = currentUser.email
+            if (email.isNullOrBlank()) {
+                _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)
+                return
+            }
+
+            isAdmin(email) { isAdmin ->
                 if (isAdmin) {
                     _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
                 } else {
-                    // Se non è un admin, non lo autentichiamo
                     _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)
                 }
             }
         }
     }
 
+
     fun isAdmin(email: String, callback: (Boolean) -> Unit) {
+        if (email.isBlank()) {
+            callback(false)
+            return
+        }
+
         db.collection("admin").document(email).get()
             .addOnSuccessListener { result ->
                 // Chiama il callback con il risultato
@@ -48,22 +60,43 @@ class AdminViewModel : ViewModel() {
     }
 
 
-    fun login(email : String, password : String){
-
-        if (email.isEmpty() || password.isEmpty()){
-            _adminState.value= _adminState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
+    fun login(email: String, password: String) {
+        if (email.isBlank() || password.isBlank()) {
+            _adminState.value = _adminState.value.copy(
+                state = AuthState.Error("Email e password non possono essere vuoti")
+            )
             return
         }
+
         _adminState.value = _adminState.value.copy(state = AuthState.Loading)
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener{ task ->
-                if (task.isSuccessful){
-                    _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
-                }else{
-                    _adminState.value = _adminState.value.copy(state = AuthState.Error(task.exception?.message?:"Errore"))
+
+        try {
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        isAdmin(email) { isAdmin ->
+                            if (isAdmin) {
+                                _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
+                            } else {
+                                _adminState.value = _adminState.value.copy(
+                                    state = AuthState.Error("Non hai i privilegi di amministratore")
+                                )
+                            }
+                        }
+                    } else {
+                        _adminState.value = _adminState.value.copy(
+                            state = AuthState.Error(task.exception?.message ?: "Errore generico")
+                        )
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            _adminState.value = _adminState.value.copy(
+                state = AuthState.Error("Errore durante il login: ${e.message}")
+            )
+        }
     }
+
+
 
     fun logout(){
         auth.signOut()

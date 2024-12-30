@@ -14,6 +14,7 @@ data class User(
 )
 
 sealed class AuthState(){
+    object None : AuthState()
     object Authenticated : AuthState()
     object Unauthenticated : AuthState()
     object Loading : AuthState()
