@@ -233,13 +233,15 @@ fun LoginScreen(
                     },
                     enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
                     modifier = Modifier.width(230.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
                         text = "ACCEDI",
                         color = my_gold,
                         fontFamily = myFont,
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
+
                     )
                 }
 
