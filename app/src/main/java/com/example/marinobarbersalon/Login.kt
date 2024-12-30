@@ -61,43 +61,39 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun LoginScreen(userViewModel: UserViewModel,
-                adminViewModel: AdminViewModel,
-                navigaHomeCliente : () -> Unit,
-                navigaHomeAdmin : () -> Unit,
-                navigaSignUp : () -> Unit) {
-
+fun LoginScreen(
+    userViewModel: UserViewModel,
+    adminViewModel: AdminViewModel,
+    navigaHomeCliente: () -> Unit,
+    navigaHomeAdmin: () -> Unit,
+    navigaSignUp: () -> Unit
+) {
     val userState by userViewModel.userState.collectAsState()
     val adminState by adminViewModel.adminState.collectAsState()
+    val userValidationMessage by userViewModel.validationMessage.collectAsState()
+    val adminValidationMessage by adminViewModel.validationMessage.collectAsState()
+
+
     val context = LocalContext.current
     BackHandler {
         val activity = context as? ComponentActivity
         activity?.finish()
     }
 
-    var email by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    var password by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    var passwordVisibility by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
 
     val image = if (passwordVisibility)
         painterResource(id = R.drawable.visibility_24dp_f5f5dc_fill0_wght400_grad0_opsz24)
     else
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
-
-
-
-    if (userState.state == null || userState.state == AuthState.Authenticated || adminState.state == AuthState.Authenticated || adminState.state == null){
+    if (userState.state == null || userState.state == AuthState.Authenticated ||
+        adminState.state == AuthState.Authenticated || adminState.state == null) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(my_grey),
             contentAlignment = Alignment.Center
         ) {
@@ -106,31 +102,50 @@ fun LoginScreen(userViewModel: UserViewModel,
                 color = my_gold
             )
         }
-    }else{
+    } else {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFF333333))
                 .padding(top = 30.dp),
-        ){
+        ) {
             Column(
-                verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Box(
                     Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(50.dp))
                         .background(color = my_grey)
-                ){
-                    Image(painter = painterResource(id = R.drawable.logo3), contentDescription ="logo",
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo3),
+                        contentDescription = "logo",
                         Modifier
                             .height(180.dp)
                             .aspectRatio(16 / 9f)
-                            .align(Alignment.Center))
+                            .align(Alignment.Center)
+                    )
                 }
                 Spacer(modifier = Modifier.height(70.dp))
                 TextField(
-                    value = email, onValueChange = {email = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Email", color = Color(0xFFF5F5DC), fontFamily = myFont, fontSize = 22.sp) },
-                    colors= TextFieldDefaults.colors(
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        userViewModel.resetValidationMessage()
+                        adminViewModel.resetValidationMessage()
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp),
+                    placeholder = {
+                        Text(
+                            text = "Email",
+                            color = Color(0xFFF5F5DC),
+                            fontFamily = myFont,
+                            fontSize = 22.sp
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_white,
@@ -139,16 +154,36 @@ fun LoginScreen(userViewModel: UserViewModel,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
                     ),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 50.dp),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    ),
                     maxLines = 1,
                     singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(60.dp))
 
-                TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Password", color = Color(0xFFF5F5DC), fontFamily = myFont,  fontSize = 22.sp) },
-                    colors= TextFieldDefaults.colors(
+                TextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        userViewModel.resetValidationMessage()
+                        adminViewModel.resetValidationMessage()
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp),
+                    placeholder = {
+                        Text(
+                            text = "Password",
+                            color = Color(0xFFF5F5DC),
+                            fontFamily = myFont,
+                            fontSize = 22.sp
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_white,
@@ -158,47 +193,70 @@ fun LoginScreen(userViewModel: UserViewModel,
                         cursorColor = my_white
                     ),
                     trailingIcon = {
-                        IconButton(onClick = {
-                            passwordVisibility = !passwordVisibility
-                        }) {
-                            Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
-
+                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                            Image(
+                                image,
+                                contentDescription = "eye",
+                                colorFilter = ColorFilter.tint(my_white)
+                            )
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 50.dp),
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
                     maxLines = 1,
                     singleLine = true
                 )
 
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                Button(onClick = {
-                    Log.d("LOGIN", email)
-                    adminViewModel.isAdmin(email) { isAdmin ->
-                        Log.d("prova", isAdmin.toString())
-                        if (isAdmin) {
-                            adminViewModel.login(email, password)
-                            Log.d("prova", "Admin loggato")
-                        } else {
-                            userViewModel.login(email, password)
-                            Log.d("prova","Utente loggato")
+
+
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(
+                    onClick = {
+                        Log.d("LOGIN", email)
+                        adminViewModel.isAdmin(email) { isAdmin ->
+                            if (isAdmin) {
+                                adminViewModel.login(email, password)
+                            } else {
+                                userViewModel.login(email, password)
+                            }
                         }
-                    }
-                }, enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
-                    modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
-                    Text(text = "ACCEDI", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
+                    },
+                    enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
+                    modifier = Modifier.width(230.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)
+                ) {
+                    Text(
+                        text = "ACCEDI",
+                        color = my_gold,
+                        fontFamily = myFont,
+                        fontSize = 20.sp
+                    )
                 }
 
                 TextButton(onClick = { navigaSignUp() }) {
-                    Text(text = "Non hai un account, registrati", fontFamily = myFont, color = my_gold, textDecoration = TextDecoration.Underline)
+                    Text(
+                        text = "Non hai un account, registrati",
+                        fontFamily = myFont,
+                        color = my_gold,
+                        textDecoration = TextDecoration.Underline
+                    )
                 }
             }
 
-            if(userState.state == AuthState.Loading || adminState.state == AuthState.Loading){
+            if (userState.state == AuthState.Loading || adminState.state == AuthState.Loading) {
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .background(my_grey),
                     contentAlignment = Alignment.Center
                 ) {
@@ -208,61 +266,42 @@ fun LoginScreen(userViewModel: UserViewModel,
                     )
                 }
             }
-
         }
     }
 
+    LaunchedEffect(userState.state, adminState.state, userValidationMessage, adminValidationMessage) {
 
+        if (!adminValidationMessage.isNullOrEmpty()) {
+            Toast.makeText(context, adminValidationMessage, Toast.LENGTH_SHORT).show()
+            adminViewModel.resetValidationMessage() // Resetta il messaggio
+        }
 
-    LaunchedEffect(userState.state, adminState.state) {
-        // Controlla prima lo stato dell'amministratore
+        if (!userValidationMessage.isNullOrEmpty()) {
+            Toast.makeText(context, userValidationMessage, Toast.LENGTH_SHORT).show()
+            userViewModel.resetValidationMessage() // Resetta il messaggio
+        }
+
         when (adminState.state) {
-            is AuthState.Authenticated -> {
-                Log.d("prova", "Admin authenticated with state: $adminState.state")
-                Log.d("prova", "Stato utente: $userState.state")
-                // Naviga verso la schermata per gli amministratori
-
-                navigaHomeAdmin()
-
-                /*
-                navController.navigate("adminGraph") {
-                    launchSingleTop = true
-                    // Se desideri anche gestire il popUpTo qui, puoi farlo
-                    popUpTo("login"){inclusive = true}
-                }
-
-                 */
-            }
+            is AuthState.Authenticated -> navigaHomeAdmin()
             is AuthState.Error -> {
-                Toast.makeText(context, (adminState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    (adminState.state as AuthState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            else -> {
-                // Solo quando l'amministratore non è autenticato, controlla lo stato dell'utente
-                when (userState.state) {
-                    is AuthState.Authenticated -> {
-
-                        navigaHomeCliente()
-
-                        /*
-                        Log.d("prova", "User authenticated with state: $userState.state")
-                        navController.navigate("clientGraph") {
-                            launchSingleTop = true
-                            popUpTo("login") { inclusive = true }
-                        }
-
-                         */
-                    }
-                    is AuthState.Error -> {
-                        Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
-                    }
-                    else -> Unit
+            else -> when (userState.state) {
+                is AuthState.Authenticated -> navigaHomeCliente()
+                is AuthState.Error -> {
+                    Toast.makeText(
+                        context,
+                        (userState.state as AuthState.Error).message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+                else -> Unit
             }
         }
     }
-
-
-
-
-
 }
+

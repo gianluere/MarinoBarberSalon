@@ -39,6 +39,12 @@ class UserViewModel : ViewModel() {
     private val _listaProdottiPrenotati = MutableStateFlow<List<Pair<ProdottoPrenotato, Prodotto>>>(emptyList())
     val listaProdottiPrenotati : StateFlow<List<Pair<ProdottoPrenotato, Prodotto>>> = _listaProdottiPrenotati.asStateFlow()
 
+    //per login
+    private val _validationMessage = MutableStateFlow<String?>(null)
+    val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
+
+
+
     init {
         checkAuthState()
 
@@ -79,41 +85,33 @@ class UserViewModel : ViewModel() {
     }
 
     fun login(email: String, password: String) {
-        Log.d("LoginDebug", "Tentativo di login con email: $email")
-
         if (email.isBlank() || password.isBlank()) {
-            Log.e("LoginDebug", "Email o password vuoti")
-            _userState.value = _userState.value.copy(
-                state = AuthState.Error("Email e password non possono essere vuoti")
-            )
+            //Perche senno mi fa vedere questo errore solo una volta
+            _validationMessage.value = null
+            _validationMessage.value = "Email e password non possono essere vuoti"
             return
         }
 
+        _validationMessage.value = null // Resetta il messaggio di errore
         _userState.value = _userState.value.copy(state = AuthState.Loading)
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d("LoginDebug", "Login riuscito")
-                    checkIfCliente(email) { isCliente ->
-                        if (isCliente) {
-                            _userState.value = _userState.value.copy(state = AuthState.Authenticated)
-                            caricaDati()
-                            sincronizzaPrenotazioni()
-                        } else {
-                            _userState.value = _userState.value.copy(
-                                state = AuthState.Error("Non sei autorizzato ad accedere come cliente")
-                            )
-                        }
-                    }
+                    _userState.value = _userState.value.copy(state = AuthState.Authenticated)
                 } else {
-                    val errorMessage = task.exception?.message ?: "Errore generico"
-                    Log.e("LoginDebug", "Errore di login: $errorMessage")
-                    _userState.value = _userState.value.copy(
-                        state = AuthState.Error(errorMessage)
-                    )
+                    val errorMessage = task.exception?.message ?: "Email o password non corretti"
+                    _validationMessage.value = errorMessage
+                    _userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
                 }
             }
+    }
+
+
+
+
+    fun resetValidationMessage() {
+        _validationMessage.value = null
     }
 
 

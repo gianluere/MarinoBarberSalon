@@ -1,5 +1,6 @@
 package com.example.marinobarbersalon.Admin
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.marinobarbersalon.Cliente.Home.AuthState
 import com.google.firebase.Firebase
@@ -15,6 +16,10 @@ class AdminViewModel : ViewModel() {
 
     private val _adminState = MutableStateFlow(Admin(state = AuthState.None))
     val adminState : StateFlow<Admin> = _adminState.asStateFlow()
+
+    //per login
+    private val _validationMessage = MutableStateFlow<String?>(null)
+    val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
 
     init {
         checkAuthState()
@@ -62,40 +67,32 @@ class AdminViewModel : ViewModel() {
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            _adminState.value = _adminState.value.copy(
-                state = AuthState.Error("Email e password non possono essere vuoti")
-            )
+            //Perche senno mi fa vedere questo errore solo una volta
+            _validationMessage.value = null
+            _validationMessage.value = "Email e password non possono essere vuoti"
             return
         }
 
+        _validationMessage.value = null // Resetta il messaggio di errore
         _adminState.value = _adminState.value.copy(state = AuthState.Loading)
 
-        try {
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        isAdmin(email) { isAdmin ->
-                            if (isAdmin) {
-                                _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
-                            } else {
-                                _adminState.value = _adminState.value.copy(
-                                    state = AuthState.Error("Non hai i privilegi di amministratore")
-                                )
-                            }
-                        }
-                    } else {
-                        _adminState.value = _adminState.value.copy(
-                            state = AuthState.Error(task.exception?.message ?: "Errore generico")
-                        )
-                    }
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
+                } else {
+                    val errorMessage = task.exception?.message ?: "Email o password non corretti"
+                    _validationMessage.value = errorMessage
+                    _adminState.value = _adminState.value.copy(state = AuthState.Error(errorMessage))
                 }
-        } catch (e: Exception) {
-            _adminState.value = _adminState.value.copy(
-                state = AuthState.Error("Errore durante il login: ${e.message}")
-            )
-        }
+            }
     }
 
+
+
+    fun resetValidationMessage() {
+        _validationMessage.value = null
+    }
 
 
     fun logout(){
