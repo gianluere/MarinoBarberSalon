@@ -7,16 +7,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -50,41 +57,21 @@ import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
 
 @Composable
-fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzione : () -> Unit) {
+fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzione: () -> Unit) {
 
     BackHandler {
-       distruzione()
+        distruzione()
     }
 
     val userState by userViewModel.userState.collectAsState()
 
-    var nome by remember {
-        mutableStateOf("")
-    }
-
-    var cognome by remember {
-        mutableStateOf("")
-    }
-
-    var email by remember {
-        mutableStateOf("")
-    }
-
-    var eta by remember {
-        mutableStateOf("")
-    }
-
-    var telefono by remember {
-        mutableStateOf("")
-    }
-
-    var password by remember {
-        mutableStateOf("")
-    }
-
-    var passwordVisibility by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var nome by remember { mutableStateOf("") }
+    var cognome by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var eta by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
 
     val image = if (passwordVisibility)
         painterResource(id = R.drawable.visibility_24dp_f5f5dc_fill0_wght400_grad0_opsz24)
@@ -92,11 +79,10 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
     val context = LocalContext.current
-    LaunchedEffect(userState.state){
-        when(userState.state){
+    LaunchedEffect(userState.state) {
+        when (userState.state) {
             is AuthState.Authenticated -> navigaHome()
-            is AuthState.Error -> Toast.makeText(context,
-                (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthState.Error -> Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
     }
@@ -107,31 +93,63 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
             .background(Color(0xFF333333))
             .padding(top = 30.dp, bottom = 50.dp),
         contentAlignment = Alignment.Center
-    ){
-        if (userState.state == AuthState.Loading){
+    ) {
+        if (userState.state == AuthState.Loading) {
             CircularProgressIndicator(color = my_gold)
-        }else{
+        } else {
             Column(
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "CREA ACCOUNT", color = my_white, fontSize = 30.sp)
-                Text(text = "Inserisci le informazioni di seguito per completare la registrazione",Modifier.width(300.dp), color = my_white, textAlign = TextAlign.Center)
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Header with Back Arrow and Title
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                ) {
+                    // Back Button
+                    IconButton(
+                        onClick = { distruzione() },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .align(Alignment.CenterStart) // Align arrow to the start
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Torna indietro",
+                            tint = my_white
+                        )
+                    }
 
-                Spacer(Modifier.height(50.dp))
+                    // Title
+                    Text(
+                        text = "Crea Account",
+                        color = my_white,
+                        fontSize = 30.sp,
+                        fontFamily = myFont,
+                        modifier = Modifier.align(Alignment.Center) // Center the title
+                    )
+                }
 
-                //Nome
+                Text(
+                    text = "Inserisci le informazioni di seguito per completare la registrazione",
+                    modifier = Modifier.width(300.dp),
+                    color = my_white,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                // Nome
                 TextField(
                     value = nome,
-                    onValueChange = {
-                        if (it.length <= 20) {
-                            nome = it
-                        }
-                    },
+                    onValueChange = { if (it.length <= 20) nome = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Nome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-
-                    colors= TextFieldDefaults.colors(
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_gold,
@@ -142,24 +160,18 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                     ),
                     singleLine = true,
                     maxLines = 1,
-                    modifier = Modifier
-                        .width(280.dp)
+                    modifier = Modifier.width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                //Cognome
+                // Cognome
                 TextField(
                     value = cognome,
-                    onValueChange = {
-                        if (it.length <= 20) {
-                            cognome = it
-                        }
-                    },
+                    onValueChange = { if (it.length <= 20) cognome = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Cognome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-
-                    colors= TextFieldDefaults.colors(
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_gold,
@@ -170,24 +182,18 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                     ),
                     singleLine = true,
                     maxLines = 1,
-                    modifier = Modifier
-                        .width(280.dp)
+                    modifier = Modifier.width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                //Email
+                // Email
                 TextField(
                     value = email,
-                    onValueChange = {
-                        if (it.length <= 35) {
-                            email = it
-                        }
-                    },
+                    onValueChange = { if (it.length <= 35) email = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Email", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-
-                    colors= TextFieldDefaults.colors(
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_gold,
@@ -199,24 +205,18 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
                     maxLines = 1,
-                    modifier = Modifier
-                        .width(280.dp)
+                    modifier = Modifier.width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                //Eta
+                // Età
                 TextField(
                     value = eta,
-                    onValueChange = {
-                        if (it.length <= 2) {
-                            eta = it
-                        }
-                    },
+                    onValueChange = { if (it.length <= 2) eta = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Età", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-
-                    colors= TextFieldDefaults.colors(
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_gold,
@@ -227,20 +227,18 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                     ),
                     singleLine = true,
                     maxLines = 1,
-                    modifier = Modifier
-                        .width(280.dp)
+                    modifier = Modifier.width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                //PAssword
+                // Password
                 TextField(
                     value = password,
-                    onValueChange = {password = it},
+                    onValueChange = { password = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Password", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-
-                    colors= TextFieldDefaults.colors(
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_gold,
@@ -248,36 +246,28 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    ), trailingIcon = {
-                        IconButton(onClick = {
-                            passwordVisibility = !passwordVisibility
-                        }) {
+                    ),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                             Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
-
                         }
                     },
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     maxLines = 1,
-                    modifier = Modifier
-                        .width(280.dp)
+                    modifier = Modifier.width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                //Telefono
+                // Telefono
                 TextField(
                     value = telefono,
-                    onValueChange = {
-                        if (it.length <= 14) {
-                            telefono = it
-                        }
-                    },
-                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp, textAlign = TextAlign.Left),
-                    placeholder = { Text(text = "Telefono, es: +39 1234567891", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
-
-                    colors= TextFieldDefaults.colors(
+                    onValueChange = { if (it.length <= 14) telefono = it },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
+                    placeholder = { Text(text = "Telefono", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                    colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         focusedTextColor = my_gold,
@@ -289,22 +279,31 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     singleLine = true,
                     maxLines = 1,
-                    modifier = Modifier
-                        .width(280.dp)
+                    modifier = Modifier.width(280.dp)
                 )
-                Spacer(Modifier.height(70.dp))
-                Button(onClick = {
-                    userViewModel.signup(email, password, nome, cognome, eta.toInt(), telefono)
 
-                }, enabled = userState.state != AuthState.Loading, modifier = Modifier.width(230.dp), colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux)) {
+                Spacer(Modifier.height(70.dp))
+
+                // Confirm Button
+                Button(
+                    onClick = {
+                        userViewModel.signup(email, password, nome, cognome, eta.toInt(), telefono)
+                    },
+                    enabled = userState.state != AuthState.Loading,
+                    modifier = Modifier
+                        .width(230.dp)
+                        .offset(y = (-30).dp) //da calibrare!!! l'ho messo io a -30 perche sembra giusto ma da vedere
+                        .align(Alignment.CenterHorizontally),
+                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
                     Text(text = "CONFERMA", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
                 }
-
             }
         }
-
     }
 }
+
 
 /*
 @Preview(showBackground = true)
