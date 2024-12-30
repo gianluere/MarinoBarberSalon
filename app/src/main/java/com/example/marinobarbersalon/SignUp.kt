@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -119,7 +120,17 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
 
                 Spacer(Modifier.height(50.dp))
 
-                TextField(value = nome, onValueChange = {nome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Nome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                //Nome
+                TextField(
+                    value = nome,
+                    onValueChange = {
+                        if (it.length <= 20) {
+                            nome = it
+                        }
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
+                    placeholder = { Text(text = "Nome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+
                     colors= TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -128,12 +139,26 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    )
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                TextField(value = cognome, onValueChange = {cognome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Cognome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                //Cognome
+                TextField(
+                    value = cognome,
+                    onValueChange = {
+                        if (it.length <= 20) {
+                            cognome = it
+                        }
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
+                    placeholder = { Text(text = "Cognome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+
                     colors= TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -142,12 +167,26 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    )
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                TextField(value = email, onValueChange = {email = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Email", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                //Email
+                TextField(
+                    value = email,
+                    onValueChange = {
+                        if (it.length <= 35) {
+                            email = it
+                        }
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
+                    placeholder = { Text(text = "Email", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+
                     colors= TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -156,12 +195,27 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                TextField(value = eta, onValueChange = {eta = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Età", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                //Eta
+                TextField(
+                    value = eta,
+                    onValueChange = {
+                        if (it.length <= 2) {
+                            eta = it
+                        }
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
+                    placeholder = { Text(text = "Età", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+
                     colors= TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -170,12 +224,22 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    )
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp), placeholder = { Text(text = "Password", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                //PAssword
+                TextField(
+                    value = password,
+                    onValueChange = {password = it},
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
+                    placeholder = { Text(text = "Password", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+
                     colors= TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -191,13 +255,28 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                             Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
 
                         }
-                    }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    },
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .width(280.dp)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                TextField(value = telefono, onValueChange = {telefono = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp, textAlign = TextAlign.Left), placeholder = { Text(text = "Telefono", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+                //Telefono
+                TextField(
+                    value = telefono,
+                    onValueChange = {
+                        if (it.length <= 14) {
+                            telefono = it
+                        }
+                    },
+                    textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp, textAlign = TextAlign.Left),
+                    placeholder = { Text(text = "Telefono, es: +39 1234567891", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
+
                     colors= TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -206,7 +285,12 @@ fun SignUpScreen(navigaHome : () -> Unit, userViewModel: UserViewModel, distruzi
                         focusedIndicatorColor = my_white,
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
-                    ), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), maxLines = 1
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .width(280.dp)
                 )
                 Spacer(Modifier.height(70.dp))
                 Button(onClick = {
