@@ -119,8 +119,9 @@ fun LoginScreen(userViewModel: UserViewModel,
                     Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(50.dp))
-                        .background(color = Color(0xFF7B2B31))){
-                    Image(painter = painterResource(id = R.drawable.logo_scontornato), contentDescription ="logo",
+                        .background(color = my_grey)
+                ){
+                    Image(painter = painterResource(id = R.drawable.logo3), contentDescription ="logo",
                         Modifier
                             .height(180.dp)
                             .aspectRatio(16 / 9f)
