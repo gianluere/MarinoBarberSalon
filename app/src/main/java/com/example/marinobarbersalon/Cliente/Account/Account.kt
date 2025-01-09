@@ -48,6 +48,9 @@ fun Account(
 
 
     val notifiche by notificheClienteViewModel.notifiche.collectAsState()
+    userViewModel.caricaProdottiPrenotati()
+
+    val listaProdottiPrenotati by userViewModel.listaProdottiPrenotati.collectAsState()
     
     Column(
         modifier = modifier.fillMaxSize(),
@@ -98,7 +101,7 @@ fun Account(
                 color = my_gold
             )
 
-            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() })
+            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() }, notifiche = listaProdottiPrenotati.size)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -151,7 +154,7 @@ fun Riga(testo : String, modifier : Modifier, notifiche : Int = 0) {
                     Text(
                         text = notifiche.toString(),
                         color = my_gold, // Colore del testo
-
+                        textAlign = TextAlign.Center,
                         fontSize = 13.sp
                     )
                 }

@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -132,12 +133,12 @@ fun SelezionaGiorno(
 
                     if (orariDisponibili.isEmpty()){
                         Text(text = "NESSUN ORARIO DISPONIBILE\n" +
-                                "\n" +
                                 "SELEZIONARE UN’ALTRA DATA",
                             fontSize = 23.sp,
                             fontFamily = myFont,
                             color = Color.Black,
-                            lineHeight = 14.sp
+                            textAlign = TextAlign.Center,
+                            maxLines = 2
                         )
                         bottone = false
                     }else{
