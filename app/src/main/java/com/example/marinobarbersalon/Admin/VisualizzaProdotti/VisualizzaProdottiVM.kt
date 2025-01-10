@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,6 +58,16 @@ class VisualizzaProdottiVM : ViewModel(){
     private val _formErrors = MutableStateFlow<List<String>>(emptyList())
     val formErrors: StateFlow<List<String>> = _formErrors.asStateFlow()
 
+    //Connessione con Supabase
+    private val supabaseClient = createSupabaseClient(
+        supabaseUrl = "https://dboogadeyqtgiirwnopm.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRib29nYWRleXF0Z2lpcndub3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY0NTMyMDQsImV4cCI6MjA1MjAyOTIwNH0.5AERHBZ3WTKr9KOzTNQRWp-xCgNserTU1j1dyJTpIMY"
+    ) {
+        install(Storage) //Installazione del modulo Storage
+    }
+
+
+
 //    // Stato per l'aggiunta
 //    private val _aggiuntaStato = MutableStateFlow<AggiuntaStato>(AggiuntaStato.Inattivo)
 //    val aggiuntaStato: StateFlow<AggiuntaStato> = _aggiuntaStato.asStateFlow()
@@ -85,9 +98,6 @@ class VisualizzaProdottiVM : ViewModel(){
         }
     }
 
-
-
-
     private suspend fun getProdottiFromFirestore(categoria: String): List<Prodotto> {
         val db = firestore.collection("prodotti")
         val snapshot = db
@@ -102,6 +112,7 @@ class VisualizzaProdottiVM : ViewModel(){
         }
 
     }
+
     fun increaseStock(prodotto: Prodotto) {
         viewModelScope.launch {
             try {
@@ -121,23 +132,12 @@ class VisualizzaProdottiVM : ViewModel(){
             }
         }
     }
-
-    fun saveImageUrl(context: Context, imageUrl: String) {
-        val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("image_url", imageUrl)
-        editor.apply() // Salva l'URL
-    }
-
-    fun getImageUrl(context: Context): String? {
-        val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("image_url", null) // Recupera l'URL salvato
-    }
     //----------------------------------------------------------------------------------------------
 
 
     //----------------------------------------------------------------------------------------------
     //FUNZIONI PER LA TERZA PAGINA
+    //----------------------------------------------------------------------------------------------
     fun onNomeChange(newNome: String) {
         _nome.value = newNome
         validateForm()
@@ -186,29 +186,95 @@ class VisualizzaProdottiVM : ViewModel(){
         return errors.isEmpty()
     }
 
-    fun aggiungiProdotto(onSuccess: () -> Unit, onError: (Exception) -> Unit) {
-        if (!validateForm()) {
-            Log.d("prodotti", "Form non valido, impossibile aggiungere il prodotto.")
-            return
-        }
+//    fun aggiungiProdotto(onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+//        if (!validateForm()) {
+//            Log.d("prodotti", "Form non valido, impossibile aggiungere il prodotto.")
+//            return
+//        }
+//
+//        val prodotto = Prodotto(
+//            nome = _nome.value,
+//            descrizione = _descrizione.value,
+//            categoria = _categoria.value,
+//            prezzo = _prezzo.value,
+//            quantita = _quantita.value,
+//            immagine = _immagine.value
+//        )
+//
+//        viewModelScope.launch {
+//            try {
+//                firestore.collection("prodotti").add(prodotto).await()
+//                onSuccess()
+//                resetFields()
+//            } catch (e: Exception) {
+//                onError(e)
+//            }
+//        }
+//    }
 
-        val prodotto = Prodotto(
-            nome = _nome.value,
-            descrizione = _descrizione.value,
-            categoria = _categoria.value,
-            prezzo = _prezzo.value,
-            quantita = _quantita.value,
-            immagine = _immagine.value
-        )
-
+    fun aggiungiProdottoWithImage(
+        context: Context,
+        imageUri: String,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         viewModelScope.launch {
             try {
-                firestore.collection("prodotti").add(prodotto).await()
+                Log.d("aggiungiProdotto", "Inizio creazione prodotto su Firestore")
+
+                //Step 1: Creazione prodotto su Firestore
+                val prodotto = Prodotto(
+                    nome = _nome.value,
+                    descrizione = _descrizione.value,
+                    categoria = _categoria.value,
+                    prezzo = _prezzo.value,
+                    quantita = _quantita.value,
+                    immagine = "" //L'img sarà aggiornata dopo
+                )
+
+                val prodottoRef = firestore.collection("prodotti").add(prodotto).await()
+                val prodottoId = prodottoRef.id
+
+                Log.d("aggiungiProdotto", "Prodotto creato con ID: $prodottoId")
+
+                //Step 2: Caricamento immagine su Supabase
+                Log.d("aggiungiProdotto", "Inizio caricamento immagine su Supabase")
+                val publicUrl = uploadImageToSupabase(context, imageUri, prodottoId)
+
+                Log.d("aggiungiProdotto", "Immagine caricata con URL: $publicUrl")
+
+                //Step 3: Aggiornamento Firestore con l'URL dell'immagine
+                Log.d("aggiungiProdotto", "Inizio aggiornamento immagine su Firestore")
+                prodottoRef.update("immagine", publicUrl).await()
+
+                Log.d("aggiungiProdotto", "Prodotto aggiornato con URL immagine su Firestore")
+
                 onSuccess()
-                resetFields()
             } catch (e: Exception) {
+                Log.e("aggiungiProdotto", "Errore durante l'aggiunta del prodotto: ${e.message}", e)
                 onError(e)
             }
+        }
+    }
+
+    private suspend fun uploadImageToSupabase(context: Context, imageUri: String, prodottoId: String): String {
+        val inputStream = context.contentResolver.openInputStream(android.net.Uri.parse(imageUri))
+            ?: throw IllegalArgumentException("Impossibile aprire il file URI: $imageUri")
+
+        val storage = supabaseClient.storage
+
+        try {
+            //Carica il file nella sottocartella "photos/photos"
+            val path = storage.from("photos")
+                .upload("photos/$prodottoId.jpg", inputStream.readBytes())
+
+            //Genera l'URL pubblico per il file
+            val publicUrl = "https://dboogadeyqtgiirwnopm.supabase.co/storage/v1/object/public/photos/photos/$prodottoId.jpg"
+            Log.d("uploadImage", "URL immagine generato: $publicUrl")
+            return publicUrl
+        } catch (e: Exception) {
+            Log.e("uploadImage", "Errore durante il caricamento dell'immagine su Supabase: ${e.message}", e)
+            throw Exception("Errore durante il caricamento dell'immagine su Supabase: ${e.message}", e)
         }
     }
 
@@ -220,19 +286,5 @@ class VisualizzaProdottiVM : ViewModel(){
         _quantita.value = 0
         _immagine.value = ""
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //----------------------------------------------------------------------------------------------
 }

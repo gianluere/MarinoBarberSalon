@@ -456,9 +456,13 @@ fun AggiungiProdotto(
     val prezzo = aggiungiProdottoViewModel.prezzo.collectAsState().value
     val categoriaVM = aggiungiProdottoViewModel.categoria.collectAsState().value
     val quantita = aggiungiProdottoViewModel.quantita.collectAsState().value
-    val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
+//    val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
 
-    // Form validation
+    //per le img su supabase
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+
+    //Form val
     val formErrors = aggiungiProdottoViewModel.formErrors.collectAsState().value
     val showErrorDialog = remember { mutableStateOf(false) }
     val isFormSubmitted = remember { mutableStateOf(false) }
@@ -475,7 +479,7 @@ fun AggiungiProdotto(
         aggiungiProdottoViewModel.setCategoria(categoria)
     }
 
-    // Visualizza dialog di successo
+    //Visualizza dialog di successo
     if (showDialogSuccess.value) {
         DialogGenerico(
             titolo = "Successo",
@@ -488,7 +492,7 @@ fun AggiungiProdotto(
         )
     }
 
-    // Visualizza dialog di errore
+    //Visualizza dialog di errore
     if (showDialogError.value) {
         DialogGenerico(
             titolo = "Errore",
@@ -498,6 +502,7 @@ fun AggiungiProdotto(
         )
     }
 
+    //Visualizza dialog form invalid
     if (showErrorDialog.value) {
         AlertDialog(
             onDismissRequest = { showErrorDialog.value = false },
@@ -555,18 +560,18 @@ fun AggiungiProdotto(
         modifier = Modifier
             .fillMaxSize()
             .padding(32.dp)
-            .verticalScroll(rememberScrollState()), // Aggiungi scrolling alla colonna
-        verticalArrangement = Arrangement.Top, // Allinea al top
+            .verticalScroll(rememberScrollState()), //scroll
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titolo
+        //Titolo
         Text(
             text = "Aggiungi Prodotto",
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .padding(top = 64.dp)
-                .fillMaxWidth(), // Mantieni il titolo fisso
+                .fillMaxWidth(), //Titolo fisso
             color = my_white,
             fontFamily = myFont,
             textAlign = TextAlign.Center,
@@ -584,7 +589,7 @@ fun AggiungiProdotto(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
-                // Nome
+                //Nome
                 OutlinedTextField(
                     value = nome,
                     onValueChange = { aggiungiProdottoViewModel.onNomeChange(it) },
@@ -603,7 +608,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Descrizione
+                //Descrizione
                 OutlinedTextField(
                     value = descrizione,
                     onValueChange = { aggiungiProdottoViewModel.onDescrizioneChange(it) },
@@ -622,7 +627,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Categoria
+                //Categoria
                 OutlinedTextField(
                     value = categoriaVM,
                     onValueChange = { aggiungiProdottoViewModel.onCategoriaChange(it) },
@@ -641,11 +646,11 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Prezzo
+                //Prezzo
                 OutlinedTextField(
                     value = if (prezzo == 0.0) ""  else String.format("%.2f", prezzo),
                     onValueChange = { newValue ->
-                        val cleanedValue = newValue.replace(',', '.') // Sostituisci virgola con punto
+                        val cleanedValue = newValue.replace(',', '.') //Sost virgola con punto (nelle tastiere numeric c'è la virgola in italia)
                         val validValue = cleanedValue.toDoubleOrNull()
 
                         // Controlla se il valore è valido e all'interno del range consentito
@@ -668,7 +673,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Quantita
+                //Quantita
                 OutlinedTextField(
                     value = if (quantita == 0) "" else quantita.toString(),
                     onValueChange = { newValue ->
@@ -693,12 +698,12 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Selettore immagine
+                //Selettore immagine
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.GetContent()
                 ) { uri: Uri? ->
                     uri?.let {
-                        aggiungiProdottoViewModel.onImmagineChange(it.toString())
+                        selectedImageUri.value = it
                     }
                 }
 
@@ -706,7 +711,6 @@ fun AggiungiProdotto(
                     onClick = { launcher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
-//                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
                         text = "Seleziona Immagine",
@@ -716,16 +720,15 @@ fun AggiungiProdotto(
                     )
                 }
 
-                // Mostra anteprima immagine
-                if (immagine.isNotEmpty()) {
+                //Mostra anteprima immagine
+                selectedImageUri.value?.let { uri ->
                     Spacer(modifier = Modifier.height(8.dp))
                     Image(
-                        painter = rememberAsyncImagePainter(immagine),
+                        painter = rememberAsyncImagePainter(uri),
                         contentDescription = "Anteprima immagine",
                         modifier = Modifier
-                            .size(100.dp) // Ridotto a un quadrato di 100x100
+                            .size(100.dp)
                             .border(2.dp, my_bordeaux, RoundedCornerShape(10.dp)),
-
                     )
                 }
             }
@@ -733,20 +736,29 @@ fun AggiungiProdotto(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Pulsanti Aggiungi e Annulla
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
             Button(
                 onClick = {
-                    isFormSubmitted.value = true
-                    aggiungiProdottoViewModel.validateForm()
-                    if (formErrors.isEmpty()) {
-                        aggiungiProdottoViewModel.aggiungiProdotto(
-                            onSuccess = { showDialogSuccess.value = true },
-                            onError = { showDialogError.value = true }
+                    selectedImageUri.value?.let { uri ->
+                        Log.d("aggiungiProdotto", "URI immagine selezionato: $uri")
+                        aggiungiProdottoViewModel.aggiungiProdottoWithImage(
+                            context = context,
+                            imageUri = uri.toString(),
+                            onSuccess = {
+                                Log.d("aggiungiProdotto", "Prodotto aggiunto con successo")
+                                showDialogSuccess.value = true
+                            },
+                            onError = { e ->
+                                Log.e("aggiungiProdotto", "Errore durante l'aggiunta del prodotto: ${e.message}", e)
+                                showDialogError.value = true
+                            }
                         )
-                    } else {
+                    } ?: run {
+                        Log.e("aggiungiProdotto", "Nessuna immagine selezionata")
                         showErrorDialog.value = true
                     }
                 },
@@ -761,10 +773,11 @@ fun AggiungiProdotto(
                 )
             }
 
+
             Button(
                 onClick = {
                     aggiungiProdottoViewModel.resetFields()
-                    isFormSubmitted.value = false
+                    selectedImageUri.value = null
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
                 shape = RoundedCornerShape(10.dp)
