@@ -358,6 +358,7 @@ fun ProdottoCard(
             contentDescription = "Immagine prodotto",
             modifier = Modifier
                 .fillMaxSize()
+                .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp))
                 .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
             loading = {
@@ -375,7 +376,7 @@ fun ProdottoCard(
                     )
                 }
             },
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillBounds,
             colorFilter = if (prodotto.quantita == 0) {
                 ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
             } else {
@@ -730,7 +731,10 @@ fun AggiungiProdotto(
                             .size(100.dp)
                             .border(2.dp, my_bordeaux, RoundedCornerShape(10.dp)),
                     )
+                    aggiungiProdottoViewModel.onImmagineChange(newImmagine = selectedImageUri.value.toString())
                 }
+
+
             }
         }
 
@@ -743,23 +747,31 @@ fun AggiungiProdotto(
         ) {
             Button(
                 onClick = {
-                    selectedImageUri.value?.let { uri ->
-                        Log.d("aggiungiProdotto", "URI immagine selezionato: $uri")
-                        aggiungiProdottoViewModel.aggiungiProdottoWithImage(
-                            context = context,
-                            imageUri = uri.toString(),
-                            onSuccess = {
-                                Log.d("aggiungiProdotto", "Prodotto aggiunto con successo")
-                                showDialogSuccess.value = true
-                            },
-                            onError = { e ->
-                                Log.e("aggiungiProdotto", "Errore durante l'aggiunta del prodotto: ${e.message}", e)
-                                showDialogError.value = true
-                            }
-                        )
-                    } ?: run {
-                        Log.e("aggiungiProdotto", "Nessuna immagine selezionata")
-                        showErrorDialog.value = true
+
+                    isFormSubmitted.value = true //Imposta il form come inviato
+                    aggiungiProdottoViewModel.validateForm() //Valida il form
+
+                    if (formErrors.isEmpty()) {
+                        selectedImageUri.value?.let { uri ->
+                            Log.d("aggiungiProdotto", "URI immagine selezionato: $uri")
+                            aggiungiProdottoViewModel.aggiungiProdottoWithImage(
+                                context = context,
+                                imageUri = uri.toString(),
+                                onSuccess = {
+                                    Log.d("aggiungiProdotto", "Prodotto aggiunto con successo")
+                                    showDialogSuccess.value = true
+                                },
+                                onError = { e ->
+                                    Log.e("aggiungiProdotto", "Errore durante l'aggiunta del prodotto: ${e.message}", e)
+                                    showDialogError.value = true
+                                }
+                            )
+                        } ?: run {
+                            Log.e("aggiungiProdotto", "Nessuna immagine selezionata")
+                            showErrorDialog.value = true
+                        }
+                    } else {
+                        showErrorDialog.value = true //Mostra errori di validazione
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
@@ -773,11 +785,11 @@ fun AggiungiProdotto(
                 )
             }
 
-
             Button(
                 onClick = {
-                    aggiungiProdottoViewModel.resetFields()
-                    selectedImageUri.value = null
+                    aggiungiProdottoViewModel.resetFields() //Resetta i campi
+                    selectedImageUri.value = null //Resetta l'immagine selezionata
+                    isFormSubmitted.value = false //Resetta lo stato del form
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
                 shape = RoundedCornerShape(10.dp)
