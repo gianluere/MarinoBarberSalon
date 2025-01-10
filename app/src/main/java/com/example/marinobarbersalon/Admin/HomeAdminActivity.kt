@@ -215,7 +215,7 @@ class HomeAdminActivity: ComponentActivity() {
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
 
-                                // Aggiungi l'elemento Logout centrato
+                                //Elemento Logout centrato
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -231,7 +231,7 @@ class HomeAdminActivity: ComponentActivity() {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.ExitToApp, // Cambia l'icona se necessario
+                                        imageVector = Icons.Default.ExitToApp,
                                         contentDescription = "Logout",
                                         tint = my_white
                                     )
