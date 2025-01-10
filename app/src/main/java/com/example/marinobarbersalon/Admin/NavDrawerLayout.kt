@@ -46,7 +46,7 @@ fun NavDrawerHeader() {
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(5.dp)
+                .height(64.dp) //distanza tra logo e NavDrawerItems
         )
     }
 }
