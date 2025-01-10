@@ -182,7 +182,7 @@ fun ProdottoPrenotatoCard(
                         )
                     }
                 },
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
             )
 
             Column(
