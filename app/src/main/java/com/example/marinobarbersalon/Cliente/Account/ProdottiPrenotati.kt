@@ -78,7 +78,7 @@ fun ProdottiPrenotati(modifier : Modifier, userViewModel: UserViewModel) {
             modifier = Modifier.padding(start = 8.dp, top = 8.dp)
         )
 
-        if (listaProdottiPrenotati.size > 0){
+        if (listaProdottiPrenotati.isNotEmpty()){
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

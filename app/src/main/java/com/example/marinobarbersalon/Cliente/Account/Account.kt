@@ -47,10 +47,9 @@ fun Account(
 ) {
 
 
-    val notifiche by notificheClienteViewModel.notifiche.collectAsState()
-    userViewModel.caricaProdottiPrenotati()
+    val prenotazioni by notificheClienteViewModel.notifichePrenotazioni.collectAsState()
 
-    val listaProdottiPrenotati by userViewModel.listaProdottiPrenotati.collectAsState()
+    val prodottiPrenotati by notificheClienteViewModel.notificheProdotti.collectAsState() //by userViewModel.listaProdottiPrenotati.collectAsState()
     
     Column(
         modifier = modifier.fillMaxSize(),
@@ -93,7 +92,7 @@ fun Account(
                 color = my_gold
             )
 
-            Riga(testo = "Prenotazioni", modifier = Modifier.clickable { onNavigaPrenotazioni() }, notifiche= notifiche)
+            Riga(testo = "Prenotazioni", modifier = Modifier.clickable { onNavigaPrenotazioni() }, notifiche= prenotazioni)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -101,7 +100,7 @@ fun Account(
                 color = my_gold
             )
 
-            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() }, notifiche = listaProdottiPrenotati.size)
+            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() }, notifiche = prodottiPrenotati)//listaProdottiPrenotati.size)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),

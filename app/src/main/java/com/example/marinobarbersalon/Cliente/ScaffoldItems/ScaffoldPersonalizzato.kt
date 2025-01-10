@@ -207,7 +207,10 @@ fun TopBarMia(
 @Composable
 fun BarraNavigazione(navController : NavController, notificheClienteViewModel: NotificheClienteViewModel) {
 
-    val notifiche by notificheClienteViewModel.notifiche.collectAsState()
+    val notificheProdotti by notificheClienteViewModel.notificheProdotti.collectAsState()
+    val notifichePrenotazioni by notificheClienteViewModel.notifichePrenotazioni.collectAsState()
+
+    val notifiche = notifichePrenotazioni + notificheProdotti
 
     val navItemList = listOf(
         NavItem(Screen.Home.route, ImageVector.vectorResource(R.drawable.sharp_content_cut_24)),

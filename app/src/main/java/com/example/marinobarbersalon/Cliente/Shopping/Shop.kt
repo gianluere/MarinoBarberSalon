@@ -93,8 +93,8 @@ fun Shop(
         ) {
             items(listaProdotti) { prodotto ->
                 Log.d("Image URI", prodotto.immagine)
-                val foto = listaProdottiViewModel.getSignedUrl(prodotto.immagine)
-                GridItem(prodotto, onNavigateToProdottoShop, foto)
+                //val foto = listaProdottiViewModel.getSignedUrl(prodotto.immagine)
+                GridItem(prodotto, onNavigateToProdottoShop)
             }
             
         }
@@ -127,7 +127,7 @@ fun Shop(
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit, foto : String) {
+fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -136,15 +136,18 @@ fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit, fot
     ) {
 
         SubcomposeAsyncImage(
-            model = Uri.parse(foto),
+            model = Uri.parse(prodotto.immagine),
+            //contentScale = ContentScale.FillBounds,
             contentDescription = "Immagine prodotto",
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp))
                 .border(2.dp, my_gold, RoundedCornerShape(10.dp))
                 .clickable {
                     onNavigateToProdottoShop(prodotto.nome)
                 },
+
             loading = {
                 Box(
                     Modifier.size(180.dp)

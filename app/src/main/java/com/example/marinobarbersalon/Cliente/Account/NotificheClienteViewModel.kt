@@ -3,10 +3,12 @@ package com.example.marinobarbersalon.Cliente.Account
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.marinobarbersalon.Cliente.Shopping.ProdottoPrenotato
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,18 +23,24 @@ class NotificheClienteViewModel : ViewModel() {
     private val db = Firebase.firestore
     private val userEmail = FirebaseAuth.getInstance().currentUser!!.email
 
-    private val _notifiche = MutableStateFlow(0)
-    val notifiche : StateFlow<Int> = _notifiche.asStateFlow()
+    private val auth : FirebaseAuth = FirebaseAuth.getInstance()
+
+    private val _notifichePrenotazioni = MutableStateFlow(0)
+    val notifichePrenotazioni : StateFlow<Int> = _notifichePrenotazioni.asStateFlow()
+
+    private val _notificheProdotti = MutableStateFlow(0)
+    val notificheProdotti : StateFlow<Int> = _notificheProdotti.asStateFlow()
 
 
     init {
 
-        startListener()
+        startListenerPrenotazioni()
+        startListenerAcquisti()
 
     }
 
 
-    private fun startListener(){
+    private fun startListenerPrenotazioni(){
 
         if (userEmail != null) {
             db.collection("utenti").document(userEmail).addSnapshotListener{snapshot, error ->
@@ -71,7 +79,7 @@ class NotificheClienteViewModel : ViewModel() {
                                 }
                             }
 
-                            _notifiche.value = totale
+                            _notifichePrenotazioni.value = totale
                         }
                     } else {
                         Log.e("FirestoreError", "Nessun appuntamento trovato per l'utente.")
@@ -83,7 +91,7 @@ class NotificheClienteViewModel : ViewModel() {
                 }
             }
 
-            }
+        }
 
     }
 
@@ -102,6 +110,33 @@ class NotificheClienteViewModel : ViewModel() {
         Log.d("Notif", "Lunghezza funzione: " + appuntamenti.size.toString())
         Log.d("Notif", "Appuntamenti funzione: " + appuntamenti.toString())
         return appuntamenti
+    }
+
+
+    private fun startListenerAcquisti(){
+
+        if (userEmail != null) {
+            val userReference = auth.currentUser?.email?.let { db.collection("utenti").document(it) }
+
+            db.collection("prodottiPrenotati").whereEqualTo("utente", userReference)
+                .whereEqualTo("stato", "attesa").addSnapshotListener{snapshot, error ->
+
+                if (error != null) {
+                    Log.e("FirestoreError", "Errore nel ricevere aggiornamenti: ", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && !snapshot.isEmpty) {
+                    val prodottiList: MutableList<ProdottoPrenotato> = snapshot.toObjects(ProdottoPrenotato::class.java)
+
+                    Log.d("ProdPren", prodottiList.size.toString())
+
+                    _notificheProdotti.value = prodottiList.size
+                }
+            }
+
+        }
+
     }
 
 
