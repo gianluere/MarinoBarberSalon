@@ -5,10 +5,12 @@ import android.text.Layout
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -79,6 +81,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Admin.Servizi.DialogGenerico
+
 
 
 /*
@@ -277,6 +280,9 @@ fun VisualizzaProdottiDettaglio(
     val context = LocalContext.current
     val categoriaSelezionata = categoria
     val prodotti = prodottiViewModel.prodottiState.collectAsState().value
+    val (prodottoDaEliminare, setProdottoDaEliminare) = remember { mutableStateOf<Prodotto?>(null) }
+
+
 
     LaunchedEffect(Unit) {
         prodottiViewModel.fetchProdottiPerCategoria(categoriaSelezionata)
@@ -309,8 +315,23 @@ fun VisualizzaProdottiDettaglio(
             modifier = Modifier.weight(1f) //togliere sovrapposizione
         ) {
             items(prodotti) { prodotto ->
-                ProdottoCard(prodotto, prodottiViewModel)
+                ProdottoCard(prodotto, prodottiViewModel, onEliminaClick = {setProdottoDaEliminare(prodotto) })
             }
+        }
+
+
+        //Dialog eliminazione prodotto
+        prodottoDaEliminare?.let { prodotto ->
+            DeleteProductDialog(
+                prodotto = prodotto,
+                onConferma = {
+                    prodottiViewModel.deleteProdotto(prodotto)
+                    setProdottoDaEliminare(null)
+                },
+                onAnnulla = {
+                    setProdottoDaEliminare(null)
+                }
+            )
         }
 
         //Bottone "Aggiungi Prodotto"
@@ -339,16 +360,97 @@ fun VisualizzaProdottiDettaglio(
         }
     }
 }
+@Composable
+fun DeleteProductDialog(
+    prodotto: Prodotto,
+    onConferma: () -> Unit,
+    onAnnulla: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onAnnulla,
+        title = {
+            Text(
+                text = "Eliminare il prodotto?",
+                fontFamily = myFont,
+                fontSize = 20.sp,
+            )
+        },
+        text = {
+            //Testo scrollabile
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth() //Occupa tutta la larghezza del dialog
+                    .heightIn(min = 50.dp, max = 200.dp) //Limita l'altezza del testo per abilitare lo scrolling
+                    .verticalScroll(rememberScrollState()) //Abilita lo scrolling verticale
+            ) {
+                Text(
+                    text = "Sei sicuro di voler eliminare il prodotto \"${prodotto.nome}\"?",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    maxLines = Int.MAX_VALUE, //Permette il rendering di tutto il contenuto
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConferma,
+                modifier = Modifier
+                    .padding(8.dp)
+//                    .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = my_bordeaux
+//                ),
+                    .background(my_bordeaux)
+            ) {
+                Text(
+                    text = "Conferma",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = my_white
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onAnnulla,
+                modifier = Modifier
+                    .padding(8.dp)
+//                    .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                    .background(my_bordeaux),
+            ) {
+                Text(
+                    text = "Annulla",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = my_white,
 
+                    )
+            }
+        },
+        shape = RoundedCornerShape(17.dp), // Rende il dialogo con angoli arrotondati
+        modifier = Modifier
+            .padding(16.dp) // Padding esterno per il dialogo
+            .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+        containerColor = my_yellow, // Colore di sfondo del dialog
+    )
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProdottoCard(
     prodotto: Prodotto,
-    prodottiViewModel: VisualizzaProdottiVM
+    prodottiViewModel: VisualizzaProdottiVM,
+    onEliminaClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(8.dp)
+            .combinedClickable(
+                onClick =  {},
+                onLongClick = onEliminaClick,
+            ),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
