@@ -80,6 +80,11 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     //PER BARRA NAV E DI STATO
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
+    //Per supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:1.3.2"))
+    implementation("io.ktor:ktor-client-android:2.3.3")
+    implementation("io.github.jan-tennert.supabase:storage-kt:1.3.2")
+
 
 
 

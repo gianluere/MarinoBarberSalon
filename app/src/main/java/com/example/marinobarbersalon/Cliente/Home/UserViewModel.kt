@@ -16,6 +16,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,6 +45,12 @@ class UserViewModel : ViewModel() {
     private val _validationMessage = MutableStateFlow<String?>(null)
     val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
 
+    private val supabase = createSupabaseClient(
+        supabaseUrl = "https://xyzcompany.supabase.co",
+        supabaseKey = "public-anon-key"
+    ) {
+        install(Storage)
+    }
 
 
     init {

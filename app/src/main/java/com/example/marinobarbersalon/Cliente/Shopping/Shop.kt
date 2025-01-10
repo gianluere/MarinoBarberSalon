@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -91,7 +93,8 @@ fun Shop(
         ) {
             items(listaProdotti) { prodotto ->
                 Log.d("Image URI", prodotto.immagine)
-                GridItem(prodotto, onNavigateToProdottoShop)
+                val foto = listaProdottiViewModel.getSignedUrl(prodotto.immagine)
+                GridItem(prodotto, onNavigateToProdottoShop, foto)
             }
             
         }
@@ -124,7 +127,7 @@ fun Shop(
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
+fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit, foto : String) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -133,7 +136,7 @@ fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
     ) {
 
         SubcomposeAsyncImage(
-            model = Uri.parse(prodotto.immagine),
+            model = Uri.parse(foto),
             contentDescription = "Immagine prodotto",
             modifier = Modifier
                 .fillMaxSize()
@@ -151,13 +154,17 @@ fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .size(10.dp),
+                            .size(30.dp),
                         color = my_gold,
                         strokeWidth = 5.dp
                     )
                 }
 
 
+            },
+            error = {
+                Image(painterResource(R. drawable.placeholder),contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                //painterResource(id = R.drawable.placeholder)
             },
             contentScale = ContentScale.Crop,
             colorFilter = if (prodotto.quantita == 0) {ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })} else { null}

@@ -10,6 +10,10 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,9 +21,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.internal.readFieldOrNull
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class ListaProdottiViewModel : ViewModel() {
 
@@ -32,6 +39,15 @@ class ListaProdottiViewModel : ViewModel() {
     private val _prodotto = MutableStateFlow(Prodotto())
     val prodotto : StateFlow<Prodotto> = _prodotto.asStateFlow()
 
+    private val supabaseClient = createSupabaseClient(
+        supabaseUrl = "https://dboogadeyqtgiirwnopm.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRib29nYWRleXF0Z2lpcndub3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY0NTMyMDQsImV4cCI6MjA1MjAyOTIwNH0.5AERHBZ3WTKr9KOzTNQRWp-xCgNserTU1j1dyJTpIMY"
+    ) {
+        install(Storage)
+    }
+
+    private val _fotoscelta = MutableStateFlow("")
+    val fotoscelta : StateFlow<String> = _fotoscelta.asStateFlow()
 
     fun caricaListaProdotti(categoria : String){
         db.collection("prodotti")
@@ -123,6 +139,20 @@ class ListaProdottiViewModel : ViewModel() {
             prenProdotto(prodotto, quantita, onSuccess, onFailed)
         }
     }
+
+    fun getSignedUrl(filePath: String, expiresInSeconds: Int = 3600) : String {
+        val storage = supabaseClient.storage
+        val bucket = storage.from("photos") // Nome del tuo bucket
+
+        return bucket.publicUrl("photos/$filePath")
+
+
+
+    }
+
+
+
+
 
 
 
