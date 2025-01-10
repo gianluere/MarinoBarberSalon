@@ -144,7 +144,7 @@ class VisualizzaProdottiVM : ViewModel(){
                 _prodottiState.value = _prodottiState.value.filter { it.id != prodotto.id }
                 //Log.d("prodotti", "$prodotto.id")
             } catch (e: Exception) {
-                Log.e("VisualizzaServiziVM", "Errore durante l'eliminazione del servizio: ${prodotto.id}", e)
+                Log.e("VisualizzaProdottiVM", "Errore durante l'eliminazione del prodotto: ${prodotto.id}", e)
             }
         }
     }
