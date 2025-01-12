@@ -505,6 +505,7 @@ class UserViewModel : ViewModel() {
 
                 // Attendi il completamento di tutti i task
                 Tasks.whenAllComplete(taskList).addOnCompleteListener {
+                    listaProdottiAssociati.sortBy { it.second.nome }
                     _listaProdottiPrenotati.value = listaProdottiAssociati
                 }
             }

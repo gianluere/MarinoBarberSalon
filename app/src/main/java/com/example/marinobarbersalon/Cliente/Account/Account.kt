@@ -162,10 +162,10 @@ fun Riga(testo : String, modifier : Modifier, notifiche : Int = 0) {
         }
 
 
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "rightArrow",
-                modifier = Modifier.size(35.dp),
-                tint = Color.Black)
-        }
+
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "rightArrow",
+            modifier = Modifier.size(35.dp),
+            tint = Color.Black)
+
     }
 }

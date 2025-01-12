@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon.Cliente.Account
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -63,6 +64,8 @@ fun ProdottiPrenotati(modifier : Modifier, userViewModel: UserViewModel) {
     userViewModel.caricaProdottiPrenotati()
 
     val listaProdottiPrenotati by userViewModel.listaProdottiPrenotati.collectAsState()
+
+    //Log.d("Ricaricato", listaProdottiPrenotati.size.toString())
 
     Column(
         modifier = modifier.fillMaxSize(),

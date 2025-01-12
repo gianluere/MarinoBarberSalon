@@ -101,7 +101,12 @@ fun InserisciRecensione(
                 OutlinedTextField(
                     modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(1f).weight(1f),
                     value = descrizione,
-                    onValueChange = {descrizione = it},
+                    onValueChange = {
+                        if (it.length <= 280){
+                            descrizione = it
+                        }
+                    }
+                    ,
                     placeholder = {
                         Text(
                             text = "Descrizione",
