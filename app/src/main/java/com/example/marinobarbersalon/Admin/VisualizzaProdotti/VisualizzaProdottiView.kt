@@ -5,10 +5,12 @@ import android.text.Layout
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -79,6 +81,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Admin.Servizi.DialogGenerico
+
 
 
 /*
@@ -277,6 +280,9 @@ fun VisualizzaProdottiDettaglio(
     val context = LocalContext.current
     val categoriaSelezionata = categoria
     val prodotti = prodottiViewModel.prodottiState.collectAsState().value
+    val (prodottoDaEliminare, setProdottoDaEliminare) = remember { mutableStateOf<Prodotto?>(null) }
+
+
 
     LaunchedEffect(Unit) {
         prodottiViewModel.fetchProdottiPerCategoria(categoriaSelezionata)
@@ -309,8 +315,23 @@ fun VisualizzaProdottiDettaglio(
             modifier = Modifier.weight(1f) //togliere sovrapposizione
         ) {
             items(prodotti) { prodotto ->
-                ProdottoCard(prodotto, prodottiViewModel)
+                ProdottoCard(prodotto, prodottiViewModel, onEliminaClick = {setProdottoDaEliminare(prodotto) })
             }
+        }
+
+
+        //Dialog eliminazione prodotto
+        prodottoDaEliminare?.let { prodotto ->
+            DeleteProductDialog(
+                prodotto = prodotto,
+                onConferma = {
+                    prodottiViewModel.deleteProdotto(prodotto)
+                    setProdottoDaEliminare(null)
+                },
+                onAnnulla = {
+                    setProdottoDaEliminare(null)
+                }
+            )
         }
 
         //Bottone "Aggiungi Prodotto"
@@ -339,16 +360,97 @@ fun VisualizzaProdottiDettaglio(
         }
     }
 }
+@Composable
+fun DeleteProductDialog(
+    prodotto: Prodotto,
+    onConferma: () -> Unit,
+    onAnnulla: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onAnnulla,
+        title = {
+            Text(
+                text = "Eliminare il prodotto?",
+                fontFamily = myFont,
+                fontSize = 20.sp,
+            )
+        },
+        text = {
+            //Testo scrollabile
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth() //Occupa tutta la larghezza del dialog
+                    .heightIn(min = 50.dp, max = 200.dp) //Limita l'altezza del testo per abilitare lo scrolling
+                    .verticalScroll(rememberScrollState()) //Abilita lo scrolling verticale
+            ) {
+                Text(
+                    text = "Sei sicuro di voler eliminare il prodotto \"${prodotto.nome}\"?",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    maxLines = Int.MAX_VALUE, //Permette il rendering di tutto il contenuto
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConferma,
+                modifier = Modifier
+                    .padding(8.dp)
+//                    .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = my_bordeaux
+//                ),
+                    .background(my_bordeaux)
+            ) {
+                Text(
+                    text = "Conferma",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = my_white
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onAnnulla,
+                modifier = Modifier
+                    .padding(8.dp)
+//                    .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                    .background(my_bordeaux),
+            ) {
+                Text(
+                    text = "Annulla",
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
+                    color = my_white,
 
+                    )
+            }
+        },
+        shape = RoundedCornerShape(17.dp), // Rende il dialogo con angoli arrotondati
+        modifier = Modifier
+            .padding(16.dp) // Padding esterno per il dialogo
+            .border(2.dp, my_gold, RoundedCornerShape(17.dp)),
+        containerColor = my_yellow, // Colore di sfondo del dialog
+    )
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProdottoCard(
     prodotto: Prodotto,
-    prodottiViewModel: VisualizzaProdottiVM
+    prodottiViewModel: VisualizzaProdottiVM,
+    onEliminaClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(8.dp)
+            .combinedClickable(
+                onClick =  {},
+                onLongClick = onEliminaClick,
+            ),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -358,6 +460,7 @@ fun ProdottoCard(
             contentDescription = "Immagine prodotto",
             modifier = Modifier
                 .fillMaxSize()
+                .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp))
                 .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
             loading = {
@@ -375,7 +478,7 @@ fun ProdottoCard(
                     )
                 }
             },
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillBounds,
             colorFilter = if (prodotto.quantita == 0) {
                 ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
             } else {
@@ -456,9 +559,13 @@ fun AggiungiProdotto(
     val prezzo = aggiungiProdottoViewModel.prezzo.collectAsState().value
     val categoriaVM = aggiungiProdottoViewModel.categoria.collectAsState().value
     val quantita = aggiungiProdottoViewModel.quantita.collectAsState().value
-    val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
+//    val immagine = aggiungiProdottoViewModel.immagine.collectAsState().value
 
-    // Form validation
+    //per le img su supabase
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+
+    //Form val
     val formErrors = aggiungiProdottoViewModel.formErrors.collectAsState().value
     val showErrorDialog = remember { mutableStateOf(false) }
     val isFormSubmitted = remember { mutableStateOf(false) }
@@ -475,7 +582,7 @@ fun AggiungiProdotto(
         aggiungiProdottoViewModel.setCategoria(categoria)
     }
 
-    // Visualizza dialog di successo
+    //Visualizza dialog di successo
     if (showDialogSuccess.value) {
         DialogGenerico(
             titolo = "Successo",
@@ -488,7 +595,7 @@ fun AggiungiProdotto(
         )
     }
 
-    // Visualizza dialog di errore
+    //Visualizza dialog di errore
     if (showDialogError.value) {
         DialogGenerico(
             titolo = "Errore",
@@ -498,6 +605,7 @@ fun AggiungiProdotto(
         )
     }
 
+    //Visualizza dialog form invalid
     if (showErrorDialog.value) {
         AlertDialog(
             onDismissRequest = { showErrorDialog.value = false },
@@ -555,18 +663,18 @@ fun AggiungiProdotto(
         modifier = Modifier
             .fillMaxSize()
             .padding(32.dp)
-            .verticalScroll(rememberScrollState()), // Aggiungi scrolling alla colonna
-        verticalArrangement = Arrangement.Top, // Allinea al top
+            .verticalScroll(rememberScrollState()), //scroll
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titolo
+        //Titolo
         Text(
             text = "Aggiungi Prodotto",
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .padding(top = 64.dp)
-                .fillMaxWidth(), // Mantieni il titolo fisso
+                .fillMaxWidth(), //Titolo fisso
             color = my_white,
             fontFamily = myFont,
             textAlign = TextAlign.Center,
@@ -584,7 +692,7 @@ fun AggiungiProdotto(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
-                // Nome
+                //Nome
                 OutlinedTextField(
                     value = nome,
                     onValueChange = { aggiungiProdottoViewModel.onNomeChange(it) },
@@ -603,7 +711,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Descrizione
+                //Descrizione
                 OutlinedTextField(
                     value = descrizione,
                     onValueChange = { aggiungiProdottoViewModel.onDescrizioneChange(it) },
@@ -622,7 +730,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Categoria
+                //Categoria
                 OutlinedTextField(
                     value = categoriaVM,
                     onValueChange = { aggiungiProdottoViewModel.onCategoriaChange(it) },
@@ -641,11 +749,11 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Prezzo
+                //Prezzo
                 OutlinedTextField(
                     value = if (prezzo == 0.0) ""  else String.format("%.2f", prezzo),
                     onValueChange = { newValue ->
-                        val cleanedValue = newValue.replace(',', '.') // Sostituisci virgola con punto
+                        val cleanedValue = newValue.replace(',', '.') //Sost virgola con punto (nelle tastiere numeric c'è la virgola in italia)
                         val validValue = cleanedValue.toDoubleOrNull()
 
                         // Controlla se il valore è valido e all'interno del range consentito
@@ -668,7 +776,7 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Quantita
+                //Quantita
                 OutlinedTextField(
                     value = if (quantita == 0) "" else quantita.toString(),
                     onValueChange = { newValue ->
@@ -693,12 +801,12 @@ fun AggiungiProdotto(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Selettore immagine
+                //Selettore immagine
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.GetContent()
                 ) { uri: Uri? ->
                     uri?.let {
-                        aggiungiProdottoViewModel.onImmagineChange(it.toString())
+                        selectedImageUri.value = it
                     }
                 }
 
@@ -706,7 +814,6 @@ fun AggiungiProdotto(
                     onClick = { launcher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
-//                    shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
                         text = "Seleziona Immagine",
@@ -716,38 +823,57 @@ fun AggiungiProdotto(
                     )
                 }
 
-                // Mostra anteprima immagine
-                if (immagine.isNotEmpty()) {
+                //Mostra anteprima immagine
+                selectedImageUri.value?.let { uri ->
                     Spacer(modifier = Modifier.height(8.dp))
                     Image(
-                        painter = rememberAsyncImagePainter(immagine),
+                        painter = rememberAsyncImagePainter(uri),
                         contentDescription = "Anteprima immagine",
                         modifier = Modifier
-                            .size(100.dp) // Ridotto a un quadrato di 100x100
+                            .size(100.dp)
                             .border(2.dp, my_bordeaux, RoundedCornerShape(10.dp)),
-
                     )
+                    aggiungiProdottoViewModel.onImmagineChange(newImmagine = selectedImageUri.value.toString())
                 }
+
+
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //Pulsanti Aggiungi e Annulla
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
             Button(
                 onClick = {
-                    isFormSubmitted.value = true
-                    aggiungiProdottoViewModel.validateForm()
+
+                    isFormSubmitted.value = true //Imposta il form come inviato
+                    aggiungiProdottoViewModel.validateForm() //Valida il form
+
                     if (formErrors.isEmpty()) {
-                        aggiungiProdottoViewModel.aggiungiProdotto(
-                            onSuccess = { showDialogSuccess.value = true },
-                            onError = { showDialogError.value = true }
-                        )
+                        selectedImageUri.value?.let { uri ->
+                            Log.d("aggiungiProdotto", "URI immagine selezionato: $uri")
+                            aggiungiProdottoViewModel.aggiungiProdottoWithImage(
+                                context = context,
+                                imageUri = uri.toString(),
+                                onSuccess = {
+                                    Log.d("aggiungiProdotto", "Prodotto aggiunto con successo")
+                                    showDialogSuccess.value = true
+                                },
+                                onError = { e ->
+                                    Log.e("aggiungiProdotto", "Errore durante l'aggiunta del prodotto: ${e.message}", e)
+                                    showDialogError.value = true
+                                }
+                            )
+                        } ?: run {
+                            Log.e("aggiungiProdotto", "Nessuna immagine selezionata")
+                            showErrorDialog.value = true
+                        }
                     } else {
-                        showErrorDialog.value = true
+                        showErrorDialog.value = true //Mostra errori di validazione
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
@@ -763,8 +889,9 @@ fun AggiungiProdotto(
 
             Button(
                 onClick = {
-                    aggiungiProdottoViewModel.resetFields()
-                    isFormSubmitted.value = false
+                    aggiungiProdottoViewModel.resetFields() //Resetta i campi
+                    selectedImageUri.value = null //Resetta l'immagine selezionata
+                    isFormSubmitted.value = false //Resetta lo stato del form
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
                 shape = RoundedCornerShape(10.dp)

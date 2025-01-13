@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,21 +23,25 @@ import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Grade
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocalMall
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.WatchLater
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.Grade
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.LocalMall
 
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.WatchLater
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,6 +75,9 @@ import com.example.marinobarbersalon.ui.theme.my_drawer
 import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+
 
 class HomeAdminActivity: ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -104,46 +112,46 @@ class HomeAdminActivity: ComponentActivity() {
 //                            unselectedIcon = Icons.Outlined.Person,
 //                        ),
                         NavDrawerItem(
-                            title = "Visualizza Appuntamenti",
+                            title = "Appuntamenti",
                             route = Screen.VisualizzaAppuntamenti.route,
                             selectedIcon = Icons.Filled.CalendarMonth,
                             unselectedIcon = Icons.Outlined.CalendarMonth,
                         ),
                         NavDrawerItem(
-                            title = "Visualizza Clienti",
+                            title = "Clienti",
                             route = Screen.VisualizzaClienti.route,
                             selectedIcon = Icons.Filled.Person,
                             unselectedIcon = Icons.Outlined.Person
                         ),
                         NavDrawerItem(
-                            title = "Visualizza Servizi",
+                            title = "Servizi",
                             route = Screen.VisualizzaServizi.route,
                             selectedIcon = Icons.Filled.ContentCut,
                             unselectedIcon = Icons.Outlined.ContentCut
                         ),
                         NavDrawerItem(
-                            title = "Visualizza Prodotti",
+                            title = "Prodotti",
                             route = Screen.VisualizzaProdotti.route,
                             selectedIcon = Icons.Filled.ShoppingCart,
                             unselectedIcon = Icons.Outlined.ShoppingCart
                         ),
                         NavDrawerItem(
-                            title = "Visualizza Recensioni",
+                            title = "Recensioni",
                             route = Screen.Recensioni.route,
                             selectedIcon = Icons.Filled.Grade,
                             unselectedIcon = Icons.Outlined.Grade
                         ),
                         NavDrawerItem(
-                            title = "Visualizza Statistiche",
+                            title = "Statistiche",
                             route = Screen.StatsBase.route,
                             selectedIcon = Icons.Filled.QueryStats,
                             unselectedIcon = Icons.Outlined.QueryStats
                         ),
                         NavDrawerItem(
-                            title = "Visualizza Prodotti Prenotati",
+                            title = "Prodotti Prenotati",
                             route = Screen.VisualizzaProdottiPrenotati.route,
-                            selectedIcon = Icons.Filled.QueryStats,
-                            unselectedIcon = Icons.Outlined.QueryStats
+                            selectedIcon = Icons.Filled.LocalMall,
+                            unselectedIcon = Icons.Outlined.LocalMall
                         )
 
 
@@ -181,63 +189,73 @@ class HomeAdminActivity: ComponentActivity() {
 //                                drawerContentColor = my_white,
 
                             ) {
-                                NavDrawerHeader()
+                                val scrollState = rememberScrollState()
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .verticalScroll(scrollState)
+                                ) {
+                                    NavDrawerHeader()
 
-                                NavDrawerBody(items = items, currentRoute = currentRoute) { currentNavigationItem ->
+                                    NavDrawerBody(
+                                        items = items,
+                                        currentRoute = currentRoute
+                                    ) { currentNavigationItem ->
 
-                                    navController.navigate(currentNavigationItem.route){
-                                        // Pop up to the start destination of the graph to
-                                        // avoid building up a large stack of destinations
-                                        // on the back stack as users select items
-                                        navController.graph.startDestinationRoute?.let { startDestinationRoute ->
-                                            // Pop up to the start destination, clearing the back stack
-                                            popUpTo(startDestinationRoute) {
-                                                // Save the state of popped destinations
-                                                saveState = true
+                                        navController.navigate(currentNavigationItem.route) {
+                                            // Pop up to the start destination of the graph to
+                                            // avoid building up a large stack of destinations
+                                            // on the back stack as users select items
+                                            navController.graph.startDestinationRoute?.let { startDestinationRoute ->
+                                                // Pop up to the start destination, clearing the back stack
+                                                popUpTo(startDestinationRoute) {
+                                                    // Save the state of popped destinations
+                                                    saveState = true
+                                                }
                                             }
+
+                                            // Configure navigation to avoid multiple instances of the same destination
+                                            launchSingleTop = true
+
+                                            // Restore state when re-selecting a previously selected item
+                                            restoreState = true
                                         }
 
-                                        // Configure navigation to avoid multiple instances of the same destination
-                                        launchSingleTop = true
 
-                                        // Restore state when re-selecting a previously selected item
-                                        restoreState = true
+                                        scope.launch {
+                                            drawerState.close()
+                                        }
                                     }
+                                    Spacer(modifier = Modifier.weight(1f))
 
-
-                                    scope.launch {
-                                        drawerState.close()
+                                    //Elemento Logout centrato
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 16.dp)
+                                            .clickable {
+                                                adminViewModel.logout()
+                                                Intent(context, MainActivity::class.java).also {
+                                                    context.startActivity(it)
+                                                    (context as? ComponentActivity)?.finish()
+                                                }
+                                            },
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ExitToApp,
+                                            contentDescription = "Logout",
+                                            tint = my_white
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Logout",
+                                            fontSize = 25.sp,
+                                            color = my_white,
+                                            fontFamily = myFont,
+                                        )
                                     }
-                                }
-                                Spacer(modifier = Modifier.weight(1f))
-
-                                // Aggiungi l'elemento Logout centrato
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 16.dp)
-                                        .clickable {
-                                            adminViewModel.logout()
-                                            Intent(context, MainActivity::class.java).also {
-                                                context.startActivity(it)
-                                                (context as? ComponentActivity)?.finish()
-                                            }
-                                        },
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ExitToApp, // Cambia l'icona se necessario
-                                        contentDescription = "Logout",
-                                        tint = my_white
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Logout",
-                                        fontSize = 25.sp,
-                                        color = my_white,
-                                        fontFamily = myFont,
-                                    )
                                 }
                             }
                         },
