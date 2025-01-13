@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.marinobarbersalon.Cliente.Home.AuthState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,15 @@ class AdminViewModel : ViewModel() {
     //per login
     private val _validationMessage = MutableStateFlow<String?>(null)
     val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
+
+    private val firebaseErrorMessages = mapOf(
+        "ERROR_INVALID_EMAIL" to "L'indirizzo email fornito non è valido. Controlla e riprova.",
+        "ERROR_INVALID_CREDENTIAL" to "Le credenziali fornite sono errate, non valide o scadute.",
+        "ERROR_USER_NOT_FOUND" to "Utente non trovato.",
+        "ERROR_WRONG_PASSWORD" to "Password errata.",
+        "ERROR_EMAIL_ALREADY_IN_USE" to "L'email è già in uso. Usa un'email diversa.",
+        "ERROR_WEAK_PASSWORD" to "La password è troppo debole. Scegli una password più sicura."
+    )
 
     init {
         checkAuthState()
@@ -81,7 +91,9 @@ class AdminViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     _adminState.value = _adminState.value.copy(state = AuthState.Authenticated)
                 } else {
-                    val errorMessage = task.exception?.message ?: "Email o password non corretti"
+                    val errorCode = (task.exception as FirebaseAuthException).errorCode
+                    Log.d("ToaError", errorCode)
+                    val errorMessage = firebaseErrorMessages[errorCode] ?: "Si è verificato un errore sconosciuto."
                     _validationMessage.value = errorMessage
                     _adminState.value = _adminState.value.copy(state = AuthState.Error(errorMessage))
                 }

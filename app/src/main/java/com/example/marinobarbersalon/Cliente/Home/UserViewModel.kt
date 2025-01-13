@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -44,6 +45,15 @@ class UserViewModel : ViewModel() {
     //per login
     private val _validationMessage = MutableStateFlow<String?>(null)
     val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
+
+    private val firebaseErrorMessages = mapOf(
+        "ERROR_INVALID_EMAIL" to "L'indirizzo email fornito non è valido. Controlla e riprova.",
+        "ERROR_INVALID_CREDENTIAL" to "Le credenziali fornite sono errate, non valide o scadute.",
+        "ERROR_USER_NOT_FOUND" to "Utente non trovato.",
+        "ERROR_WRONG_PASSWORD" to "Password errata.",
+        "ERROR_EMAIL_ALREADY_IN_USE" to "L'email è già in uso. Usa un'email diversa.",
+        "ERROR_WEAK_PASSWORD" to "La password è troppo debole. Scegli una password più sicura."
+    )
 
     private val supabase = createSupabaseClient(
         supabaseUrl = "https://xyzcompany.supabase.co",
@@ -108,7 +118,9 @@ class UserViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     _userState.value = _userState.value.copy(state = AuthState.Authenticated)
                 } else {
-                    val errorMessage = task.exception?.message ?: "Email o password non corretti"
+                    val errorCode = (task.exception as FirebaseAuthException).errorCode
+                    Log.d("ToaError", errorCode)
+                    val errorMessage = firebaseErrorMessages[errorCode] ?: "Si è verificato un errore sconosciuto."
                     _validationMessage.value = errorMessage
                     _userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
                 }
@@ -149,10 +161,10 @@ class UserViewModel : ViewModel() {
                         }
 
                 }else{
-                    _userState.value = _userState.value.copy(state = AuthState.Error(
-                        task.exception?.message ?: "Errore"
-                    )
-                    )
+                    val errorCode = (task.exception as FirebaseAuthException).errorCode
+                    Log.d("ToaError", errorCode)
+                    val errorMessage = firebaseErrorMessages[errorCode] ?: "Si è verificato un errore sconosciuto."
+                    _userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
                 }
             }
     }

@@ -225,6 +225,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
                     ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     singleLine = true,
                     maxLines = 1,
                     modifier = Modifier.width(280.dp)
