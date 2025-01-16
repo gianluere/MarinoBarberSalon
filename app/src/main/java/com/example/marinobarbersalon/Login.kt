@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,6 +73,9 @@ fun LoginScreen(
     val adminState by adminViewModel.adminState.collectAsState()
     val userValidationMessage by userViewModel.validationMessage.collectAsState()
     val adminValidationMessage by adminViewModel.validationMessage.collectAsState()
+
+    val loginRepository = LoginRepository()
+    var isLoading by remember { mutableStateOf(false) }
 
 
     val context = LocalContext.current
@@ -222,6 +226,7 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
+                        /*
                         Log.d("LOGIN", email)
                         adminViewModel.isAdmin(email) { isAdmin ->
                             if (isAdmin) {
@@ -230,10 +235,44 @@ fun LoginScreen(
                                 userViewModel.login(email, password)
                             }
                         }
+
+                         */
+
+                        isLoading = true
+
+                        loginRepository.loginUser(email, password) { userId, error ->
+                            if (userId != null) {
+                                loginRepository.determineUserType() { userType ->
+                                    when (userType) {
+                                        "admin" -> {
+                                            adminViewModel.checkAuthState()
+                                        }
+                                        "cliente" -> {
+                                            userViewModel.checkAuthState()
+                                        }
+                                        else -> {
+                                            Log.e("MainActivity", "Unknown user type")
+                                        }
+                                    }
+                                }
+                                isLoading = false
+                            } else {
+                                userViewModel.login(email, password)
+                                isLoading = false
+                            }
+                        }
+
+
+
+
+
+
+
+
                     },
-                    enabled = userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
+                    enabled = !isLoading,//userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
                     modifier = Modifier.width(230.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
+                    colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux, disabledContainerColor = my_bordeaux),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(

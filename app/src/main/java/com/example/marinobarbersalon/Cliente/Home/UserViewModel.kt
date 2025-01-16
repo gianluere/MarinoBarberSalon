@@ -68,18 +68,22 @@ class UserViewModel : ViewModel() {
 
     }
 
-    private fun checkAuthState() {
+    fun checkAuthState() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
             _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
+            Log.d("LOGIN", "User non trovato e vuoto")
         } else {
             checkIfCliente(currentUser.email ?: "") { isCliente ->
                 if (isCliente) {
+                    Log.d("LOGIN", "User autenticato e non vuoto")
                     _userState.value = _userState.value.copy(state = AuthState.Authenticated)
                     caricaDati()
                     sincronizzaPrenotazioni()
+                    Log.d("LOGIN", "User autenticato e non vuoto 2")
                 } else {
                     _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
+                    Log.d("LOGIN", "User autenticato e non vuoto 3")
                 }
             }
         }
