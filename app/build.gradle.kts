@@ -84,6 +84,16 @@ dependencies {
     implementation(platform("io.github.jan-tennert.supabase:bom:1.3.2"))
     implementation("io.ktor:ktor-client-android:2.3.3")
     implementation("io.github.jan-tennert.supabase:storage-kt:1.3.2")
+    //Woerker per notifiche
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    //Per il test
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.mockito:mockito-core:4.8.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    testImplementation("com.google.truth:truth:1.1.5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
 
 
 

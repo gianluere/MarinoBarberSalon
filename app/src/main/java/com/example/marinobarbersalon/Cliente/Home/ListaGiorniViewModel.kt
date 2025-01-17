@@ -73,7 +73,7 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
                 _listaGiorni.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
                 _listaGiorniAggiornata.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
 
-                val prova = async{ generaListaOccupatiSospend(LocalDate.now(), 60)}
+                val prova = async{ generaListaOccupatiSuspend(LocalDate.now(), 60)}
                 _listaGiorniOccupati.value = prova.await()
 
                 // Aggiorna la lista dei giorni con quelli occupati
@@ -94,12 +94,15 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
     }
 
 
-    private fun pimoOrarioDisponibile(currentTime: LocalTime): LocalTime {
-        val nextMinute = if (currentTime.minute % 30 == 0) {
+    private fun primoOrarioDisponibile(currentTime: LocalTime): LocalTime {
+        val nextMinute = if (currentTime.minute % 30 == 0 || currentTime.minute == 0) {
             currentTime.minute
         } else {
             (currentTime.minute / 30 + 1) * 30
         }
+
+        Log.d("OrarioIniziale", "CurrTime: " + currentTime.minute.toString())
+        Log.d("OrarioIniziale", nextMinute.toString())
 
         return currentTime.withMinute(nextMinute % 60).withHour(currentTime.hour + nextMinute / 60)
             .withSecond(0).withNano(0)
@@ -120,8 +123,8 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
             val giornoCorrente = oggi.plusDays(i.toLong())
 
             // Escludi sabato, domenica e giorni festivi
-            if (giornoCorrente.dayOfWeek == DayOfWeek.SATURDAY ||
-                giornoCorrente.dayOfWeek == DayOfWeek.SUNDAY ||
+            if (giornoCorrente.dayOfWeek == DayOfWeek.SUNDAY ||
+                giornoCorrente.dayOfWeek == DayOfWeek.MONDAY ||
                 giorniFestivi.contains(giornoCorrente)) {
                 // Aggiungi il giorno senza orari disponibili
                 giorniDisponibili.add(giornoCorrente to emptyList())
@@ -129,7 +132,7 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
                 val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
 
                 var orarioCorrente = if (i == 0 && LocalTime.now().isAfter(orarioInizio)) {
-                    pimoOrarioDisponibile(LocalTime.now())
+                    primoOrarioDisponibile(LocalTime.now())
                 } else {
                     orarioInizio
                 }
@@ -149,7 +152,7 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
 
 
-    private suspend fun generaListaOccupatiSospend(
+    private suspend fun generaListaOccupatiSuspend(
         oggi: LocalDate,
         giorniTotali: Int
     ): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {

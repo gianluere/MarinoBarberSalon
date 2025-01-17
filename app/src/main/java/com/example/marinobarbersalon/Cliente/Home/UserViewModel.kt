@@ -1,11 +1,14 @@
 package com.example.marinobarbersalon.Cliente.Home
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marinobarbersalon.Cliente.Account.Appuntamento
 import com.example.marinobarbersalon.Cliente.Shopping.Prodotto
 import com.example.marinobarbersalon.Cliente.Shopping.ProdottoPrenotato
+import com.example.marinobarbersalon.NotificationWorker
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
@@ -27,6 +30,13 @@ import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.marinobarbersalon.LoginRepository
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class UserViewModel : ViewModel() {
 
@@ -46,6 +56,8 @@ class UserViewModel : ViewModel() {
     private val _validationMessage = MutableStateFlow<String?>(null)
     val validationMessage: StateFlow<String?> = _validationMessage.asStateFlow()
 
+    private var loginRepository: LoginRepository = LoginRepository()
+
     private val firebaseErrorMessages = mapOf(
         "ERROR_INVALID_EMAIL" to "L'indirizzo email fornito non è valido. Controlla e riprova.",
         "ERROR_INVALID_CREDENTIAL" to "Le credenziali fornite sono errate, non valide o scadute.",
@@ -55,17 +67,13 @@ class UserViewModel : ViewModel() {
         "ERROR_WEAK_PASSWORD" to "La password è troppo debole. Scegli una password più sicura."
     )
 
-    private val supabase = createSupabaseClient(
-        supabaseUrl = "https://xyzcompany.supabase.co",
-        supabaseKey = "public-anon-key"
-    ) {
-        install(Storage)
-    }
-
-
     init {
         checkAuthState()
 
+    }
+
+    fun setLoginRepositoryForTest(repository: LoginRepository) {
+        this.loginRepository = repository
     }
 
     fun checkAuthState() {
@@ -204,6 +212,25 @@ class UserViewModel : ViewModel() {
 
                 }
         }
+    }
+
+    fun scheduleNotificationWithWorker(
+        context: Context,
+        titolo: String,
+        messaggio: String,
+        delayInMillis: Long
+    ) {
+        val data = Data.Builder()
+            .putString("title", titolo)
+            .putString("message", messaggio)
+            .build()
+
+        val notificationWorkRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+            .setInputData(data)
+            .setInitialDelay(delayInMillis, TimeUnit.MILLISECONDS)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(notificationWorkRequest)
     }
 
     fun aggiungiApp(

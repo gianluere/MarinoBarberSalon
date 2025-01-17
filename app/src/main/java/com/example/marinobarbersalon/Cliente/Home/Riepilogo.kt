@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -41,8 +42,11 @@ import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_white
+import com.google.type.DateTime
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun Riepilogo(
@@ -55,6 +59,9 @@ fun Riepilogo(
     dataSelezionata : String,
     onSuccess : () -> Unit
 ) {
+
+    val context = LocalContext.current
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -146,6 +153,46 @@ fun Riepilogo(
                                 dataSel = dataSelezionata.toString(),
                                 onSuccess = {
                                     showDialogSuccess = true
+
+                                    // Calcola il ritardo fino alla mattina dell'appuntamento
+
+
+                                    val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                    val parsedDate = inputFormat.parse(dataSelezionata)
+                                    val formattedDate = parsedDate?.let { outputFormat.format(it) }
+
+                                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                                    val appointmentDate = sdf.parse("$formattedDate 08:00") ?: throw IllegalArgumentException("Data non valida")
+                                    val delay = appointmentDate.time - System.currentTimeMillis()
+
+                                    val oggi = outputFormat.format(System.currentTimeMillis())
+
+
+                                    Log.d("Worker", "DELAY: $delay")
+                                    Log.d("Worker", "Adesso inizio il work")
+
+                                    if (formattedDate == oggi){
+                                        userViewModel.scheduleNotificationWithWorker(
+                                            context = context,
+                                            titolo = "Promemoria Appuntamento",
+                                            messaggio = "Hai un appuntamento oggi alle $orarioInizio per il servizio ${servizio.nome}.",
+                                            delayInMillis = 0
+                                        )
+
+                                        Log.d("Worker", "Inviato adesso")
+
+                                    } else if (delay > 0) {
+                                        // Programma la notifica con il Worker
+                                        userViewModel.scheduleNotificationWithWorker(
+                                            context = context,
+                                            titolo = "Promemoria Appuntamento",
+                                            messaggio = "Hai un appuntamento oggi alle $orarioInizio per il servizio ${servizio.nome}.",
+                                            delayInMillis = delay
+                                        )
+                                        Log.d("Worker", "Work finito")
+                                    }
+
                                 },
                                 onFailed = {
                                     showDialogError = true
