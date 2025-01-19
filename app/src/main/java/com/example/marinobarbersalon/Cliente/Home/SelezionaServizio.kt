@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.R
@@ -120,11 +121,15 @@ fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : 
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 5.dp),
-                horizontalArrangement = Arrangement.SpaceBetween){
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
                 Text(text = servizio.nome.toString(),
                     fontFamily = myFont,
                     fontSize = 19.sp,
-                    color = Color.Black)
+                    color = Color.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 val icon = if (servizio.tipo == "Barba") {
                     Log.d("Messaggio", servizio.tipo)

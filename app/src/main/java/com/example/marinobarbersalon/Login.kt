@@ -93,8 +93,32 @@ fun LoginScreen(
     else
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
-    if (userState.state == null || userState.state == AuthState.Authenticated ||
-        adminState.state == AuthState.Authenticated || adminState.state == null) {
+
+    LaunchedEffect(userState.state, adminState.state, userValidationMessage, adminValidationMessage) {
+
+        if (!adminValidationMessage.isNullOrEmpty()) {
+            Toast.makeText(context, adminValidationMessage, Toast.LENGTH_SHORT).show()
+            adminViewModel.resetValidationMessage() // Resetta il messaggio
+        }
+
+        if (!userValidationMessage.isNullOrEmpty()) {
+            Toast.makeText(context, userValidationMessage, Toast.LENGTH_SHORT).show()
+            userViewModel.resetValidationMessage() // Resetta il messaggio
+        }
+
+        when (adminState.state) {
+            is AuthState.Authenticated -> navigaHomeAdmin()
+            else -> when (userState.state) {
+                is AuthState.Authenticated -> navigaHomeCliente()
+                else -> Unit
+            }
+        }
+    }
+
+
+
+    if (userState.state == null || userState.state == AuthState.Authenticated || userState.state == AuthState.Loading ||
+        adminState.state == AuthState.Authenticated || adminState.state == AuthState.Authenticated || isLoading ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -262,13 +286,6 @@ fun LoginScreen(
                             }
                         }
 
-
-
-
-
-
-
-
                     },
                     enabled = !isLoading,//userState.state != AuthState.Loading && adminState.state != AuthState.Loading,
                     modifier = Modifier.width(230.dp),
@@ -294,55 +311,10 @@ fun LoginScreen(
                 }
             }
 
-            if (userState.state == AuthState.Loading || adminState.state == AuthState.Loading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(my_grey),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(80.dp),
-                        color = my_gold
-                    )
-                }
-            }
+
         }
     }
 
-    LaunchedEffect(userState.state, adminState.state, userValidationMessage, adminValidationMessage) {
 
-        if (!adminValidationMessage.isNullOrEmpty()) {
-            Toast.makeText(context, adminValidationMessage, Toast.LENGTH_SHORT).show()
-            adminViewModel.resetValidationMessage() // Resetta il messaggio
-        }
-
-        if (!userValidationMessage.isNullOrEmpty()) {
-            Toast.makeText(context, userValidationMessage, Toast.LENGTH_SHORT).show()
-            userViewModel.resetValidationMessage() // Resetta il messaggio
-        }
-
-        when (adminState.state) {
-            is AuthState.Authenticated -> navigaHomeAdmin()
-            is AuthState.Error -> {
-                Toast.makeText(
-                    context,
-                    (adminState.state as AuthState.Error).message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            else -> when (userState.state) {
-                is AuthState.Authenticated -> navigaHomeCliente()
-                is AuthState.Error -> {
-                    Toast.makeText(
-                        context,
-                        (userState.state as AuthState.Error).message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                else -> Unit
-            }
-        }
-    }
 }
 

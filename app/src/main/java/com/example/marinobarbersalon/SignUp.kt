@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.yml.charts.common.extensions.isNotNull
 import com.example.marinobarbersalon.Cliente.Home.AuthState
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.ui.theme.myFont
@@ -64,6 +65,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
     }
 
     val userState by userViewModel.userState.collectAsState()
+    val validationMessage by userViewModel.validationMessage.collectAsState()
 
     var nome by remember { mutableStateOf("") }
     var cognome by remember { mutableStateOf("") }
@@ -79,10 +81,16 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
     val context = LocalContext.current
-    LaunchedEffect(userState.state) {
+    LaunchedEffect(userState.state, validationMessage) {
+
+        if (validationMessage.isNotNull()){
+            Toast.makeText(context, validationMessage, Toast.LENGTH_SHORT).show()
+            userViewModel.resetValidationMessage()
+        }
+
         when (userState.state) {
             is AuthState.Authenticated -> navigaHome()
-            is AuthState.Error -> Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            //is AuthState.Error -> Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
     }
@@ -126,7 +134,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
 
                     // Title
                     Text(
-                        text = "Crea Account",
+                        text = "CREA ACCOUNT",
                         color = my_white,
                         fontSize = 30.sp,
                         fontFamily = myFont,
@@ -138,6 +146,8 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                     text = "Inserisci le informazioni di seguito per completare la registrazione",
                     modifier = Modifier.width(300.dp),
                     color = my_white,
+                    fontFamily = myFont,
+                    fontSize = 20.sp,
                     textAlign = TextAlign.Center
                 )
 
@@ -288,13 +298,19 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                 // Confirm Button
                 Button(
                     onClick = {
-                        userViewModel.signup(email, password, nome, cognome, eta.toInt(), telefono)
+                        userViewModel.signup(
+                            email,
+                            password,
+                            nome,
+                            cognome,
+                            if(eta.isNotBlank()) eta.toInt() else 0,
+                            telefono
+                        )
                     },
                     enabled = userState.state != AuthState.Loading,
                     modifier = Modifier
-                        .width(230.dp)
-                        .offset(y = (-30).dp) //da calibrare!!! l'ho messo io a -30 perche sembra giusto ma da vedere
-                        .align(Alignment.CenterHorizontally),
+                        .width(230.dp),
+                        //.align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
                     shape = RoundedCornerShape(10.dp)
                 ) {

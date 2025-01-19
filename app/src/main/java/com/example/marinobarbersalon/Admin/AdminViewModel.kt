@@ -36,6 +36,8 @@ class AdminViewModel : ViewModel() {
     }
 
     fun checkAuthState() {
+        _adminState.value = _adminState.value.copy(state = AuthState.Loading)
+
         val currentUser = auth.currentUser
         if (currentUser == null) {
             _adminState.value = _adminState.value.copy(state = AuthState.Unauthenticated)

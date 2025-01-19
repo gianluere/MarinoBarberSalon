@@ -77,6 +77,9 @@ class UserViewModel : ViewModel() {
     }
 
     fun checkAuthState() {
+
+        _userState.value = _userState.value.copy(state = AuthState.Loading)
+
         val currentUser = auth.currentUser
         if (currentUser == null) {
             _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
@@ -134,7 +137,8 @@ class UserViewModel : ViewModel() {
                     Log.d("ToaError", errorCode)
                     val errorMessage = firebaseErrorMessages[errorCode] ?: "Si è verificato un errore sconosciuto."
                     _validationMessage.value = errorMessage
-                    _userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
+                    //_userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
+                    _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
                 }
             }
     }
@@ -148,10 +152,14 @@ class UserViewModel : ViewModel() {
 
 
 
-    fun signup(email : String, password : String, nome: String, cognome : String, eta: Int, telefono : String){
+    fun signup(email : String, password : String, nome: String, cognome : String, eta: Int = 0, telefono : String){
 
-        if (email.isEmpty() || password.isEmpty()){
-            _userState.value = _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
+        if (email.isBlank() || password.isBlank()){
+            Log.d("Registrazione", "Errore. EM e PW no vuoti")
+            _validationMessage.value = null
+            _validationMessage.value = "Email e password non possono essere vuoti"
+            //_userState.value = _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
+            Log.d("Registrazione", "Errore. EM e PW no vuoti")
             return
         }
         _userState.value = _userState.value.copy(state = AuthState.Loading)
@@ -176,7 +184,9 @@ class UserViewModel : ViewModel() {
                     val errorCode = (task.exception as FirebaseAuthException).errorCode
                     Log.d("ToaError", errorCode)
                     val errorMessage = firebaseErrorMessages[errorCode] ?: "Si è verificato un errore sconosciuto."
-                    _userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
+                    _validationMessage.value = errorMessage
+                    //_userState.value = _userState.value.copy(state = AuthState.Error(errorMessage))
+                    _userState.value = _userState.value.copy(state = AuthState.Unauthenticated)
                 }
             }
     }
@@ -187,7 +197,7 @@ class UserViewModel : ViewModel() {
 
     }
 
-    fun caricaDati(){
+    private fun caricaDati(){
 
         auth.currentUser?.email?.let {
 
