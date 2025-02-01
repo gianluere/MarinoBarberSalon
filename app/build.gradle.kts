@@ -93,6 +93,12 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
     testImplementation("com.google.truth:truth:1.1.5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.mockk:mockk:1.12.0")
+    //per i test per evitare di usare un disp. fisico o emulato si usa questo
+    testImplementation("org.robolectric:robolectric:4.10")
+    testImplementation("androidx.test:core:1.5.0")
+
+
 
 
 
@@ -100,6 +106,7 @@ dependencies {
 
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
