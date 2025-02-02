@@ -275,7 +275,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    private suspend fun aggiungiAppuntamento(
+     suspend fun aggiungiAppuntamento(
         servizio: String,
         orarioInizio: String,
         orarioFine: String,

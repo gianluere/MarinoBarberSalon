@@ -19,6 +19,7 @@ constraintlayout = "2.1.4"
 firebaseStorageKtx = "21.0.1"
 core = "1.47.0"
 coreVersion = "1.6.1"
+coreKtxVersion = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 core = { group = "com.google.ar", name = "core", version.ref = "core" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "coreVersion" }
+core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

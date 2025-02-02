@@ -21,6 +21,7 @@ android {
         }
     }
 
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -48,7 +49,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
+
 
 dependencies {
 
@@ -86,6 +89,7 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:storage-kt:1.3.2")
     //Woerker per notifiche
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation(libs.core.ktx)
     //Per il test
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
@@ -97,6 +101,8 @@ dependencies {
     //per i test per evitare di usare un disp. fisico o emulato si usa questo
     testImplementation("org.robolectric:robolectric:4.10")
     testImplementation("androidx.test:core:1.5.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+
 
 
 
@@ -107,6 +113,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

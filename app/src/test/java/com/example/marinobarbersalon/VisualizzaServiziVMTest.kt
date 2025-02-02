@@ -1,9 +1,9 @@
-package com.example.marinobarbersalon.Admin.Servizi
+package com.example.marinobarbersalon
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
+import com.example.marinobarbersalon.Admin.Servizi.VisualizzaServiziVM
 import com.example.marinobarbersalon.Cliente.Home.Servizio
+import com.google.common.truth.Truth.assertThat
 import com.google.firebase.firestore.FirebaseFirestore
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
@@ -13,10 +13,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import com.google.common.truth.Truth.assertThat
-import com.google.firebase.FirebaseApp
-import org.robolectric.annotation.Config
-
 
 @ExperimentalCoroutinesApi
 class VisualizzaServiziVMTest {
@@ -27,23 +23,35 @@ class VisualizzaServiziVMTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var firestoreMock: FirebaseFirestore
     private lateinit var viewModelServizi: VisualizzaServiziVM
-    private lateinit var contesto: Context
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+
+        //Mock Firestore
         firestoreMock = mockk(relaxed = true)
-        contesto = mockk(relaxed = true)
 
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        FirebaseApp.initializeApp(context)
+        mockkStatic(FirebaseFirestore::class)
+        every { FirebaseFirestore.getInstance() } returns firestoreMock
 
+        //Mock della collezione "servizi"
+        val collectionMock = mockk<com.google.firebase.firestore.CollectionReference>(relaxed = true)
+        every { firestoreMock.collection("servizi") } returns collectionMock
+
+        //Mock dei log altrimenti fallisce il test
+        mockkStatic(android.util.Log::class)
+        every { android.util.Log.d(any(), any()) } returns 0
+
+        //Creazione VM
         viewModelServizi = VisualizzaServiziVM()
     }
+
+
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        unmockkAll()
     }
 
     @Test
@@ -93,6 +101,7 @@ class VisualizzaServiziVMTest {
         viewModelServizi.onNomeChange("")
         viewModelServizi.aggiungiServizio(onSuccess, onError)
 
+        verify(exactly = 0) { firestoreMock.collection("servizi").add(any()) }
         verify(exactly = 0) { onSuccess() }
         verify(exactly = 0) { onError(any()) }
     }
