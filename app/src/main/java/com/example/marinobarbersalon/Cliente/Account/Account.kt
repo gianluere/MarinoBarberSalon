@@ -1,19 +1,24 @@
 package com.example.marinobarbersalon.Cliente.Account
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,11 +33,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.marinobarbersalon.Cliente.Home.AuthState
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
 import com.example.marinobarbersalon.ui.theme.my_grey
+import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
@@ -115,6 +122,32 @@ fun Account(
                 thickness = 2.dp,
                 color = my_gold
             )
+
+            Box(
+                modifier = Modifier.fillMaxSize().padding(bottom = 20.dp),
+                contentAlignment = Alignment.BottomCenter,
+            ){
+                Button(
+                    onClick = {
+                        userViewModel.logout()
+                    },
+
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(my_bordeaux, shape = RoundedCornerShape(17.dp)) //Sfondo!!!
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = my_white
+                    ),
+                    shape = RoundedCornerShape(17.dp),
+                    enabled = !(userViewModel.userState.equals(AuthState.Loading))
+                ) {
+                    Text(text = "LOGOUT", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
+                }
+            }
+
+
 
 
 

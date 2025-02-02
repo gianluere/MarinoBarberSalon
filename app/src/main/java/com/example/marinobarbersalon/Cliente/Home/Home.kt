@@ -185,11 +185,7 @@ fun SelezionaTipo(userViewModel : UserViewModel,
 
         }
 
-        Button(onClick = {
-            userViewModel.logout()
-        }) {
-            Text(text = "LOGOUT")
-        }
+
     }
     //}
 
