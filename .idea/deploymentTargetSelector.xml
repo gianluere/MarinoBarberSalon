@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="VisualizzaServiziScreenTest">
+      <SelectionState runConfigName="registrazioneFallisceConEmailEsistente()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="validateFormDescrizioneVuota()">
+      <SelectionState runConfigName="registrazioneFallisceConPasswordTroppoCorta()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="validateFormDurataZero()">
+      <SelectionState runConfigName="registrazioneFallisceConEmailNonValida()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="validateFormPrezzoZero()">
+      <SelectionState runConfigName="ShopScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="validateFormPassaConDatiValidi()">
+      <SelectionState runConfigName="testSelezioneProdottoNavigaASchermataPrenotazione()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

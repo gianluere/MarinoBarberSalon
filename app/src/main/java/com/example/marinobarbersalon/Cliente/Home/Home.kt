@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.R
@@ -138,7 +139,8 @@ fun SelezionaTipo(userViewModel : UserViewModel,
                     .clickable {
                         onNavigateToSelezionaServizioBarba()
                         //userViewModel.logout()
-                    },
+                    }
+                    .testTag("Home"),
                 colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
             )
             Text(text = "BARBA", color = my_white, fontSize = 40.sp,

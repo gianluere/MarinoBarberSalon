@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -69,7 +70,8 @@ fun Shop(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(10.dp),
+            .padding(10.dp)
+            .testTag("shop"),
     ) {
         Text(
             text = "Scegli un prodotto per $title",
@@ -81,6 +83,7 @@ fun Shop(
 
 
         LazyVerticalGrid(
+            modifier = Modifier.testTag("LazyGrid"),
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(
                 start = 12.dp,
