@@ -145,7 +145,7 @@ class UserViewModelTest3 {
         userViewModel.login(email, password)
         advanceUntilIdle()
 
-        //Vediamo se lo stato è cambiato dopo login
+        //Controllo se lo stato è cambiato dopo login
         assertThat(userViewModel.userState.value.state).isEqualTo(AuthState.Authenticated)
     }
 
@@ -176,29 +176,24 @@ class UserViewModelTest3 {
 
     @Test
     fun `aggiungiApp chiama onSuccess quando la prenotazione avviene con successo`() = runTest {
-        // Dati fittizi per la prenotazione
+
         val servizio = "Taglio Capelli"
         val orarioInizio = "10:00"
         val orarioFine = "10:30"
         val dataSel = "12/12/2025"
 
-        // Mock del ViewModel
         val userViewModel = mockk<UserViewModel>(relaxed = true)
 
-        // Mock di Firebase Firestore DocumentReference
         val fakeDocumentReference = mockk<DocumentReference>(relaxed = true)
 
-        // Mock dello stato utente con appuntamenti come DocumentReference
         val userStateFlow = MutableStateFlow(User(state = AuthState.Authenticated, appuntamenti = emptyList()))
         every { userViewModel.userState } returns userStateFlow
 
-        // Mock delle funzioni di callback
         var onSuccessCalled = false
         var onFailedCalled = false
         val onSuccess = { onSuccessCalled = true }
         val onFailed = { onFailedCalled = true }
 
-        // Simulazione del comportamento di aggiungiApp
         every {
             userViewModel.aggiungiApp(servizio, orarioInizio, orarioFine, dataSel, any(), any())
         } answers {
@@ -206,51 +201,44 @@ class UserViewModelTest3 {
             onSuccess()
         }
 
-        // Esegui il metodo
         userViewModel.aggiungiApp(servizio, orarioInizio, orarioFine, dataSel, onSuccess, onFailed)
-        advanceUntilIdle() // Completa le coroutine sospese
+        advanceUntilIdle()
 
-        // Verifiche
-        assertThat(onSuccessCalled).isTrue() // Deve essere chiamato onSuccess
-        assertThat(onFailedCalled).isFalse() // onFailed non deve essere chiamato
-        assertThat(userViewModel.userState.value.appuntamenti).isNotEmpty() // La lista di appuntamenti deve contenere almeno un elemento
+        assertThat(onSuccessCalled).isTrue() //Deve essere chiamato onSuccess
+        assertThat(onFailedCalled).isFalse() //onFailed non deve essere chiamato
+        assertThat(userViewModel.userState.value.appuntamenti).isNotEmpty() //La lista di appuntamenti deve contenere almeno un elemento
     }
 
     @Test
     fun `aggiungiApp chiama onFailed quando la prenotazione fallisce`() = runTest {
-        // Dati fittizi per la prenotazione
+
         val servizio = "Taglio Capelli"
         val orarioInizio = "10:00"
         val orarioFine = "10:30"
         val dataSel = "12/12/2025"
 
-        // Mock del ViewModel
         val userViewModel = mockk<UserViewModel>(relaxed = true)
 
-        // Mock dello stato utente con appuntamenti vuoti
         val userStateFlow = MutableStateFlow(User(state = AuthState.Authenticated, appuntamenti = emptyList()))
         every { userViewModel.userState } returns userStateFlow
 
-        // Mock delle funzioni di callback
         var onSuccessCalled = false
         var onFailedCalled = false
         val onSuccess = { onSuccessCalled = true }
         val onFailed = { onFailedCalled = true }
 
-        // Simulazione del comportamento di aggiungiApp che fallisce
         every {
             userViewModel.aggiungiApp(servizio, orarioInizio, orarioFine, dataSel, any(), any())
         } answers {
-            onFailed() // Simuliamo un errore chiamando onFailed
+            onFailed()
         }
 
-        // Esegui il metodo
         userViewModel.aggiungiApp(servizio, orarioInizio, orarioFine, dataSel, onSuccess, onFailed)
-        advanceUntilIdle() // Completa le coroutine sospese
+        advanceUntilIdle()
 
-        // Verifiche
-        assertThat(onSuccessCalled).isFalse() // onSuccess NON deve essere chiamato
-        assertThat(onFailedCalled).isTrue() // Deve essere chiamato onFailed
-        assertThat(userViewModel.userState.value.appuntamenti).isEmpty() // Nessun appuntamento deve essere aggiunto
+
+        assertThat(onSuccessCalled).isFalse() //onSuccess NON deve essere chiamato
+        assertThat(onFailedCalled).isTrue() //Deve essere chiamato onFailed
+        assertThat(userViewModel.userState.value.appuntamenti).isEmpty() //Nessun appuntamento deve essere aggiunto
     }
 }
