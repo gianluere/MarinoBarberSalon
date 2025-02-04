@@ -235,7 +235,8 @@ fun ProdottoShop(
                     },
                     enabled = prodotto.quantita>0,
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .testTag("PRENOTA"),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = my_bordeaux,

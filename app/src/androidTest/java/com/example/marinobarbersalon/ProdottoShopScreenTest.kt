@@ -1,13 +1,22 @@
 package com.example.marinobarbersalon
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.compose.rememberNavController
+import com.example.marinobarbersalon.Cliente.Screen
 import com.example.marinobarbersalon.Cliente.Shopping.Shop
 import com.example.marinobarbersalon.Cliente.Shopping.ListaProdottiViewModel
+import com.example.marinobarbersalon.Cliente.Shopping.ProdottoShop
+import com.example.marinobarbersalon.Cliente.Shopping.SelezionaShop
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.concurrent.timer
 
 class ShopScreenTest {
 
@@ -22,39 +31,34 @@ class ShopScreenTest {
     }
 
     @Test
-    fun testSelezioneProdottoNavigaASchermataPrenotazione() {
-        var prodottoSelezionato = ""
+    fun prenotazioneProdottoAvvenutaConSuccesso() {
+        val auth = Firebase.auth
 
-        // Imposta la schermata Shop
-        composeTestRule.setContent {
-            Shop(
-                modifier = Modifier,
-                title = "Barba",
-                onNavigateToProdottoShop = { nomeProdotto ->
-                    prodottoSelezionato = nomeProdotto
+        // Accedi con un utente di test
+        auth.signInWithEmailAndPassword("testuser@example.com", "password123")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    composeTestRule.waitUntil(timeoutMillis = 5000) {
+                        auth.currentUser != null
+                    }
+
+
+                    composeTestRule.setContent {
+                        ProdottoShop(
+                            modifier = Modifier,
+                            nomeProdotto = "Crema ricci"
+                        ) {
+                            composeTestRule.onNodeWithTag("PRENOTA")
+                                .assertExists("Il pulsante non esiste nella UI")
+                                .performClick()
+
+                            composeTestRule.onNodeWithText("Prodotto prenotato \ncon successo")
+                                .assertIsDisplayed()
+                        }
+                    }
+                } else {
+                    throw AssertionError("Autenticazione fallita: ${task.exception?.message}")
                 }
-            )
-        }
-
-        // Aspetta che la UI sia pronta
-        composeTestRule.waitForIdle()
-
-        // Scorri fino al prodotto "Provba"
-        composeTestRule.onNode(hasText("Provba"), useUnmergedTree = true)
-            .performScrollTo()
-
-        // Cerca il prodotto "Provba" nella lista e clicca
-        composeTestRule.onNodeWithText("Provba", useUnmergedTree = true)
-            .assertExists("Il prodotto 'Provba' non esiste nella UI")
-            .performClick()
-
-        // Aspetta la navigazione alla schermata di prenotazione
-        composeTestRule.waitForIdle()
-
-        // Verifica che la schermata di prenotazione sia visibile
-        composeTestRule.onNodeWithTag("prenotaprodotto")
-            .assertExists("La schermata di prenotazione non si è aperta correttamente")
+            }
     }
-
-
 }

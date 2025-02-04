@@ -114,12 +114,5 @@ class UserViewModelScreenTest {
 
         scenario.close()
     }
-
-
-
-
-
-
-
 }
 
