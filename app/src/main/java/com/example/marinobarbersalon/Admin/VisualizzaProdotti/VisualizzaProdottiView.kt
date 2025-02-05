@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon.Admin.VisualizzaProdotti
 
 import android.net.Uri
+import android.os.Build
 import android.text.Layout
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -82,6 +83,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.marinobarbersalon.Admin.Servizi.DialogGenerico
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 
 
 /*
@@ -554,6 +558,25 @@ fun AggiungiProdotto(
     onAggiungiSuccess: () -> Unit,
     onAnnullaClick: () -> Unit
 ) {
+
+    val context = LocalContext.current
+    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+
+    var hasPermission by remember { mutableStateOf(
+        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+    ) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+    }
+
+
+
     val nome = aggiungiProdottoViewModel.nome.collectAsState().value
     val descrizione = aggiungiProdottoViewModel.descrizione.collectAsState().value
     val prezzo = aggiungiProdottoViewModel.prezzo.collectAsState().value
@@ -563,7 +586,7 @@ fun AggiungiProdotto(
 
     //per le img su supabase
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
-    val context = LocalContext.current
+    //val context = LocalContext.current
 
     //Form val
     val formErrors = aggiungiProdottoViewModel.formErrors.collectAsState().value
@@ -811,7 +834,15 @@ fun AggiungiProdotto(
                 }
 
                 Button(
-                    onClick = { launcher.launch("image/*") },
+                    onClick ={
+
+                        if (hasPermission){
+                            launcher.launch("image/*")
+                        }else{
+                            permissionLauncher.launch(permission)
+                        }
+
+                              },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = my_bordeaux),
                 ) {

@@ -98,10 +98,6 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     )
                     HomeScreen(
                         modifier = Modifier.padding(padding),
-                        onNavigateToLogin = {
-                            //navController.navigate(Screen.Login.route)
-                            logout()
-                        },
                         onNavigateToSelezionaServizioBarba = {
                             navController.navigate(Screen.SelezionaServizioBarba.route)
                         },
@@ -274,6 +270,10 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     modifier = Modifier.padding(padding),
                     userViewModel = userViewModel,
                     notificheClienteViewModel = notificheClienteViewModel,
+                    onNavigateToLogin = {
+                        //navController.navigate(Screen.Login.route)
+                        logout()
+                    },
                     onNavigaDatiPersonali = {
                         navController.navigate(Screen.DatiPersonali.route)
                     },

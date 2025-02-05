@@ -3,6 +3,7 @@ package com.example.marinobarbersalon.Cliente.Account
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -70,6 +73,8 @@ fun InserisciRecensione(
         mutableStateOf(false)
     }
 
+    val focusManager = LocalFocusManager.current
+
     val stellePiene = rating.toInt()
     val mezzaStella = if (rating - stellePiene >= 0.5) 1 else 0
     val stelleVuote = 5 - stellePiene - mezzaStella
@@ -77,7 +82,12 @@ fun InserisciRecensione(
 
     if (!showDialogSuccess){
         Column(
-            modifier = modifier.fillMaxSize().padding(20.dp),
+            modifier = modifier.fillMaxSize()
+                .padding(20.dp)
+                .pointerInput(Unit) {
+                    // Quando l'utente tocca, rimuove il focus dai campi di testo
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
 
@@ -178,7 +188,7 @@ fun InserisciRecensione(
                 onClick = {
                     listaRecensioniViewModel.inserisciRecensione(
                         Recensione(
-                            nome = userViewModel.userState.value.nome + userViewModel.userState.value.cognome,
+                            nome = userViewModel.userState.value.nome + " " + userViewModel.userState.value.cognome,
                             stelle = rating,
                             descrizione = descrizione
                         ),

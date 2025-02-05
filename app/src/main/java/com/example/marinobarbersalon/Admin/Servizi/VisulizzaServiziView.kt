@@ -2,11 +2,13 @@ package com.example.marinobarbersalon.Admin.Servizi
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,9 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -290,6 +295,8 @@ fun AggiungiServizio(
     val durata = aggiungiServizioViewModel.durata.collectAsState().value
     val prezzo = aggiungiServizioViewModel.prezzo.collectAsState().value
 
+    val focusManager = LocalFocusManager.current
+
     //form val
     val formErrors = aggiungiServizioViewModel.formErrors.collectAsState().value
     val showErrorDialog = remember { mutableStateOf(false) }
@@ -386,7 +393,12 @@ fun AggiungiServizio(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .pointerInput(Unit) {
+                // Quando l'utente tocca, rimuove il focus dai campi di testo
+                detectTapGestures(onTap = { focusManager.clearFocus() })
+            }
+        ,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -425,6 +437,7 @@ fun AggiungiServizio(
                         unfocusedBorderColor = Color.Black,     // Colore del bordo non selezionato
                         unfocusedLabelColor = Color.Black         // Colore della label non selezionata
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     maxLines = 2
 
                 )
@@ -445,7 +458,8 @@ fun AggiungiServizio(
                         unfocusedBorderColor = Color.Black,
                         unfocusedLabelColor = Color.Black
                     ),
-                    maxLines = 3
+                    maxLines = 3,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -507,15 +521,16 @@ fun AggiungiServizio(
                 OutlinedTextField(
                     value = if (durata == 0) "" else durata.toString(),
                     onValueChange = { newValue ->
-                        val validInput = newValue.toIntOrNull() != null || newValue.isEmpty()
+                        val cleanedValue = newValue.filter { it.isDigit() } // Accetta solo numeri
+                        val validNumber = cleanedValue.toIntOrNull()?.coerceAtMost(60) // Limita il massimo a 60
 
-                        if (validInput) {
-                            aggiungiServizioViewModel.onDurataChange(newValue.toIntOrNull() ?: 0)
+                        if (validNumber != null || newValue.isEmpty()) {
+                            aggiungiServizioViewModel.onDurataChange(validNumber ?: 0)
                         }
                     },
                     label = { Text("Durata (minuti)") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
                     colors =  OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Black,
@@ -530,17 +545,19 @@ fun AggiungiServizio(
 
                 //Prezzo
                 OutlinedTextField(
-                    value = if (prezzo == 0.0) "" else prezzo.toString(),
+                    value = if (prezzo == 0.0) ""  else String.format("%.2f", prezzo),
                     onValueChange = { newValue ->
-                        val cleanedValue = newValue.replace(',', '.')
-                        val validValue = cleanedValue.toDoubleOrNull()
+                        val cleanedValue = newValue.replace(',', '.') //Sost virgola con punto (nelle tastiere numeric c'è la virgola in italia)
+                        val validValue = cleanedValue.toDoubleOrNull()?.coerceAtMost(1000.0)
+
+                        // Controlla se il valore è valido e all'interno del range consentito
                         if (validValue != null) {
                             aggiungiServizioViewModel.onPrezzoChange(validValue)
                         }
                     },
                     label = { Text("Prezzo (€)") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 25.sp),
                     colors =  OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Black,

@@ -51,34 +51,24 @@ import com.example.marinobarbersalon.ui.theme.my_white
 @Composable
 fun HomeScreen(
     modifier: Modifier,
-    onNavigateToLogin: () -> Unit,
     onNavigateToSelezionaServizioBarba: () -> Unit,
     onNavigateToSelezionaServizioCapelli: () -> Unit,
     userViewModel: UserViewModel
 ) {
 
-    val activity = LocalContext.current as? ComponentActivity
-
-
-    /*
-    BackHandler {
-
-        activity?.finish()
-    }
-
-     */
-
-
 
 
     val userState by userViewModel.userState.collectAsState()
-    
+
+    /*
     LaunchedEffect(userState.state){
         when(userState.state){
             is AuthState.Unauthenticated -> onNavigateToLogin()
             else -> Unit
         }
     }
+
+     */
 
 
     if (userState.nome.isNullOrEmpty() ) {
@@ -102,15 +92,6 @@ fun HomeScreen(
         }
     }
 
-
-    
-    /*Text(text = "HOME")
-    
-    TextButton(onClick = {userViewModel.logout()}) {
-        Text(text = "ESCI")
-    }*/
-    
-    //ShowNavigationStack(navController = navController)
 
 
 

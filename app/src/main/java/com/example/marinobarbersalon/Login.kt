@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +41,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -93,6 +96,8 @@ fun LoginScreen(
     else
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
+    val focusManager = LocalFocusManager.current
+
 
     LaunchedEffect(userState.state, adminState.state, userValidationMessage, adminValidationMessage) {
 
@@ -135,7 +140,12 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFF333333))
-                .padding(top = 30.dp),
+                .padding(top = 30.dp)
+                .pointerInput(Unit) {
+                    // Quando l'utente tocca, rimuove il focus dai campi di testo
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
+                }
+            ,
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -305,6 +315,7 @@ fun LoginScreen(
                     Text(
                         text = "Non hai un account, registrati",
                         fontFamily = myFont,
+                        fontSize = 18.sp,
                         color = my_gold,
                         textDecoration = TextDecoration.Underline
                     )

@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,9 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -80,6 +84,8 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
     else
         painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
 
+    val focusManager = LocalFocusManager.current
+
     val context = LocalContext.current
     LaunchedEffect(userState.state, validationMessage) {
 
@@ -108,7 +114,12 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 20.dp)
+                    .pointerInput(Unit) {
+                        // Quando l'utente tocca, rimuove il focus dai campi di testo
+                        detectTapGestures(onTap = { focusManager.clearFocus() })
+                    }
+                ,
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -170,6 +181,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                     ),
                     singleLine = true,
                     maxLines = 1,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.width(280.dp)
                 )
 
@@ -192,6 +204,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                     ),
                     singleLine = true,
                     maxLines = 1,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.width(280.dp)
                 )
 
@@ -212,7 +225,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                     singleLine = true,
                     maxLines = 1,
                     modifier = Modifier.width(280.dp)
@@ -235,10 +248,12 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
                     singleLine = true,
                     maxLines = 1,
+
                     modifier = Modifier.width(280.dp)
+
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -264,7 +279,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                         }
                     },
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                     singleLine = true,
                     maxLines = 1,
                     modifier = Modifier.width(280.dp)
@@ -287,7 +302,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                         unfocusedIndicatorColor = my_white,
                         cursorColor = my_white
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
                     singleLine = true,
                     maxLines = 1,
                     modifier = Modifier.width(280.dp)

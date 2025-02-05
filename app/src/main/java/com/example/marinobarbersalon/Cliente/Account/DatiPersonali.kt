@@ -1,6 +1,7 @@
 package com.example.marinobarbersalon.Cliente.Account
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
@@ -95,6 +98,7 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
 
     LaunchedEffect(readOnly) {
@@ -105,13 +109,13 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
 
 
 
-
-    val image = if (passwordVisibility)
-        painterResource(id = R.drawable.visibility_24dp_f5f5dc_fill0_wght400_grad0_opsz24)
-    else
-        painterResource(id = R.drawable.visibility_off_24dp_faf9f6_fill0_wght400_grad0_opsz24)
-
-    Box(modifier = modifier.fillMaxSize()){
+    Box(
+        modifier = modifier.fillMaxSize()
+            .pointerInput(Unit) {
+                // Quando l'utente tocca, rimuove il focus dai campi di testo
+                detectTapGestures(onTap = { focusManager.clearFocus() })
+            }
+    ){
         Column(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -163,87 +167,6 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
                 }
             }
 
-            /*
-            Column {
-                Row(Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically){
-                    Text(
-                        text = "Nome: ",
-                        color = my_white,
-                        fontSize = 20.sp,
-                        fontFamily = myFont
-                    )
-
-                    TextField(
-                        value = nome, onValueChange = {nome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 20.sp),
-                        colors= TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = my_white,
-                            unfocusedTextColor = my_white,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = my_white
-                        ),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        maxLines = 1,
-                        readOnly = readOnly,
-
-                        )
-
-
-
-
-                }
-
-                HorizontalDivider(
-                    Modifier
-                        .fillMaxWidth(), thickness = 2.dp, color = my_white)
-
-            }
-
-
-            Column {
-                Row(Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically){
-                    Text(
-                        text = "Cognome: ",
-                        color = my_white,
-                        fontSize = 20.sp,
-                        fontFamily = myFont
-                    )
-
-                    TextField(
-                        value = cognome, onValueChange = {cognome = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 20.sp),
-                        colors= TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = my_white,
-                            unfocusedTextColor = my_white,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = my_white
-                        ),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        maxLines = 1,
-                        readOnly = readOnly,
-
-                        )
-
-
-
-
-                }
-
-                HorizontalDivider(
-                    Modifier
-                        .fillMaxWidth(), thickness = 2.dp, color = my_white)
-
-            }
-
-             */
 
             RigaDato(
                 label = "Nome",
@@ -264,7 +187,7 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
                 label = "Email",
                 value = email,
                 onValueChange = {email = it},
-                readOnly = readOnly
+                readOnly = true
             )
 
             RigaDato(

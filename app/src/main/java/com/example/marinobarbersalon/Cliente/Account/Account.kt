@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,6 +48,7 @@ fun Account(
     modifier: Modifier = Modifier,
     userViewModel: UserViewModel,
     notificheClienteViewModel : NotificheClienteViewModel,
+    onNavigateToLogin: () -> Unit,
     onNavigaDatiPersonali : () -> Unit,
     onNavigaPrenotazioni : () -> Unit,
     onNavigaProdottiPrenotati : () -> Unit,
@@ -57,7 +59,18 @@ fun Account(
     val prenotazioni by notificheClienteViewModel.notifichePrenotazioni.collectAsState()
 
     val prodottiPrenotati by notificheClienteViewModel.notificheProdotti.collectAsState() //by userViewModel.listaProdottiPrenotati.collectAsState()
-    
+
+
+    val userState by userViewModel.userState.collectAsState()
+
+    LaunchedEffect(userState.state){
+        when(userState.state){
+            is AuthState.Unauthenticated -> onNavigateToLogin()
+            else -> Unit
+        }
+    }
+
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -141,7 +154,7 @@ fun Account(
                         contentColor = my_white
                     ),
                     shape = RoundedCornerShape(17.dp),
-                    enabled = !(userViewModel.userState.equals(AuthState.Loading))
+                    enabled = (userState.state != AuthState.Loading)
                 ) {
                     Text(text = "LOGOUT", color = my_gold, fontFamily = myFont, fontSize = 20.sp)
                 }
