@@ -37,6 +37,8 @@ class HomeClienteActivity: ComponentActivity() {
                     Scaffold(
                         bottomBar = { BarraNavigazione(navController, notificheClienteViewModel) }
                     ) {innerpadding->
+                        //Navigation è il file con tutte le rotte
+                        //il modifier.padding è per gli spazi nello scaffold
                         Navigation(Modifier.padding(innerpadding), navController, userViewModel, notificheClienteViewModel,
                             logout = {
                                 Intent(applicationContext, MainActivity::class.java).also {

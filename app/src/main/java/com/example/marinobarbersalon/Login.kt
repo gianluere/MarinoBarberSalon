@@ -98,7 +98,7 @@ fun LoginScreen(
 
     val focusManager = LocalFocusManager.current
 
-
+    //Mi permette di fare azioni al cambio di stato di queste variabili
     LaunchedEffect(userState.state, adminState.state, userValidationMessage, adminValidationMessage) {
 
         if (!adminValidationMessage.isNullOrEmpty()) {
@@ -112,16 +112,16 @@ fun LoginScreen(
         }
 
         when (adminState.state) {
-            is AuthState.Authenticated -> navigaHomeAdmin()
+            is AuthState.Authenticated -> navigaHomeAdmin() //navigo home admin
             else -> when (userState.state) {
-                is AuthState.Authenticated -> navigaHomeCliente()
+                is AuthState.Authenticated -> navigaHomeCliente() //navigo home cliente
                 else -> Unit
             }
         }
     }
 
 
-
+    //serie di condizioni per mostrare il CircularProgressIndicator per il caricamento login di firebase
     if (userState.state == null || userState.state == AuthState.Authenticated || userState.state == AuthState.Loading ||
         adminState.state == AuthState.Authenticated || adminState.state == AuthState.Authenticated || isLoading ) {
         Box(
@@ -242,7 +242,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 50.dp),
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(), //per mostrare caratteri password
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
@@ -260,23 +260,14 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        /*
-                        Log.d("LOGIN", email)
-                        adminViewModel.isAdmin(email) { isAdmin ->
-                            if (isAdmin) {
-                                adminViewModel.login(email, password)
-                            } else {
-                                userViewModel.login(email, password)
-                            }
-                        }
 
-                         */
 
                         isLoading = true
 
+                        //meccanismo per effettuare il login e riconoscere il tipo di utente
                         loginRepository.loginUser(email, password) { userId, error ->
                             if (userId != null) {
-                                loginRepository.determineUserType() { userType ->
+                                loginRepository.determineUserType { userType ->
                                     when (userType) {
                                         "admin" -> {
                                             adminViewModel.checkAuthState()

@@ -40,12 +40,15 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 
+/**
+ * Sono sostanzialmente uguali, vado a filtrare la lista dei servizi in base a quale tipologia ho scelto
+ */
+
+
 @Composable
 fun SelezioneServizioCapelli(modifier: Modifier, viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer: String) -> Unit) {
 
-    val serviziViewModel = viewModel
-
-    val servizi by serviziViewModel.listaServizi.collectAsState()
+    val servizi by viewModel.listaServizi.collectAsState()
 
 
     Contenuto(modifier = modifier, servizi = servizi.filter{ it.tipo == "Capelli"}, titolo = "Capelli", onNavigateToSelezionaGiorno)
@@ -56,9 +59,7 @@ fun SelezioneServizioCapelli(modifier: Modifier, viewModel: ListaServiziViewMode
 @Composable
 fun SelezionaServiziobarba(modifier: Modifier, viewModel: ListaServiziViewModel, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
 
-    val serviziViewModel = viewModel
-
-    val servizi by serviziViewModel.listaServizi.collectAsState()
+    val servizi by viewModel.listaServizi.collectAsState()
 
 
 
@@ -69,7 +70,10 @@ fun SelezionaServiziobarba(modifier: Modifier, viewModel: ListaServiziViewModel,
 
 
 @Composable
-private fun Contenuto(modifier: Modifier, servizi: List<Servizio>, titolo : String, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
+private fun Contenuto(
+    modifier: Modifier, servizi: List<Servizio>,
+    titolo : String,
+    onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
     Column(modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -144,7 +148,8 @@ fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : 
                         }
                     }
 
-                Icon(painter = painterResource(id = icon), contentDescription = null,
+                Icon(painter = painterResource(id = icon),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(23.dp)
                         .padding(end = 4.dp),
@@ -153,7 +158,7 @@ fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : 
 
             HorizontalDivider(
                 modifier = Modifier
-                    .fillMaxWidth(),// altezza della bottom bar
+                    .fillMaxWidth(),
                 thickness = 1.dp,
                 color = Color.Black
             )
@@ -163,6 +168,7 @@ fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : 
                 fontFamily = myFont,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Left,
+                overflow = TextOverflow.Ellipsis,
                 color = Color.Black)
 
             Spacer(Modifier.height(6.dp))

@@ -13,6 +13,7 @@ data class User(
     val appuntamenti: List<DocumentReference> = emptyList()
 )
 
+//classe di aiuto per l'autenticazione
 sealed class AuthState(){
     object None : AuthState()
     object Authenticated : AuthState()

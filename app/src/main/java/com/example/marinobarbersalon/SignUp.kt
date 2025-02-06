@@ -87,15 +87,17 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
     val focusManager = LocalFocusManager.current
 
     val context = LocalContext.current
+
+    //anche qui, al cambiamento delle seguenti variabili posso eseguire delle azioni
     LaunchedEffect(userState.state, validationMessage) {
 
         if (validationMessage.isNotNull()){
-            Toast.makeText(context, validationMessage, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, validationMessage, Toast.LENGTH_SHORT).show() //mostro toast errore registrazione
             userViewModel.resetValidationMessage()
         }
 
         when (userState.state) {
-            is AuthState.Authenticated -> navigaHome()
+            is AuthState.Authenticated -> navigaHome() //navigo alla home se mi ha autenticato
             //is AuthState.Error -> Toast.makeText(context, (userState.state as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
@@ -134,7 +136,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                         onClick = { distruzione() },
                         modifier = Modifier
                             .size(36.dp)
-                            .align(Alignment.CenterStart) // Align arrow to the start
+                            .align(Alignment.CenterStart)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
@@ -167,7 +169,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                 // Nome
                 TextField(
                     value = nome,
-                    onValueChange = { if (it.length <= 20) nome = it },
+                    onValueChange = { if (it.length <= 20) nome = it }, //massimo 20 caratteri
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Nome", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
                     colors = TextFieldDefaults.colors(
@@ -213,7 +215,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                 // Email
                 TextField(
                     value = email,
-                    onValueChange = { if (it.length <= 35) email = it },
+                    onValueChange = { if (it.length <= 45) email = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Email", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
                     colors = TextFieldDefaults.colors(
@@ -290,7 +292,7 @@ fun SignUpScreen(navigaHome: () -> Unit, userViewModel: UserViewModel, distruzio
                 // Telefono
                 TextField(
                     value = telefono,
-                    onValueChange = { if (it.length <= 14) telefono = it },
+                    onValueChange = { if (it.length <= 10) telefono = it },
                     textStyle = TextStyle(fontFamily = myFont, fontSize = 17.sp),
                     placeholder = { Text(text = "Telefono", color = my_gold, fontFamily = myFont, fontSize = 17.sp) },
                     colors = TextFieldDefaults.colors(

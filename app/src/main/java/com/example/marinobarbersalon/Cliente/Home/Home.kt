@@ -57,18 +57,7 @@ fun HomeScreen(
 ) {
 
 
-
     val userState by userViewModel.userState.collectAsState()
-
-    /*
-    LaunchedEffect(userState.state){
-        when(userState.state){
-            is AuthState.Unauthenticated -> onNavigateToLogin()
-            else -> Unit
-        }
-    }
-
-     */
 
 
     if (userState.nome.isNullOrEmpty() ) {
@@ -86,31 +75,32 @@ fun HomeScreen(
 
             Log.d("NAVBAR", userState.nome.toString())
 
-            SelezionaTipo(userViewModel,
+            SelezionaTipo(
                 onNavigateToSelezionaServizioBarba,
-                onNavigateToSelezionaServizioCapelli)
+                onNavigateToSelezionaServizioCapelli
+            )
         }
     }
-
-
 
 
 }
 
 @Composable
-fun SelezionaTipo(userViewModel : UserViewModel,
+fun SelezionaTipo(
                   onNavigateToSelezionaServizioBarba: () -> Unit,
                   onNavigateToSelezionaServizioCapelli: () -> Unit
 ) {
 
-    val context = LocalContext.current
 
-    //Column(modifier.fillMaxSize()) {
-
-
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
         Box(Modifier.size(290.dp, 210.dp), contentAlignment = Alignment.Center){
-            Image(painterResource(id = R.drawable.barba), contentDescription = "barba", contentScale = ContentScale.Crop,
+            Image(
+                painterResource(id = R.drawable.barba),
+                contentDescription = "barba", contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(290.dp, 210.dp)
                     .border(
@@ -119,7 +109,6 @@ fun SelezionaTipo(userViewModel : UserViewModel,
                     .clip(RoundedCornerShape(16.dp))
                     .clickable {
                         onNavigateToSelezionaServizioBarba()
-                        //userViewModel.logout()
                     }
                     .testTag("Home"),
                 colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
@@ -142,7 +131,9 @@ fun SelezionaTipo(userViewModel : UserViewModel,
         }
 
         Box(Modifier.size(290.dp, 210.dp), contentAlignment = Alignment.Center){
-            Image(painterResource(id = R.drawable.capelli), contentDescription = "capelli", contentScale = ContentScale.Crop,
+            Image(painterResource(id = R.drawable.capelli),
+                contentDescription = "capelli",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(290.dp, 210.dp)
                     .border(
@@ -170,40 +161,6 @@ fun SelezionaTipo(userViewModel : UserViewModel,
 
 
     }
-    //}
 
 
-
-
-
-
-
-
-
-}
-
-
-
-/*
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Prova()
-}
- */
-
-
-
-
-@Composable
-fun ShowNavigationStack(navController: NavController) {
-    // Ottieni la lista delle destinazioni nello stack di navigazione
-    val backStackEntry = navController.currentBackStackEntryFlow.collectAsState(initial = null)
-
-    Column(modifier = Modifier.padding(top = 16.dp)) {
-        Text("Navigation Stack:")
-        backStackEntry.value?.let { entry ->
-            Text(entry.destination.route ?: "Unknown Destination")
-        }
-    }
 }

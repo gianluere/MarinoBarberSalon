@@ -45,71 +45,6 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 import com.example.marinobarbersalon.ui.theme.my_white
 
 
-/*
-@Composable
-fun ScaffoldPersonalizzato(titolo : String,
-                           showIcon : Boolean,
-                           onBack : () -> Unit = {},
-                           content : @Composable () -> Unit = {}) {
-    Scaffold(
-        containerColor = Color(0xFF333333),
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            Column(
-                Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(modifier = Modifier.fillMaxWidth()
-                        .padding(bottom = 25.dp),
-                    contentAlignment = Alignment.Center
-                ){
-
-                    if (showIcon){
-                        IconButton(onClick = {onBack()},
-                            modifier = Modifier.size(25.dp).align(Alignment.CenterStart)) {
-                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
-                                tint = my_white,
-                                modifier = Modifier.size(25.dp))
-                        }
-                    }
-
-                    Text(
-                        text = titolo,
-                        color = my_white,
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-
-                }
-
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),// altezza della bottom bar
-                    thickness = 2.dp,
-                    color = my_gold
-                )
-            }
-        },
-        bottomBar = { BarraNavigazione() }
-    ) {innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize()) {
-            content()
-        }
-
-    }
-
-}
-
-
- */
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarMia(
@@ -153,43 +88,7 @@ fun TopBarMia(
 
             }
         )
-        /*
-        TopAppBar(
-            title = {
 
-                Text(
-                    text = titolo,
-                    fontSize = 25.sp,
-                    color = my_white,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(x = if (!showIcon) 0.dp else (-24).dp),
-                )
-
-
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = my_grey
-            ),
-            navigationIcon = {
-                if (showIcon){
-                    IconButton(onClick = {onBack()},
-                        ) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null,
-                            tint = my_white,
-                            modifier = Modifier
-                                .size(24.dp)
-                                )
-                    }
-                }
-
-            }
-
-        )
-
-         */
 
         HorizontalDivider(
             modifier = Modifier
@@ -219,6 +118,8 @@ fun BarraNavigazione(navController : NavController, notificheClienteViewModel: N
     )
     val rottaCorrente = navController.currentBackStackEntryAsState().value?.destination?.route
 
+
+    //mapping della rotta per evidenziare l'icona della bottomBar
     val rottaDaEvidenziare = when (rottaCorrente) {
         Screen.SelezionaServizioBarba.route -> Screen.Home.route
         Screen.SelezionaServizioCapelli.route -> Screen.Home.route
@@ -244,6 +145,7 @@ fun BarraNavigazione(navController : NavController, notificheClienteViewModel: N
                     onClick = {
                         if(rottaDaEvidenziare != navItem.route){
                             navController.navigate(navItem.route){
+                                //mi salva lo stato e non mi duplica le schermate
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true

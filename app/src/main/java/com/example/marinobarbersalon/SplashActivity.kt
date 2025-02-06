@@ -29,7 +29,7 @@ class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val bool = if (Build.VERSION.SDK_INT < 31) true else false
+            val bool = Build.VERSION.SDK_INT < 31
             if(bool) {
                 Log.d("Splash", bool.toString())
                 SplashScreen {

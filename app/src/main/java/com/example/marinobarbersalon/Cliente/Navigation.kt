@@ -50,30 +50,34 @@ import com.example.marinobarbersalon.ui.theme.my_grey
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun Navigation(modifier: Modifier, navController : NavHostController, userViewModel : UserViewModel, notificheClienteViewModel: NotificheClienteViewModel, logout : () -> Unit) {
+fun Navigation(
+    modifier: Modifier,
+    navController : NavHostController,
+    userViewModel : UserViewModel,
+    notificheClienteViewModel: NotificheClienteViewModel,
+    logout : () -> Unit)
+{
 
     val listaServiziViewModel : ListaServiziViewModel = viewModel()
     val listaRecensioniViewModel : ListaRecensioniViewModel = viewModel()
 
+    //Ci saranno sempre due scaffold annidati per risolvere il problema legato alla navbar
+
+
     NavHost(navController, startDestination = "home"){
-
-
-
-        //clienteNavGraph(modifier = modifier, navController, userViewModel, listaServiziViewModel, logout)
-        //adminNavGraph(navController, adminViewModel)
 
         composable(Screen.Home.route) {
             val userState by userViewModel.userState.collectAsState()
 
             if (userState.nome.isNullOrEmpty() ) {
-                // Mostra una schermata di caricamento o uno stato intermedio
+                //Mostra una schermata di caricamento
                 Box(
                     modifier = modifier
                         .fillMaxSize()
                         .background(my_grey),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = my_gold) // Indicatore di caricamento
+                    CircularProgressIndicator(color = my_gold)
                 }
             }else{
                 Scaffold(
@@ -81,21 +85,15 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     containerColor = my_grey,
                     topBar = {
                         TopBarMia(
-                            titolo = "BENVENUTO " + userState.nome!!.uppercase(),
+                            titolo = "BENVENUTO " + userState.nome!!.uppercase(), //posso fare !! perchè mi assicuro sopra che non sia nullo
                             showIcon = false,
                             onBack = {
                                 navController.popBackStack()
                             }
                         )
                     },
-                    //bottomBar = {}
                 ) { padding ->
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        thickness = 2.dp,
-                        color = my_gold
-                    )
+
                     HomeScreen(
                         modifier = Modifier.padding(padding),
                         onNavigateToSelezionaServizioBarba = {
@@ -124,12 +122,11 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                         }
                     )
                 },
-                //bottomBar = { BarraNavigazione(navController) }
             ) { padding ->
                 SelezioneServizioCapelli(
                     modifier = Modifier.padding(padding),
                     viewModel = listaServiziViewModel,
-                    onNavigateToSelezionaGiorno = {idSer ->
+                    onNavigateToSelezionaGiorno = {idSer -> //l'id lo prendo da questo composable
                         navController.navigate(Screen.SelezionaGiorno.route + "/$idSer")
                     })
             }
@@ -149,7 +146,6 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                         }
                     )
                 },
-                //bottomBar = { BarraNavigazione(navController) }
             ){padding ->
                 SelezionaServiziobarba(
                     modifier = Modifier.padding(padding),
@@ -162,8 +158,9 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
 
         }
         composable(
-            Screen.SelezionaGiorno.route + "/{idSer}",
+            Screen.SelezionaGiorno.route + "/{idSer}",  //argomento della rotta
             arguments =  listOf(
+                //recupero dati passati dalla schermata precedente
                 navArgument(name = "idSer"){
                     type = NavType.StringType
                 }
@@ -183,12 +180,12 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                         }
                     )
                 },
-                //bottomBar = { BarraNavigazione(navController) }
             ){padding ->
                 SelezionaGiorno(
                     modifier = Modifier.padding(padding),
                     listaServiziViewModel = listaServiziViewModel,
                     idSer = id.toString(),
+                    //questi parametri li prenderò dalla questo composable
                     onNavigateToRiepilogo = {idSer, orarioInizio, orarioFine, dataSelezionata->
                         navController.navigate(Screen.Riepilogo.route + "/$idSer" + "/$orarioInizio" +"/$orarioFine" + "/$dataSelezionata")
                     }
@@ -231,7 +228,6 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                         }
                     )
                 },
-                //bottomBar = { BarraNavigazione(navController) }
             ){padding ->
                 Riepilogo(
                     modifier = Modifier.padding(padding),
@@ -240,8 +236,10 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                     idSer = id.toString(),
                     orarioInizio = orarioInizio.toString(),
                     orarioFine = orarioFine.toString(),
-                    dataSelezionata = dataSelezionata.toString(),
+                    dataSelezionata = dataSelezionata.toString(), //oppure dovrei aggiungere !!
                     onSuccess = {
+                        //passo la funzione da eseguire al termine della prenotazione,
+                        //ovvero tornare indietro fino alla home
                         navController.popBackStack(route = Screen.Home.route, inclusive = false)
                     }
                 )
@@ -264,14 +262,13 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
                         }
                     )
                 },
-                //bottomBar = { BarraNavigazione(navController) }
             ) { padding ->
                 Account(
                     modifier = Modifier.padding(padding),
                     userViewModel = userViewModel,
                     notificheClienteViewModel = notificheClienteViewModel,
                     onNavigateToLogin = {
-                        //navController.navigate(Screen.Login.route)
+                        //distruggo questa activity e torno a quella del login
                         logout()
                     },
                     onNavigaDatiPersonali = {
@@ -503,6 +500,8 @@ fun Navigation(modifier: Modifier, navController : NavHostController, userViewMo
 
 }
 
+
+//Classe per definire le route
 sealed class Screen(val route:String ){
     object Login : Screen("login")
     object SignUp : Screen("signup")

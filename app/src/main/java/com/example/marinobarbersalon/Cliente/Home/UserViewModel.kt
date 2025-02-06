@@ -58,6 +58,7 @@ class UserViewModel : ViewModel() {
 
     private var loginRepository: LoginRepository = LoginRepository()
 
+    //errori possibili da firebase
     private val firebaseErrorMessages = mapOf(
         "ERROR_INVALID_EMAIL" to "L'indirizzo email fornito non è valido. Controlla e riprova.",
         "ERROR_INVALID_CREDENTIAL" to "Le credenziali fornite sono errate, non valide o scadute.",
@@ -100,6 +101,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //uso questa funzione per vedere se esiste il documento su firebase relativo a questa email
     private fun checkIfCliente(email: String, callback: (Boolean) -> Unit) {
         // Funzione per verificare se l'email è associata a un amministratore
         if (email.isBlank()) {
@@ -119,7 +121,7 @@ class UserViewModel : ViewModel() {
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            //Perche senno mi fa vedere questo errore solo una volta
+            //Altrimenti mi fa vedere questo errore solo una volta
             _validationMessage.value = null
             _validationMessage.value = "Email e password non possono essere vuoti"
             return
@@ -155,11 +157,10 @@ class UserViewModel : ViewModel() {
     fun signup(email : String, password : String, nome: String, cognome : String, eta: Int = 0, telefono : String){
 
         if (email.isBlank() || password.isBlank()){
-            Log.d("Registrazione", "Errore. EM e PW no vuoti")
+
             _validationMessage.value = null
             _validationMessage.value = "Email e password non possono essere vuoti"
-            //_userState.value = _userState.value.copy(state = AuthState.Error("Email e password non possono essere vuoti"))
-            Log.d("Registrazione", "Errore. EM e PW no vuoti")
+
             return
         }
         _userState.value = _userState.value.copy(state = AuthState.Loading)
@@ -224,6 +225,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //funzione per inviare la notifica dell'appuntamento
     fun scheduleNotificationWithWorker(
         context: Context,
         titolo: String,
@@ -309,7 +311,7 @@ class UserViewModel : ViewModel() {
         val totalePath = appuntamentoPath.collection("totale").document("count")
 
         try {
-            // Esegui una transazione per garantire che solo una scrittura avvenga alla volta
+            //Transazione per garantire che tutte le operazioni vengano svolte
             db.runTransaction { transaction ->
                 val appuntamentoSnapshot = transaction.get(appuntamentoPath)
                 val occupatiSnapshot = transaction.get(occupatiPath)
@@ -318,12 +320,13 @@ class UserViewModel : ViewModel() {
 
                 // Aggiungi appuntamento
                 if (appuntamentoSnapshot.exists()) {
-                    Log.d("Appuntamento", "Documento appuntamento già esistente")
+
                     transaction.set(
                         appuntamentoPath.collection("app").document(chiave),
                         appuntamento
                     )
                 } else {
+                    //il primo vuoto mi serve solo per creare il documento
                     transaction.set(appuntamentoPath, emptyMap<String, Any>())
                     transaction.set(
                         appuntamentoPath.collection("app").document(chiave),
@@ -331,7 +334,7 @@ class UserViewModel : ViewModel() {
                     )
                 }
 
-                // Aggiorna la collezione "totale" incrementando il conteggio
+                //Aggiorno la collezione "totale" incrementando il conteggio
                 if (totaleSnapshot.exists()) {
                     val currentCount = totaleSnapshot.getLong("count") ?: 0
                     transaction.update(totalePath, "count", currentCount + 1)
@@ -339,7 +342,7 @@ class UserViewModel : ViewModel() {
                     transaction.set(totalePath, mapOf("count" to 1))
                 }
 
-                // Gestisci la collezione occupati
+                //Aggiorno la collection occupati
                 if (occupatiSnapshot.exists()) {
                     val occupatiMap = occupatiSnapshot.data
                     if (occupatiMap?.containsKey(chiave) == true) {
@@ -354,7 +357,7 @@ class UserViewModel : ViewModel() {
                     transaction.set(occupatiPath, hashMapOf(chiave to "occupato"))
                 }
 
-                // Aggiorna il riferimento utente
+                //Aggiorna la lista appuntamenti dell'utente
                 transaction.update(
                     utenteRiferimento,
                     "appuntamenti",
@@ -370,7 +373,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
-
+    //funzione per aggiornare i propri dati personali
     fun updateDati(
         nome : String,
         cognome : String,
@@ -403,22 +406,20 @@ class UserViewModel : ViewModel() {
     }
 
 
+    //funzione di appoggio che mi converte i docRef in oggetti Appuntamento
     private suspend fun recuperaDocumenti(listaAppuntamenti : List<DocumentReference>): List<Appuntamento>{
         val appuntamenti = mutableListOf<Appuntamento>()
-        Log.d("Notif", "size: " + listaAppuntamenti.size.toString())
+
         for (document in listaAppuntamenti){
             val result = document.get().await()
 
-            result.toObject(Appuntamento::class.java)?.let { appuntamenti.add(it)
-                Log.d("Notif", "Ci sto " + result.id)}
+            result.toObject(Appuntamento::class.java)?.let { appuntamenti.add(it) }
         }
 
-
-        Log.d("Notif", "Lunghezza funzione: " + appuntamenti.size.toString())
-        Log.d("Notif", "Appuntamenti funzione: " + appuntamenti.toString())
         return appuntamenti
     }
 
+    //listener automatico per l'aggiornamento delle prenotazioni
     fun sincronizzaPrenotazioni(){
 
         auth.currentUser?.email?.let {
@@ -436,11 +437,13 @@ class UserViewModel : ViewModel() {
                         viewModelScope.launch {
                             var listApp = recuperaDocumenti(appuntamentiList)
                             listApp.forEach{app->
+                                //c'è un bug per il doppio spazio che si vede come un a capo
                                 app.descrizione = app.descrizione.replace(Regex("\\s+"), " ")
                             }
 
                             val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
                             val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+                            //riordino la lista
                             listApp = listApp.sortedWith(compareByDescending<Appuntamento> {
                                 LocalDate.parse(it.data, dateFormatter)
                             }.thenByDescending {
@@ -459,12 +462,14 @@ class UserViewModel : ViewModel() {
 
     fun annullaPrenotazione(appuntamento: Appuntamento, finito: () -> Unit, errore: () -> Unit) {
 
+        //Prendo i riferimenti ai vari documenti
+
         val appuntamentoPath = db.collection("appuntamenti").document(appuntamento.data)
         val occupatiPath = db.collection("occupati").document(appuntamento.data)
-        val utenteRiferimento: DocumentReference =
-            db.collection("utenti").document(_userState.value.email.toString())
-        val totalePath = appuntamentoPath.collection("totale").document("count") // Percorso al totale
+        val utenteRiferimento: DocumentReference = db.collection("utenti").document(_userState.value.email.toString())
+        val totalePath = appuntamentoPath.collection("totale").document("count")
 
+        //Transazione per effettuare tutte le operazioni
         db.runTransaction { transaction ->
             val appuntamentoSnapshot = transaction.get(appuntamentoPath)
             val occupatiSnapshot = transaction.get(occupatiPath)
@@ -475,17 +480,17 @@ class UserViewModel : ViewModel() {
             val appuntamentoReference =
                 db.collection("appuntamenti").document(appuntamento.data).collection("app").document(chiave)
 
-            // Cancella l'appuntamento
+            //Cancella l'appuntamento
             if (appuntamentoSnapshot.exists()) {
                 transaction.delete(appuntamentoPath.collection("app").document(chiave))
             }
 
-            // Aggiorna il documento "occupati" rimuovendo la chiave
+            //Aggiorna il documento "occupati" rimuovendo la chiave
             if (occupatiSnapshot.exists()) {
                 transaction.update(occupatiPath, chiave, FieldValue.delete())
             }
 
-            // Rimuove il riferimento appuntamento dall'utente
+            //Rimuove il riferimento appuntamento dall'utente
             if (userSnapshot.exists()) {
                 transaction.update(
                     utenteRiferimento,
@@ -494,16 +499,16 @@ class UserViewModel : ViewModel() {
                 )
             }
 
-            // Aggiorna il conteggio nella collezione "totale"
+            //Aggiorna il conteggio nella collezione "totale"
             if (totaleSnapshot.exists()) {
                 val currentCount = totaleSnapshot.getLong("count") ?: 0
                 if (currentCount > 0) {
-                    transaction.update(totalePath, "count", currentCount - 1) // Decrementa di 1
+                    transaction.update(totalePath, "count", currentCount - 1)
                 } else {
-                    transaction.update(totalePath, "count", 0) // Garantisce che il conteggio non vada sotto zero
+                    transaction.update(totalePath, "count", 0) //Garantisce che il conteggio non vada sotto zero
                 }
             } else {
-                // Se per qualche motivo il documento totale non esiste, lo crea con valore 0
+                //Se per qualche motivo il documento totale non esiste, lo crea con valore 0
                 transaction.set(totalePath, mapOf("count" to 0))
             }
 
@@ -520,6 +525,7 @@ class UserViewModel : ViewModel() {
     }
 
 
+    //Carica la lista dei prodotti prenotati che sono in stato di attesa
     fun caricaProdottiPrenotati(){
 
         val listaProdPren = mutableListOf<ProdottoPrenotato>()
@@ -533,20 +539,21 @@ class UserViewModel : ViewModel() {
             .whereEqualTo("stato", "attesa")
             .get()
             .addOnSuccessListener { result ->
-                val taskList = mutableListOf<Task<DocumentSnapshot>>()
+                val taskList = mutableListOf<Task<DocumentSnapshot>>() //Lista per gestire le richieste asincrone
 
-                // Aggiungi i prodotti prenotati alla lista
+                //Aggiungo i prodotti prenotati alla lista
                 for (document in result) {
                     val prodottoPrenotato = document.toObject<ProdottoPrenotato>()
-                    Log.d("Prenotato", prodottoPrenotato.quantita.toString())
+
                     listaProdPren.add(prodottoPrenotato)
 
-                    // Recupera il prodotto associato
+                    //Recupero il prodotto associato poichè è un docRef
                     val prodottoTask = prodottoPrenotato.prodotto?.get()
                     if (prodottoTask != null) {
-                        taskList.add(prodottoTask)
+                        taskList.add(prodottoTask) //Aggiungo il task alla lista per attendere il completamento
                     }
 
+                    // Quando il task di recupero del prodotto è completato
                     prodottoTask?.addOnSuccessListener { prodottoDoc ->
                         val prodotto = prodottoDoc.toObject<Prodotto>()
                         if (prodotto != null) {
@@ -556,7 +563,7 @@ class UserViewModel : ViewModel() {
                     }
                 }
 
-                // Attendi il completamento di tutti i task
+                //Attende che tutte le richieste per i prodotti siano completate prima di aggiornare la lista
                 Tasks.whenAllComplete(taskList).addOnCompleteListener {
                     listaProdottiAssociati.sortBy { it.second.nome }
                     _listaProdottiPrenotati.value = listaProdottiAssociati
@@ -577,7 +584,7 @@ class UserViewModel : ViewModel() {
             .whereEqualTo("quantita", prodotto.quantita)
             .whereEqualTo("utente", prodotto.utente)
             .whereEqualTo("data", prodotto.data)
-            .whereEqualTo("stato", prodotto.stato).get()
+            .whereEqualTo("stato", "attesa").get()
             .addOnSuccessListener { result ->
                 if (!result.isEmpty) {
                     for (document in result) {

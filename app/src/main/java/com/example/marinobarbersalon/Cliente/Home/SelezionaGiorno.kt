@@ -52,7 +52,8 @@ fun SelezionaGiorno(
     modifier : Modifier,
     listaServiziViewModel: ListaServiziViewModel,
     idSer : String,
-    onNavigateToRiepilogo : (String, String, String, String) -> Unit) {
+    onNavigateToRiepilogo : (String, String, String, String) -> Unit
+) {
     
     Column(
         modifier = modifier.fillMaxSize()
@@ -60,18 +61,15 @@ fun SelezionaGiorno(
         val listaServiziViewModel = listaServiziViewModel
         val listaServizi by listaServiziViewModel.listaServizi.collectAsState()
 
-        Log.d("PROVA", "sono qui")
-        Log.d("PROVA", "Contenuto listaServizi: $listaServizi")
+
         val servizio = listaServizi.find { serv->
             serv.nome == idSer
         }
-        Log.d("PROVA", "sono sotto")
-        if (servizio != null) {
-            Log.d("FINALE", servizio.nome.toString())
-        }
+
+
         val listaGiorniViewModel : ListaGiorniViewModel = viewModel(
             factory = servizio?.let { ListaGiorniViewModelFactory(it) }
-        )
+        )//mi serve per filtrare gli orari in base alla durata del servizio
 
         val listaGiorni by listaGiorniViewModel.listaGiorniAggiornata.collectAsState()
 
@@ -110,7 +108,6 @@ fun SelezionaGiorno(
                             indexGiornoSelezionato = selectedIndex
                             indexOrarioSelezionato = 0
                             dataSelezionata = listaGiorni[indexGiornoSelezionato].first
-                            Log.d("Servizio", dataSelezionata.toString())
                         }
                     )
 
@@ -148,6 +145,7 @@ fun SelezionaGiorno(
                         ) {
                             items(orariDisponibili.size) { index ->
                                 if (index == 0){
+                                    //inizializzo solo al primo slot disponibile
                                     orarioInizio = orariDisponibili[indexOrarioSelezionato].first
                                     orarioFine = orariDisponibili[indexOrarioSelezionato].second
                                 }
@@ -222,16 +220,19 @@ fun CardGiorno(giorno : LocalDate, index : Int, isSelected: Boolean, onCardSelec
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            //giorno in numero
             Text(text = giorno.dayOfMonth.toString(),
                 fontFamily = myFont,
                 color = Color.Black,
                 fontSize = 17.sp)
 
+            //mese in caratteri
             Text(text = giorno.format(DateTimeFormatter.ofPattern("MMMM", Locale("it"))).replaceFirstChar { it.uppercase() },
                 fontFamily = myFont,
                 color = Color.Black,
                 fontSize = 17.sp)
 
+            //giorno della settimana
             Text(text = giorno.format(DateTimeFormatter.ofPattern("EEE", Locale("it"))).uppercase(),
                 fontFamily = myFont,
                 color = Color.Black,

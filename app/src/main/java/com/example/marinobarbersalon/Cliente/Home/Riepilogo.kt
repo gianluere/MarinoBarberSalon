@@ -82,7 +82,7 @@ fun Riepilogo(
 
         Log.d("Servizio", dataSelezionata)
 
-        val user = userViewModel.userState.collectAsState()
+        //faccio il cast per formattarlo nello standard italiano
         val dataSelezionata = LocalDate.parse(dataSelezionata).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 
@@ -154,7 +154,7 @@ fun Riepilogo(
                                 onSuccess = {
                                     showDialogSuccess = true
 
-                                    // Calcola il ritardo fino alla mattina dell'appuntamento
+                                    //Calcola il ritardo fino alla mattina dell'appuntamento per la notifica
 
 
                                     val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -172,6 +172,7 @@ fun Riepilogo(
                                     Log.d("Worker", "DELAY: $delay")
                                     Log.d("Worker", "Adesso inizio il work")
 
+                                    //se la prenotazione coincide con la data odierna invio notifica istantanea
                                     if (formattedDate == oggi){
                                         userViewModel.scheduleNotificationWithWorker(
                                             context = context,
@@ -183,7 +184,7 @@ fun Riepilogo(
                                         Log.d("Worker", "Inviato adesso")
 
                                     } else if (delay > 0) {
-                                        // Programma la notifica con il Worker
+                                        //altrimenti programmo la notifica con il Worker
                                         userViewModel.scheduleNotificationWithWorker(
                                             context = context,
                                             titolo = "Promemoria Appuntamento",

@@ -126,13 +126,12 @@ class NotificheClienteViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val prodottiList: MutableList<ProdottoPrenotato> = snapshot.toObjects(ProdottoPrenotato::class.java)
+                    val prodottiList = snapshot?.toObjects(ProdottoPrenotato::class.java) ?: emptyList()
 
                     Log.d("ProdPren", prodottiList.size.toString())
 
                     _notificheProdotti.value = prodottiList.size
-                }
+
             }
 
         }
