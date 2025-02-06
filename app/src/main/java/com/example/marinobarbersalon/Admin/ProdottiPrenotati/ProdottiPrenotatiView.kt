@@ -2,6 +2,7 @@ package com.example.marinobarbersalon.Admin.ProdottiPrenotati
 
 import ProdottiPrenotatiVM
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -47,6 +48,8 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
+import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.my_green
 
 
@@ -182,7 +185,15 @@ fun ProdottoPrenotatoCard(
                         )
                     }
                 },
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.FillBounds,
+                error = {
+                    Image(
+                        painter = painterResource(R.drawable.placeholder),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             )
 
             Column(
