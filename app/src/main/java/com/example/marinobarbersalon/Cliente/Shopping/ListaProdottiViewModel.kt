@@ -5,28 +5,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
-import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
-import okhttp3.internal.readFieldOrNull
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 class ListaProdottiViewModel : ViewModel() {
 
@@ -49,6 +41,7 @@ class ListaProdottiViewModel : ViewModel() {
     private val _fotoscelta = MutableStateFlow("")
     val fotoscelta : StateFlow<String> = _fotoscelta.asStateFlow()
 
+    //Carico la lista filtrata per categoria dei prodotti (Barba, Capelli o Viso)
     fun caricaListaProdotti(categoria : String){
         db.collection("prodotti")
             .get()
@@ -84,54 +77,76 @@ class ListaProdottiViewModel : ViewModel() {
     }
 
     private suspend fun prenProdotto(
-        prodotto : Prodotto,
-        quantita : Int,
-        onSuccess : () -> Unit,
-        onFailed : () -> Unit
-    ){
+        prodotto: Prodotto,
+        quantita: Int,
+        onSuccess: () -> Unit,
+        onFailed: () -> Unit
+    ) {
+        try {
+            // Prendo i riferimenti ai documenti
+            val prod = db.collection("prodotti")
+                .whereEqualTo("nome", prodotto.nome)
+                .limit(1)
+                .get()
+                .await()
 
-        val prod = db.collection("prodotti")
-            .whereEqualTo("nome", prodotto.nome).limit(1).get().await()
+            if (prod.isEmpty) {
+                Log.e("Prod", "Prodotto non trovato")
+                onFailed()
+                return
+            }
 
-        val prod_ref = db.collection("prodotti").document(prod.documents[0].id)
-        val user_ref = db.collection("utenti").document(auth.currentUser?.email.toString())
+            val prodRef = db.collection("prodotti").document(prod.documents[0].id)
+            val userRef = db.collection("utenti").document(auth.currentUser?.email.toString())
 
-        val data = SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN).format(Date())
+            val data = SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN).format(Date())
 
-        val prenotazioneProd = hashMapOf(
-            "prodotto" to prod_ref,
-            "utente" to user_ref,
-            "quantita" to quantita,
-            "stato" to "attesa",
-             "data" to data
-        )
+            val prenotazioneProd = hashMapOf(
+                "prodotto" to prodRef,
+                "utente" to userRef,
+                "quantita" to quantita,
+                "stato" to "attesa",
+                "data" to data
+            )
 
-        try{
-            db.runTransaction {transaction ->
-                val userSnapshot = transaction.get(user_ref)
-                val prodottoSnapshot = transaction.get(prod_ref)
+            //Transazione per verificare la quantità prima di aggiornare
+            db.runTransaction { transaction ->
+                val userSnapshot = transaction.get(userRef)
+                val prodottoSnapshot = transaction.get(prodRef)
 
-                if (prodottoSnapshot.exists()){
-                    transaction.update(prod_ref, "quantita", prodotto.quantita-quantita)
-                    Log.d("Prod", "Aggiornata quantita: " + (prodotto.quantita-quantita).toString())
+                if (!prodottoSnapshot.exists()) {
+                    throw FirebaseFirestoreException("Prodotto non trovato", FirebaseFirestoreException.Code.NOT_FOUND)
                 }
 
-                if (userSnapshot.exists()){
+                val quantitaDisponibile = prodottoSnapshot.getLong("quantita") ?: 0
+
+                if (quantitaDisponibile < quantita) {
+                    throw FirebaseFirestoreException("Quantità insufficiente", FirebaseFirestoreException.Code.ABORTED)
+                }
+
+                //Aggiorno la quantità solo se è sufficiente
+                transaction.update(prodRef, "quantita", quantitaDisponibile - quantita)
+
+                //Aggiungo il documento alla collezione prodottiPrenotati
+                if (userSnapshot.exists()) {
                     val nuovoDocumentoRef = db.collection("prodottiPrenotati").document()
                     transaction.set(nuovoDocumentoRef, prenotazioneProd)
                     Log.d("Prod", "Inserito documento")
-                    //transaction.set(db.collection("prodottiPrenotati"), prenotazioneProd)
                 }
 
                 onSuccess()
 
             }.await()
-        }catch (e: FirebaseFirestoreException){
+
+        } catch (e: FirebaseFirestoreException) {
+            Log.e("Prod", "Errore nella prenotazione: ${e.message}")
+            onFailed()
+        } catch (e: Exception) {
+            Log.e("Prod", "Errore generico: ${e.message}")
             onFailed()
         }
-
-
     }
+
 
 
     fun prenotaProdotto(prodotto: Prodotto, quantita: Int, onSuccess : () -> Unit, onFailed: () -> Unit){

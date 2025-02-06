@@ -102,27 +102,6 @@ fun Shop(
             
         }
 
-        /*
-        val launcher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            uri?.let {
-                // Fai qualcosa con l'URI
-                Log.d("Image URI", "Selected URI: $it")
-            }
-        }
-
-// Bottone per avviare il selettore immagini
-        Button(onClick = { launcher.launch("image/*") }) {
-            Text("Seleziona immagine")
-        }
-
-         */
-        fd
-
-
-         */
-
 
     }
 }
@@ -199,7 +178,7 @@ fun GridItem(prodotto: Prodotto, onNavigateToProdottoShop: (String) -> Unit) {
                 fontSize = 18.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Visible, // Il prezzo non sarà troncato
-                modifier = Modifier.padding(start = 6.dp, bottom = 4.dp) // Spazio per separarlo dal nome
+                modifier = Modifier.padding(start = 6.dp, bottom = 4.dp)
             )
         }
 

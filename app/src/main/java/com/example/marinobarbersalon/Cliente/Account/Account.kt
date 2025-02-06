@@ -58,7 +58,7 @@ fun Account(
 
     val prenotazioni by notificheClienteViewModel.notifichePrenotazioni.collectAsState()
 
-    val prodottiPrenotati by notificheClienteViewModel.notificheProdotti.collectAsState() //by userViewModel.listaProdottiPrenotati.collectAsState()
+    val prodottiPrenotati by notificheClienteViewModel.notificheProdotti.collectAsState()
 
 
     val userState by userViewModel.userState.collectAsState()
@@ -120,7 +120,7 @@ fun Account(
                 color = my_gold
             )
 
-            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() }, notifiche = prodottiPrenotati)//listaProdottiPrenotati.size)
+            Riga(testo = "Acquisti in app",modifier = Modifier.clickable { onNavigaProdottiPrenotati() }, notifiche = prodottiPrenotati)
             HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -192,13 +192,13 @@ fun Riga(testo : String, modifier : Modifier, notifiche : Int = 0) {
                     modifier = Modifier
                         .padding(start = 15.dp)
                         .size(25.dp)
-                        .clip(CircleShape) // Applica la forma circolare
-                        .background(color = my_bordeaux), // Imposta il colore di sfondo
-                    contentAlignment = Alignment.Center // Centra il testo all'interno
+                        .clip(CircleShape)
+                        .background(color = my_bordeaux),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = notifiche.toString(),
-                        color = my_gold, // Colore del testo
+                        color = my_gold,
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp
                     )

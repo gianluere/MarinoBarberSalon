@@ -1,8 +1,6 @@
 package com.example.marinobarbersalon.Cliente.Account
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,7 +27,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,15 +42,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.marinobarbersalon.Cliente.Home.AuthState
-import com.example.marinobarbersalon.Cliente.Home.CardAppuntamento
-import com.example.marinobarbersalon.Cliente.Home.Servizio
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
-import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
@@ -65,78 +57,83 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun Prenotazioni(modifier : Modifier, userViewModel: UserViewModel) {
-
-    //userViewModel.sincronizzaPrenotazioni()
+fun Prenotazioni(modifier: Modifier, userViewModel: UserViewModel) {
     val listaPrenotazioni by userViewModel.listaAppuntamenti.collectAsState()
 
-    var loading by remember {
-        mutableStateOf(false)
-    }
-
+    var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Text(
-            text = "Le tue prenotazioni:",
-            color = my_white,
-            fontSize = 25.sp,
-            fontFamily = myFont,
-            modifier = Modifier.padding(start = 10.dp, top = 10.dp)
-        )
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                text = "Le tue prenotazioni:",
+                color = my_white,
+                fontSize = 25.sp,
+                fontFamily = myFont,
+                modifier = Modifier.padding(start = 10.dp, top = 10.dp)
+            )
 
-
-        if (listaPrenotazioni.size > 0){
-            LazyColumn(
-                contentPadding = PaddingValues(25.dp),
-                verticalArrangement = Arrangement.spacedBy(23.dp)
-            ) {
-                items(listaPrenotazioni) { appuntamento ->
-
-                    CardPrenotazione(
-                        appuntamento = appuntamento,
-                        annulla = {
-                            //loading = true
-                            userViewModel.annullaPrenotazione(
-                                appuntamento = appuntamento,
-                                finito = {
-                                    //loading = false
-                                },
-                                errore = {
-                                    Toast.makeText(context, "Errore di connessione", Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                        }
-                    )
-
+            if (listaPrenotazioni.isNotEmpty()) {
+                LazyColumn(
+                    contentPadding = PaddingValues(25.dp),
+                    verticalArrangement = Arrangement.spacedBy(23.dp)
+                ) {
+                    items(listaPrenotazioni) { appuntamento ->
+                        CardPrenotazione(
+                            appuntamento = appuntamento,
+                            annulla = {
+                                loading = true
+                                userViewModel.annullaPrenotazione(
+                                    appuntamento = appuntamento,
+                                    finito = {
+                                        loading = false
+                                    },
+                                    errore = {
+                                        loading = false
+                                        Toast.makeText(context, "Errore di connessione", Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }
+                        )
+                    }
                 }
-            }
-        }else{
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    modifier = Modifier.border(width = 3.dp, color = my_gold, shape = RoundedCornerShape(20.dp))
-                        .padding(vertical = 20.dp),
-                    text = "NON CI SONO PRENOTAZIONI",
-                    color = my_white,
-                    fontFamily = myFont,
-                    fontSize = 30.sp,
-                    lineHeight = 35.sp,
-                    textAlign = TextAlign.Center
-                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .border(width = 3.dp, color = my_gold, shape = RoundedCornerShape(20.dp))
+                            .padding(vertical = 20.dp),
+                        text = "NON CI SONO PRENOTAZIONI",
+                        color = my_white,
+                        fontFamily = myFont,
+                        fontSize = 30.sp,
+                        lineHeight = 35.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
 
 
+        if (loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = my_gold, modifier = Modifier.size(50.dp))
+            }
+        }
     }
-
 }
 
 

@@ -3,6 +3,7 @@ package com.example.marinobarbersalon.Cliente.Shopping
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,206 +63,194 @@ import com.example.marinobarbersalon.ui.theme.my_white
 fun ProdottoShop(
     modifier: Modifier = Modifier,
     nomeProdotto: String,
-    onSuccess : () -> Unit
-    ) {
-    val listaProdottiViewModel : ListaProdottiViewModel = viewModel()
+    onSuccess: () -> Unit
+) {
+    val listaProdottiViewModel: ListaProdottiViewModel = viewModel()
     listaProdottiViewModel.trovaProdotto(nomeProdotto)
     val prodotto by listaProdottiViewModel.prodotto.collectAsState()
-    Log.d("Passaggio", prodotto.nome+ " " + prodotto.categoria)
 
-    var counter by remember{
-        mutableIntStateOf(1)
-    }
+    var counter by remember { mutableIntStateOf(1) }
+    var showDialogSuccess by rememberSaveable { mutableStateOf(false) }
+    var showDialogError by rememberSaveable { mutableStateOf(false) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
 
-    var showDialogSuccess by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    var showDialogError by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(12.dp)
-            .testTag("prenotaprodotto")
-    ) {
-
-        if (!showDialogError && !showDialogSuccess){
-            Text(
-                text = prodotto.nome,
-                fontSize = 27.sp,
-                fontFamily = myFont,
-                color = my_white
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 50.dp, vertical = 30.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                SubcomposeAsyncImage(
-                    model = Uri.parse(prodotto.immagine),
-                    contentDescription = "Immagine prodotto",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .border(2.dp, my_gold, RoundedCornerShape(10.dp))
-                        .fillMaxHeight(0.5f),
-                    contentScale = ContentScale.Crop,
-                    loading = {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(10.dp))
-                                .border(2.dp, my_gold, RoundedCornerShape(10.dp)),
-                            color = my_gold,
-                            strokeWidth = 5.dp
-                        )
-                    }
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp)
+                .testTag("prenotaprodotto")
+        ) {
+            if (!showDialogError && !showDialogSuccess) {
+                Text(
+                    text = prodotto.nome,
+                    fontSize = 27.sp,
+                    fontFamily = myFont,
+                    color = my_white
                 )
-            }
 
-            Text(
-                text = prodotto.descrizione,
-                fontSize = 24.sp,
-                fontFamily = myFont,
-                color = my_white
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                if (prodotto.quantita>0){
-
-                    Text(
-                        text = "Quantità: $counter",
-                        fontSize = 24.sp,
-                        fontFamily = myFont,
-                        color = my_white,
-                        modifier = Modifier.padding(end = 25.dp)
-                    )
-
-                    Button(
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 50.dp, vertical = 30.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SubcomposeAsyncImage(
+                        model = Uri.parse(prodotto.immagine),
+                        contentDescription = "Immagine prodotto",
                         modifier = Modifier
-                            .border(width = 4.dp, color = my_gold, shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)),
-                        onClick = {
-                            if (counter > 1){
-                                counter -= 1
-                            }
+                            .clip(RoundedCornerShape(10.dp))
+                            .border(2.dp, my_gold, RoundedCornerShape(10.dp))
+                            .fillMaxHeight(0.5f),
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(50.dp),
+                                color = my_gold,
+                                strokeWidth = 5.dp
+                            )
                         },
-                        enabled = prodotto.quantita>0,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = my_white,
-                            disabledContainerColor = Color(0xFF708090)
-                        ),
-                        shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp),
-                        contentPadding = PaddingValues(0.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 20.dp)
-                    ) {
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_remove_24),
-                            contentDescription = "Icona remove",
-                            //modifier = Modifier.size(15.dp),
-                            tint = my_grey
-                        )
-
-                    }
-
-                    Button(
-                        modifier = Modifier
-                            .border(width = 4.dp, color = my_gold, shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)),
-                        onClick = {
-                            if (counter < prodotto.quantita){
-                                counter += 1
-                            }
-                        },
-                        enabled = prodotto.quantita>0,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = my_white,
-                            disabledContainerColor = Color(0xFF708090)
-                        ),
-                        shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp),
-                        contentPadding = PaddingValues(0.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 20.dp)
-                    ) {
-
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Icona remove",
-                            //modifier = Modifier.size(15.dp),
-                            tint = my_grey
-                        )
-
-                    }
-                }else{
-                    Text(
-                        text = "Attualmente non disponibile",
-                        fontSize = 24.sp,
-                        fontFamily = myFont,
-                        color = my_white,
-                        modifier = Modifier.padding(end = 25.dp)
+                        error = {
+                            Image(
+                                painter = painterResource(R.drawable.placeholder),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     )
                 }
 
+                Text(
+                    text = prodotto.descrizione,
+                    fontSize = 22.sp,
+                    fontFamily = myFont,
+                    color = my_white
+                )
 
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (prodotto.quantita > 0) {
+                        Text(
+                            text = "Quantità: $counter",
+                            fontSize = 24.sp,
+                            fontFamily = myFont,
+                            color = my_white,
+                            modifier = Modifier.padding(end = 25.dp)
+                        )
 
+                        Button(
+                            modifier = Modifier.border(
+                                width = 4.dp,
+                                color = my_gold,
+                                shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)
+                            ),
+                            onClick = { if (counter > 1) counter -= 1 },
+                            enabled = prodotto.quantita > 0,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = my_white,
+                                disabledContainerColor = Color(0xFF708090)
+                            ),
+                            shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp),
+                            contentPadding = PaddingValues(0.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 20.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_remove_24),
+                                contentDescription = "Icona remove",
+                                tint = my_grey
+                            )
+                        }
 
+                        Button(
+                            modifier = Modifier.border(
+                                width = 4.dp,
+                                color = my_gold,
+                                shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
+                            ),
+                            onClick = { if (counter < prodotto.quantita) counter += 1 },
+                            enabled = prodotto.quantita > 0,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = my_white,
+                                disabledContainerColor = Color(0xFF708090)
+                            ),
+                            shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp),
+                            contentPadding = PaddingValues(0.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 20.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Icona add",
+                                tint = my_grey
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "Attualmente non disponibile",
+                            fontSize = 24.sp,
+                            fontFamily = myFont,
+                            color = my_white,
+                            modifier = Modifier.padding(end = 25.dp)
+                        )
+                    }
+                }
 
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 10.dp, start = 15.dp, end = 15.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Button(
+                        onClick = {
+                            isLoading = true
+                            listaProdottiViewModel.prenotaProdotto(
+                                prodotto,
+                                counter,
+                                onSuccess = {
+                                    isLoading = false
+                                    showDialogSuccess = true
+                                },
+                                onFailed = {
+                                    isLoading = false
+                                    showDialogError = true
+                                }
+                            )
+                        },
+                        enabled = prodotto.quantita > 0,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("PRENOTA"),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = my_bordeaux,
+                            disabledContainerColor = Color(0xFF708090)
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 30.dp)
+                    ) {
+                        Text(text = "PRENOTA", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
+                    }
+                }
+            } else if (showDialogSuccess) {
+                DialogSuccessoProdotto(onDismiss = onSuccess)
+            } else {
+                DialogErroreProdotto(onDismiss = onSuccess)
             }
+        }
 
+        // Overlay con CircularProgressIndicator quando isLoading è true
+        if (isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 10.dp, start = 15.dp, end = 15.dp),
-                contentAlignment = Alignment.BottomCenter
-            ){
-                Button(
-                    onClick = {
-                        listaProdottiViewModel.prenotaProdotto(
-                            prodotto,
-                            counter,
-                            onSuccess = {
-                                showDialogSuccess = true
-                            },
-                            onFailed = {
-                                showDialogError = true
-                            }
-                        )
-                    },
-                    enabled = prodotto.quantita>0,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("PRENOTA"),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = my_bordeaux,
-                        disabledContainerColor = Color(0xFF708090)
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp, pressedElevation = 30.dp)
-                ) {
-                    Text(text = "PRENOTA", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
-                }
+                    .background(Color.Black.copy(alpha = 0.4f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = my_gold, modifier = Modifier.size(50.dp))
             }
-
-        }else if (showDialogSuccess){
-            DialogSuccessoProdotto(
-                onDismiss = onSuccess
-            )
-        }else{
-            DialogErroreProdotto(
-                onDismiss = onSuccess
-            )
         }
-
     }
-
-
 }
+
 
 
 

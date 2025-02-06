@@ -20,6 +20,7 @@ class ListaServiziViewModel : ViewModel() {
         getListaServizi()
     }
 
+    //carica la lista dei servizi
     fun getListaServizi(){
 
         db.collection("servizi")

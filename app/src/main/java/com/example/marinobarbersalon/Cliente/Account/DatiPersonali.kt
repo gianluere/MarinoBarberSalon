@@ -59,6 +59,7 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
 
     val userState by userViewModel.userState.collectAsState()
 
+    //E' la variabile che mi permette di decidere se posso editare o meno le textfield
     var readOnly by remember {
         mutableStateOf(true)
     }
@@ -87,13 +88,6 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
         mutableStateOf(userState.telefono.toString())
     }
 
-    var password by remember {
-        mutableStateOf(userState.password.toString())
-    }
-
-    var passwordVisibility by rememberSaveable {
-        mutableStateOf(false)
-    }
 
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -101,6 +95,7 @@ fun DatiPersonali(modifier: Modifier, userViewModel: UserViewModel) {
     val focusManager = LocalFocusManager.current
 
 
+    //Mi serve per poter far vedere correttamente le textfield mentre c'è la tastiera aperta
     LaunchedEffect(readOnly) {
         if (!readOnly) {
             focusRequester.requestFocus()
@@ -266,53 +261,11 @@ fun RigaDato(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .onFocusChanged { focusState ->
-                    onFocusChanged?.invoke(focusState) // Invoca onFocusChanged se è definito
+                    onFocusChanged?.invoke(focusState)
                     }
                     .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier),
-                singleLine = true // Evita di andare a capo
+                singleLine = true
             )
-            /*
-            TextField(
-                modifier = Modifier.padding(vertical = 0.dp),
-                value = value,
-                onValueChange = onValueChange,
-                textStyle = TextStyle(fontFamily = myFont, fontSize = 20.sp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedTextColor = my_white,
-                    unfocusedTextColor = my_white,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = my_white
-                ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                maxLines = 1,
-                readOnly = readOnly
-            )
-
-            TextField(value = password, onValueChange = {password = it}, textStyle = TextStyle(fontFamily = myFont, fontSize = 22.sp), placeholder = { Text(text = "Password", color = Color(0xFFF5F5DC), fontFamily = myFont,  fontSize = 22.sp) },
-                    colors= TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = my_white,
-                        unfocusedTextColor = my_white,
-                        focusedIndicatorColor = my_white,
-                        unfocusedIndicatorColor = my_white,
-                        cursorColor = my_white
-                    ), trailingIcon = {
-                        IconButton(onClick = {
-                            passwordVisibility = !passwordVisibility
-                        }) {
-                            Image(image, contentDescription = "eye", colorFilter = ColorFilter.tint(my_white))
-
-                        }
-                    }, visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                    maxLines = 1
-                )
-
-             */
         }
         HorizontalDivider(
             Modifier.fillMaxWidth(),

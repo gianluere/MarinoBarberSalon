@@ -2,6 +2,7 @@ package com.example.marinobarbersalon.Cliente.Account
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -51,6 +54,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.marinobarbersalon.Cliente.Home.UserViewModel
 import com.example.marinobarbersalon.Cliente.Shopping.Prodotto
 import com.example.marinobarbersalon.Cliente.Shopping.ProdottoPrenotato
+import com.example.marinobarbersalon.R
 import com.example.marinobarbersalon.ui.theme.myFont
 import com.example.marinobarbersalon.ui.theme.my_bordeaux
 import com.example.marinobarbersalon.ui.theme.my_gold
@@ -59,70 +63,81 @@ import com.example.marinobarbersalon.ui.theme.my_white
 import com.example.marinobarbersalon.ui.theme.my_yellow
 
 @Composable
-fun ProdottiPrenotati(modifier : Modifier, userViewModel: UserViewModel) {
+fun ProdottiPrenotati(modifier: Modifier, userViewModel: UserViewModel) {
 
     userViewModel.caricaProdottiPrenotati()
-
     val listaProdottiPrenotati by userViewModel.listaProdottiPrenotati.collectAsState()
 
-    //Log.d("Ricaricato", listaProdottiPrenotati.size.toString())
+    var loading by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text(
+                text = "Da ritirare in negozio:",
+                fontSize = 25.sp,
+                fontFamily = myFont,
+                color = my_white,
+                modifier = Modifier.padding(start = 8.dp, top = 8.dp)
+            )
 
-    ) {
-
-        Text(
-            text = "Da ritirare in negozio:",
-            fontSize = 25.sp,
-            fontFamily = myFont,
-            color = my_white,
-            modifier = Modifier.padding(start = 8.dp, top = 8.dp)
-        )
-
-        if (listaProdottiPrenotati.isNotEmpty()){
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(listaProdottiPrenotati) { item ->
-                    ProdPrenItem(
-                        item = item,
-                        onDelete = {
-                            userViewModel.annullaPrenotazioneProdotto(item.first)
-                        }
+            if (listaProdottiPrenotati.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(listaProdottiPrenotati) { item ->
+                        ProdPrenItem(
+                            item = item,
+                            onDelete = {
+                                loading = true
+                                userViewModel.annullaPrenotazioneProdotto(
+                                    prodotto = item.first,
+                                    onFinish = {
+                                        loading = false
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .border(width = 3.dp, color = my_gold, shape = RoundedCornerShape(20.dp))
+                            .padding(vertical = 20.dp),
+                        text = "NON CI SONO PRODOTTI PRENOTATI",
+                        color = my_white,
+                        fontFamily = myFont,
+                        fontSize = 30.sp,
+                        lineHeight = 35.sp,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-        }else{
+        }
+
+        if (loading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 20.dp),
+                    .background(Color.Black.copy(alpha = 0.6f)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    modifier = Modifier.border(width = 3.dp, color = my_gold, shape = RoundedCornerShape(20.dp))
-                        .padding(vertical = 20.dp),
-                    text = "NON CI SONO PRODOTTI PRENOTATI",
-                    color = my_white,
-                    fontFamily = myFont,
-                    fontSize = 30.sp,
-                    lineHeight = 35.sp,
-                    textAlign = TextAlign.Center
-                )
+                CircularProgressIndicator(color = my_gold, modifier = Modifier.size(50.dp))
             }
         }
-
-
-
-
-
     }
-
 }
+
 
 @Composable
 fun ProdPrenItem(item: Pair<ProdottoPrenotato, Prodotto>, onDelete : () -> Unit) {
@@ -156,7 +171,12 @@ fun ProdPrenItem(item: Pair<ProdottoPrenotato, Prodotto>, onDelete : () -> Unit)
                     color = my_gold,
                     strokeWidth = 4.dp
                 )
+            },
+            error = {
+                Image(painterResource(R. drawable.placeholder),contentDescription = null, contentScale = ContentScale.Crop)
+
             }
+
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -209,8 +229,8 @@ fun ProdPrenItem(item: Pair<ProdottoPrenotato, Prodotto>, onDelete : () -> Unit)
             colors = ButtonDefaults.buttonColors(
                 containerColor = my_bordeaux
             ),
-            contentPadding = PaddingValues(0.dp), // Rimuove padding extra
-            modifier = Modifier.size(75.dp) // Imposta una dimensione coerente
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.size(75.dp)
         ) {
             Icon(
                 imageVector = Icons.Outlined.Delete,

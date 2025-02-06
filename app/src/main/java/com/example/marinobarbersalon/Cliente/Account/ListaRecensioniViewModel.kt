@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
 class ListaRecensioniViewModel : ViewModel() {
 
     private val db = Firebase.firestore
-    private val userEmail = FirebaseAuth.getInstance().currentUser!!.email
 
     private val _listaRecensioni = MutableStateFlow(listOf<Recensione>())
     val listaRecensioni : StateFlow<List<Recensione>> = _listaRecensioni.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
 
     init {
@@ -37,7 +39,10 @@ class ListaRecensioniViewModel : ViewModel() {
     ){
         db.collection("recensioni").add(recensione)
             .addOnSuccessListener {
+                _isLoading.value = false
                 onCompleted()
+            }.addOnFailureListener {
+                _isLoading.value = false
             }
     }
 

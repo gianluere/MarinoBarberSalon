@@ -150,9 +150,9 @@ fun CardRecensione(recensione : Recensione) {
             if (mezzaStella == 1) {
                 Icon(
                     modifier = Modifier.size(20.dp),
-                    painter = painterResource(R.drawable.outline_star_half_24), // Puoi usare un'icona diversa per la mezza stella
+                    painter = painterResource(R.drawable.outline_star_half_24),
                     contentDescription = "Mezza stella",
-                    tint = my_gold // metà opacità per indicare la mezza stella
+                    tint = my_gold //
                 )
             }
 
@@ -201,9 +201,6 @@ fun CardRecensione(recensione : Recensione) {
             color = my_gold
         )
     }
-
-
-
 
 
 

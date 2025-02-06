@@ -90,7 +90,7 @@ private fun Contenuto(
             verticalArrangement = Arrangement.spacedBy(23.dp)
         ) {
             items(servizi) { servizio ->
-                    CardAppuntamento(servizio = servizio, onNavigateToSelezionaGiorno)
+                    CardServizio(servizio = servizio, onNavigateToSelezionaGiorno)
 
             }
         }
@@ -99,7 +99,7 @@ private fun Contenuto(
 
 
 @Composable
-fun CardAppuntamento(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
+fun CardServizio(servizio : Servizio, onNavigateToSelezionaGiorno: (idSer : String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

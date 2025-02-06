@@ -16,23 +16,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-/*
-class ListaGiorniViewModelFactory(application: Application, servizio : Servizio) :
-    ViewModelProvider.Factory {
-    private val mApplication: Application
-    private val mservizio: Servizio
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ListaGiorniViewModel(mApplication, mservizio) as T
-    }
-    init {
-        mApplication = application
-        mservizio = servizio
-    }
-}
 
- */
-
-
+//Factory per istanziare l'oggetto servizio
 class ListaGiorniViewModelFactory(private val servizio: Servizio) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ListaGiorniViewModel::class.java)) {
@@ -57,11 +42,12 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
     val listaGiorniAggiornata: StateFlow<List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>> = _listaGiorniAggiornata.asStateFlow()
 
     private val giorniFestivi = listOf(
-        LocalDate.of(2024, 1, 1),  // Capodanno
-        LocalDate.of(2024, 12, 25), // Natale
-        LocalDate.of(2024, 12, 26), // Santo Stefano
-        LocalDate.of(2024, 4, 25),  // Festa della Liberazione
-        LocalDate.of(2024, 8, 15)   // Ferragosto
+        LocalDate.of(2024, 1, 1),  //Capodanno
+        LocalDate.of(2024, 1, 6),  //Epifania
+        LocalDate.of(2024, 12, 25), //Natale
+        LocalDate.of(2024, 12, 26), //Santo Stefano
+        LocalDate.of(2024, 4, 25),  //Festa della Liberazione
+        LocalDate.of(2024, 8, 15)   //Ferragosto
     )
 
 
@@ -73,19 +59,19 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
                 _listaGiorni.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
                 _listaGiorniAggiornata.value = generateListaDate(LocalDate.now(), 60, giorniFestivi)
 
+                //Richiede un ulteriore punto di sincronizzazione
                 val prova = async{ generaListaOccupatiSuspend(LocalDate.now(), 60)}
                 _listaGiorniOccupati.value = prova.await()
 
-                // Aggiorna la lista dei giorni con quelli occupati
+                //Aggiorna la lista dei giorni con quelli occupati
                 val lista = aggiornaListaOccupati(_listaGiorni.value, _listaGiorniOccupati.value)
                 _listaGiorniAggiornata.value = lista
 
-                // Se il servizio dura più di 30 minuti, aggiorna gli slot
+                //Se il servizio dura più di 30 minuti, aggiorna gli slot
                 if (servizio.durata!! > 30) {
                     _listaGiorniAggiornata.value = aggiornaSlotdaSessanta(_listaGiorniAggiornata.value)
                 }
 
-                Log.d("ViewModelInit", "Lista aggiornata: ${_listaGiorniAggiornata.value}")
             } catch (e: Exception) {
                 Log.e("ViewModelInit", "Errore durante l'inizializzazione: ${e.message}", e)
             }
@@ -94,6 +80,12 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
     }
 
 
+    //Ritorna il primo orario disponibile su cui iniziare a calcolare gli slot
+    /**
+     * Esempio: ora attuale 10:20 => ritorna 10:30
+     * Esempio: ora attuale 10:31 => ritorna 11:00
+     * Esemio: ora attuale 10:00 oppure 10:30 => ritorna 10:00 oppure 10:30
+     * */
     private fun primoOrarioDisponibile(currentTime: LocalTime): LocalTime {
         val nextMinute = if (currentTime.minute % 30 == 0 || currentTime.minute == 0) {
             currentTime.minute
@@ -113,36 +105,43 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
         giorniTotali: Int,
         giorniFestivi: List<LocalDate>
     ): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {
+
+        //E' una lista fatta da elementi pair, dove a ogni data è associata la lista degli slot orari
         val giorniDisponibili = mutableListOf<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>()
 
         val orarioInizio = LocalTime.of(9, 0)
         val orarioFine = LocalTime.of(20, 0)
         val durataSlot = 30L
 
+        //Per ogni giorno genero gli slot
         for (i in 0..giorniTotali) {
             val giornoCorrente = oggi.plusDays(i.toLong())
 
-            // Escludi sabato, domenica e giorni festivi
+            //Escludi domenica, lunedì e giorni festivi
             if (giornoCorrente.dayOfWeek == DayOfWeek.SUNDAY ||
                 giornoCorrente.dayOfWeek == DayOfWeek.MONDAY ||
                 giorniFestivi.contains(giornoCorrente)) {
-                // Aggiungi il giorno senza orari disponibili
+                //Aggiungo il giorno senza orari disponibili
                 giorniDisponibili.add(giornoCorrente to emptyList())
             } else {
                 val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
 
+                //controllo se l'orario attuale di oggi è maggiore delle 09:00
                 var orarioCorrente = if (i == 0 && LocalTime.now().isAfter(orarioInizio)) {
+                    //Calcolo il primo orario disponibile dato che le 9:00 di oggi sono già passate
                     primoOrarioDisponibile(LocalTime.now())
                 } else {
                     orarioInizio
                 }
-                Log.d("ORARIO", orarioCorrente.toString())
+
                 while (orarioCorrente.isBefore(orarioFine)) {
+                    //Aggiungo slot da 30 minuti fino ad arrivare alle 20:00
                     val orarioSuccessivo = orarioCorrente.plusMinutes(durataSlot)
                     slotOrari.add(orarioCorrente to orarioSuccessivo)
                     orarioCorrente = orarioSuccessivo
                 }
 
+                //Aggiungo il pair alla lista
                 giorniDisponibili.add(giornoCorrente to slotOrari)
             }
         }
@@ -156,35 +155,40 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
         oggi: LocalDate,
         giorniTotali: Int
     ): List<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>> {
-        val db = FirebaseFirestore.getInstance()
+
+        //E' una lista fatta da elementi pair, dove a ogni data è associata la lista degli slot orari
         val listaOccupati = mutableListOf<Pair<LocalDate, List<Pair<LocalTime, LocalTime>>>>()
         val ultimo = oggi.plusDays(giorniTotali.toLong())
 
         try {
-            // Chiamata Firestore bloccante con await()
+            //Chiamata Firestore bloccante con await()
             val giorni = db.collection("occupati").get().await()
 
             for (giorno in giorni) {
                 val dati = giorno.data
+                //i miei documenti su firestore sono posti con format dd-MM-yyyy
                 val giornoCorrente = LocalDate.parse(giorno.id, DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 
                 Log.d("ListaGiorniViewModel", "Elaborando il giorno: $giornoCorrente")
-                Log.d("ListaGiorniViewModel", giorno.id)
 
+                //qui ricerco solo i giorni che sono occupati e che si trovano da oggi a oggi + 3mesi, gli altri non mi interessano
                 if (giornoCorrente.isEqual(oggi) ||
                     (giornoCorrente.isAfter(oggi) && giornoCorrente.isBefore(ultimo)) ||
                     giornoCorrente.isEqual(ultimo)
                 ) {
-                    Log.d("Sorted", "Giorno $giornoCorrente")
+
                     val slotOrari = mutableListOf<Pair<LocalTime, LocalTime>>()
                     //dati.keys.sorted()
+
+                    //le chiavi sono definite come "hh:mm-hh:mm" e ne faccio l'ordinamento
                     val orariOrdinati = dati.keys.sortedBy { intervallo ->
                         val orarioInizio = intervallo.split("-")[0].trim()
                         LocalTime.parse(orarioInizio, DateTimeFormatter.ofPattern("HH:mm"))
                     }
-                    Log.d("Sorted", orariOrdinati.toString())
+
                     for (key in orariOrdinati) {
-                        Log.d("Sorted", key)
+
+                        //le chiavi sono definite come "hh:mm-hh:mm" prendo orarioInizio e orarioFine
                         val oraInizio =  LocalTime.parse(key.take(5), DateTimeFormatter.ofPattern("HH:mm"))
                         Log.d("Sorted", "OrIn: $oraInizio")
                         val oraFine = LocalTime.parse(key.substring(6, 11), DateTimeFormatter.ofPattern("HH:mm"))
@@ -192,18 +196,18 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
                         val durataSlot = oraFine.toSecondOfDay() - oraInizio.toSecondOfDay()
 
-                        if (durataSlot >= 60 * 60) { // Se la durata è di almeno un'ora
-                            // Aggiungi due slot da 30 minuti
+                        // Se la durata è di almeno un'ora aggiungo due slot da 30 minuti
+                        if (durataSlot >= 60 * 60) {
                             val primoSlotFine = oraInizio.plusMinutes(30)
                             slotOrari.add(oraInizio to primoSlotFine)
                             slotOrari.add(primoSlotFine to oraFine)
-                            Log.d("Sorted", "Aggiunti due")
+
                         } else {
-                            // Aggiungi lo slot originale
+                            //Aggiungo lo slot originale
                             slotOrari.add(oraInizio to oraFine)
                         }
                     }
-                    //slotOrari.sort()
+
                     listaOccupati.add(giornoCorrente to slotOrari)
                 }
             }
@@ -228,12 +232,12 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
         // Crea una nuova lista modificata a partire dalla listaOrari
         return listaOrari.map { (data, orariDisponibili) ->
-            Log.d("ListaGiorniViewModel", data.toString())
-            // Trova se esiste una corrispondenza nella listaOccupati per la data corrente
+
+            //Trova, se esiste una corrispondenza nella listaOccupati per la data corrente, tutti gli orari occupati del giorno corrente
             val occupatiPerQuestaData = listaOccupati.find { it.first == data }?.second
 
 
-            // Se ci sono orari occupati per questa data, rimuovili da orariDisponibili
+            //Se ci sono orari occupati per questa data, li rimuovo da orariDisponibili
             val orariAggiornati = if (occupatiPerQuestaData != null) {
                 orariDisponibili.filterNot { orarioDisponibile ->
                     occupatiPerQuestaData.any { orarioOccupato ->
@@ -249,7 +253,7 @@ class ListaGiorniViewModel(private val servizio : Servizio) : ViewModel() {
 
 
 
-            // Restituisci la data con la nuova lista di orari aggiornati
+            //Data con la nuova lista di orari aggiornati
             data to orariAggiornati
         }
     }

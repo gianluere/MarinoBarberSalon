@@ -21,11 +21,13 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -75,140 +77,152 @@ fun InserisciRecensione(
 
     val focusManager = LocalFocusManager.current
 
+    val isLoading by listaRecensioniViewModel.isLoading.collectAsState()
+
     val stellePiene = rating.toInt()
     val mezzaStella = if (rating - stellePiene >= 0.5) 1 else 0
     val stelleVuote = 5 - stellePiene - mezzaStella
 
 
     if (!showDialogSuccess){
-        Column(
-            modifier = modifier.fillMaxSize()
-                .padding(20.dp)
-                .pointerInput(Unit) {
-                    // Quando l'utente tocca, rimuove il focus dai campi di testo
-                    detectTapGestures(onTap = { focusManager.clearFocus() })
-                },
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-
-        ){
-            Column(
-                modifier = Modifier.fillMaxWidth()
-                    .height(200.dp)
-                    .background(color = my_yellow, shape = RoundedCornerShape(20.dp))
-                    .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(20.dp))
-                    .padding(10.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.Start
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Inserisci recensione:",
-                    fontSize = 20.sp,
-                    fontFamily = myFont,
-                    color = my_grey,
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(1f).weight(1f),
-                    value = descrizione,
-                    onValueChange = {
-                        if (it.length <= 280){
-                            descrizione = it
-                        }
-                    }
-                    ,
-                    placeholder = {
-                        Text(
-                            text = "Descrizione",
-                            fontSize = 17.sp,
-                            fontFamily = myFont,
-                            color = my_grey,
-                        )
+                CircularProgressIndicator(color = my_gold, modifier = Modifier.size(50.dp))
+            }
+        }else{
+            Column(
+                modifier = modifier.fillMaxSize()
+                    .padding(20.dp)
+                    .pointerInput(Unit) {
+                        // Quando l'utente tocca, rimuove il focus dai campi di testo
+                        detectTapGestures(onTap = { focusManager.clearFocus() })
                     },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-                )
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-
-                ){
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)
-                    ) {
-
-                        for (i in 1..5) {
-                            // Calcola se mostrare la stella piena, mezza o vuota
-                            val starRatingValue = i.toDouble()
-                            val isFullStar = rating >= starRatingValue
-                            val isHalfStar = rating in (starRatingValue - 0.5)..(starRatingValue - 0.1)
-
-                            // Imposta l'icona e il colore della stella
-                            Icon(
-                                painter = when {
-                                    isFullStar -> painterResource(R.drawable.baseline_star_24)
-                                    isHalfStar -> painterResource(R.drawable.outline_star_half_24) // Si può sostituire con un'icona di mezza stella
-                                    else -> painterResource(R.drawable.outline_star_border_24)
-                                },
-                                contentDescription = null,
-                                tint = if (isFullStar || isHalfStar) my_gold else Color.Black,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .clickable {
-                                        // Cambia il rating al clic; aggiungi 0.5 per la mezza stella se cliccata
-                                        rating = if (rating == starRatingValue - 0.5) {
-                                            starRatingValue // Da mezza a piena
-                                        } else {
-                                            starRatingValue - 0.5 // Da piena a mezza
-                                        }
-
-                                    }
-                            )
-                        }
-
-                    }
-
-
+            ){
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .height(200.dp)
+                        .background(color = my_yellow, shape = RoundedCornerShape(20.dp))
+                        .border(width = 2.dp, color = my_gold, shape = RoundedCornerShape(20.dp))
+                        .padding(10.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.Start
+                ) {
                     Text(
-                        text = rating.toString(),
-                        fontFamily = myFont,
+                        text = "Inserisci recensione:",
                         fontSize = 20.sp,
+                        fontFamily = myFont,
                         color = my_grey,
                     )
 
+                    OutlinedTextField(
+                        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(1f).weight(1f),
+                        value = descrizione,
+                        onValueChange = {
+                            if (it.length <= 280){
+                                descrizione = it
+                            }
+                        }
+                        ,
+                        placeholder = {
+                            Text(
+                                text = "Descrizione",
+                                fontSize = 17.sp,
+                                fontFamily = myFont,
+                                color = my_grey,
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+
+                    ){
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        ) {
+
+                            for (i in 1..5) {
+                                //Calcola se mostrare la stella piena, mezza o vuota
+                                val starRatingValue = i.toDouble()
+                                val isFullStar = rating >= starRatingValue
+                                val isHalfStar = rating in (starRatingValue - 0.5)..(starRatingValue - 0.1)
+
+                                //Imposta l'icona e il colore della stella
+                                Icon(
+                                    painter = when {
+                                        isFullStar -> painterResource(R.drawable.baseline_star_24)
+                                        isHalfStar -> painterResource(R.drawable.outline_star_half_24)
+                                        else -> painterResource(R.drawable.outline_star_border_24)
+                                    },
+                                    contentDescription = null,
+                                    tint = if (isFullStar || isHalfStar) my_gold else Color.Black,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clickable {
+                                            //Cambia il rating al clic; aggiungo 0.5 per la mezza stella se cliccata
+                                            rating = if (rating == starRatingValue - 0.5) {
+                                                starRatingValue // Da mezza a piena
+                                            } else {
+                                                starRatingValue - 0.5 // Da piena a mezza
+                                            }
+
+                                        }
+                                )
+                            }
+
+                        }
 
 
+                        Text(
+                            text = rating.toString(),
+                            fontFamily = myFont,
+                            fontSize = 20.sp,
+                            color = my_grey,
+                        )
+
+
+
+
+                    }
 
                 }
 
-            }
-
-            Button(
-                onClick = {
-                    listaRecensioniViewModel.inserisciRecensione(
-                        Recensione(
-                            nome = userViewModel.userState.value.nome + " " + userViewModel.userState.value.cognome,
-                            stelle = rating,
-                            descrizione = descrizione
-                        ),
-                        onCompleted = {
-                            showDialogSuccess = true
-                        }
+                Button(
+                    onClick = {
+                        listaRecensioniViewModel.inserisciRecensione(
+                            Recensione(
+                                nome = userViewModel.userState.value.nome + " " + userViewModel.userState.value.cognome,
+                                stelle = rating,
+                                descrizione = descrizione
+                            ),
+                            onCompleted = {
+                                showDialogSuccess = true
+                            }
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = my_bordeaux,
+                        disabledContainerColor = my_bordeaux
                     )
-                },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = my_bordeaux,
-                    disabledContainerColor = my_bordeaux
-                )
-            ) {
-                Text(text = "CONFERMA", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
-            }
+                ) {
+                    Text(text = "CONFERMA", color = my_gold, fontFamily = myFont, fontSize = 25.sp)
+                }
 
+            }
         }
+
     }else{
         DialogSuccessoRecensione(onDismiss = onSuccess)
     }

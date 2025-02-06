@@ -577,7 +577,7 @@ class UserViewModel : ViewModel() {
 
     }
 
-    fun annullaPrenotazioneProdotto(prodotto : ProdottoPrenotato){
+    fun annullaPrenotazioneProdotto(prodotto : ProdottoPrenotato, onFinish : () -> Unit){
 
         db.collection("prodottiPrenotati")
             .whereEqualTo("prodotto", prodotto.prodotto)
@@ -614,9 +614,9 @@ class UserViewModel : ViewModel() {
                     }.addOnFailureListener { e ->
                         println("Errore durante la transazione: ${e.message}")
                     }
-                } ?: run {
-                    println("Riferimento al prodotto nullo.")
                 }
+
+                onFinish()
             }
             .addOnFailureListener { e ->
                 println("Errore durante il recupero dei documenti: ${e.message}")
