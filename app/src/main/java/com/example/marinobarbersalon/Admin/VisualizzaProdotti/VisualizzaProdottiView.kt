@@ -482,6 +482,10 @@ fun ProdottoCard(
                     )
                 }
             },
+            error = {
+                Image(painterResource(R. drawable.placeholder),contentDescription = null, contentScale = ContentScale.Crop)
+
+            },
             contentScale = ContentScale.FillBounds,
             colorFilter = if (prodotto.quantita == 0) {
                 ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
